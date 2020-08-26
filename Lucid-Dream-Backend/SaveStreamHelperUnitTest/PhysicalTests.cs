@@ -1,8 +1,8 @@
 using NUnit.Framework;
 using SaveStream;
 using System.Configuration;
+using System.IO;
 using System.Text;
-
 using System.Timers;
 
 namespace Tests
@@ -32,13 +32,14 @@ namespace Tests
 
         private static void TestTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            saveStreamHelper.saveData(testData, "TestFile");
+            saveStreamHelper.SaveData(testData, "TestFile");
         }
 
         [Test]
         public void SaveFile_FileExists_True()
         {
-            saveStreamHelper.saveData(testData, testFileName);
+            saveStreamHelper.SaveData(testData, testFileName);
+            Assert.True(File.Exists(savePath + testFileName), "file does not exist");
         }
     }
 }

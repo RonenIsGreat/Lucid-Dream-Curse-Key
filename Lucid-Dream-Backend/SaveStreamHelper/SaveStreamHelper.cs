@@ -21,22 +21,32 @@ namespace SaveStream
             dataBufferBlock = new BufferBlock<byte[]>();
             transformDataBlock = new TransformBlock<byte[], char[]>((data) =>
             {
-                var encodedData = Encoding.UTF8.GetChars(data);
-                //TODO: transform data to saveable data here if needed
-                return encodedData;
+                return transformDataCallback(data);
             });
             saveToFileBlock = new ActionBlock<char[]>( (data) =>
             {
-               ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
-               var readedBytes = File.ReadAllLines(savePathFolder + '/' + saveFileName, Encoding.UTF8);
-                
-                Console.WriteLine("Saved file: " + saveFileName);
+                saveFileCallback(savePathFolder, data);
             });
             dataBufferBlock.LinkTo(transformDataBlock);
             transformDataBlock.LinkTo(saveToFileBlock);
         }
 
-        private bool ByteArrayToFile(string path, char[] byteArray)
+        private static char[] transformDataCallback(byte[] data)
+        {
+            var encodedData = Encoding.UTF8.GetChars(data);
+            //TODO: transform data here if needed
+            return encodedData;
+        }
+
+        private void saveFileCallback(string savePathFolder, char[] data)
+        {
+            ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
+            var readedBytes = File.ReadAllLines(savePathFolder + '/' + saveFileName, Encoding.UTF8);
+
+            Console.WriteLine("Saved file: " + saveFileName);
+        }
+
+        private static bool ByteArrayToFile(string path, char[] byteArray)
         {
             try
             {
@@ -55,7 +65,7 @@ namespace SaveStream
             }
         }
 
-        public bool saveData(byte[] data, string saveFileName)
+        public bool SaveData(byte[] data, string saveFileName)
         {
             this.saveFileName = saveFileName;
             try
