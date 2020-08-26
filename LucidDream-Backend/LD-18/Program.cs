@@ -23,11 +23,14 @@ namespace LD_18
         {
             UserInput input = new UserInput();
             Producer controller = new Producer();
+            Consumer[] consumersArray = new Consumer[6];
             // create distinct routing key for each channel
+            int i = 0;
             foreach (string channelName in Enum.GetNames(typeof(ChannelNames)))
             {
-                var c = new Consumer();
-                c.ListenToQueue(channelName);
+                consumersArray[i] = new Consumer();
+                consumersArray[i].ListenToQueue(channelName);
+                i++;
             }
             while (true)
             {
@@ -61,8 +64,6 @@ namespace LD_18
                 {
                     controller.SendMessage(Deactivate, channelToDeactivate.ToString());
                 }
-
-                //var body = Encoding.UTF8.GetBytes(message); // create a body to send via xchange
             }
 
         }
