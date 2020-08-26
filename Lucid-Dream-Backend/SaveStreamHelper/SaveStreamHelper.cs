@@ -10,17 +10,14 @@ namespace SaveStream
     {
         private ActionBlock<char[]> saveToFileBlock;
         private BufferBlock<byte[]> dataBufferBlock;
-        private readonly string savePath;
         private TransformBlock<byte[], char[]> transformDataBlock;
         private string saveFileName;
-        public SaveStreamHelper()
+        public SaveStreamHelper(string savePathFolder)
         {
-            //Get the recordings save path for the config file
-            this.savePath = ConfigurationManager.AppSettings["save-path"];
-            InitilaizeDataBlocks();
+            InitilaizeDataBlocks(savePathFolder);
         }
 
-        private void InitilaizeDataBlocks()
+        private void InitilaizeDataBlocks(string savePathFolder)
         {
             dataBufferBlock = new BufferBlock<byte[]>();
             transformDataBlock = new TransformBlock<byte[], char[]>((data) =>
@@ -31,8 +28,8 @@ namespace SaveStream
             });
             saveToFileBlock = new ActionBlock<char[]>( (data) =>
             {
-               ByteArrayToFile(savePath + '/' + saveFileName, data);
-               var readedBytes = File.ReadAllLines(savePath + '/' + saveFileName, Encoding.UTF8);
+               ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
+               var readedBytes = File.ReadAllLines(savePathFolder + '/' + saveFileName, Encoding.UTF8);
                 
                 Console.WriteLine("Saved file: " + saveFileName);
             });
