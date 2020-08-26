@@ -67,6 +67,8 @@
   <ItemGroup>
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelNames.cs" />
+    <Compile Include="Consumer.cs" />
+    <Compile Include="Producer.cs" />
     <Compile Include="UserInput.cs" />
     <Compile Include="WelcomeMessage.cs" />
     <Compile Include="CreateMessage.cs" />

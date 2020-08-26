@@ -16,11 +16,19 @@ namespace LD_18
 
         static private List<ChannelNames> activeList = new List<ChannelNames>(),
                                    nonActiveList = new List<ChannelNames>();
+        private readonly static string Activate = "ON", Deactivate = "OFF";
 
  
         static void Main(string[] args)
         {
             UserInput input = new UserInput();
+            Producer controller = new Producer();
+            // create distinct routing key for each channel
+            foreach (string channelName in Enum.GetNames(typeof(ChannelNames)))
+            {
+                var c = new Consumer();
+                c.ListenToQueue(channelName);
+            }
             while (true)
             {
                 WelcomeMessage.WriteMessage();
@@ -35,13 +43,24 @@ namespace LD_18
                     nonActiveList.Remove(channel);               // update non-checked channels
 
                 }
+                /* TESTING ONLY */
                 Console.WriteLine("ACTIVE");
                 activeList.ForEach((ch => Console.WriteLine(ch.ToString())));
                 Console.WriteLine("NON ACTIVE");
                 nonActiveList.ForEach((ch => Console.WriteLine(ch.ToString())));
+                /* END TESTING */
 
                 /* send "OFF" to all channels that weren't checked - in nonActiveList
                    *send "ON"  to all channels in activeList Enum.ToString(channel)*/
+
+                foreach (var channelToActivate in activeList) {
+                    controller.SendMessage(Activate, channelToActivate.ToString());
+                }
+
+                foreach (var channelToDeactivate in nonActiveList)
+                {
+                    controller.SendMessage(Deactivate, channelToDeactivate.ToString());
+                }
 
                 //var body = Encoding.UTF8.GetBytes(message); // create a body to send via xchange
             }
