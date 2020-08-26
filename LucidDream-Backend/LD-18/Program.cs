@@ -26,22 +26,26 @@ namespace LD_18
                 WelcomeMessage.WriteMessage();
                 var channelsList = input.GetChannelsToActivate(); // input from user 
                 // all channels are non active by default
+                activeList.Clear();
                 nonActiveList = Enum.GetValues(typeof(ChannelNames)).Cast<ChannelNames>().ToList();
                 foreach (ChannelNames channel in channelsList) {
-                    
-                    Console.WriteLine($"{channel}"); // TESTING only
-
+ 
                     activeList.Add(channel);                     // update checked channels
 
                     nonActiveList.Remove(channel);               // update non-checked channels
 
-                    /* send "OFF" to all channels that weren't checked - in nonActiveList
-                    *send "ON"  to all channels in activeList Enum.ToString(channel)*/
-
                 }
+                Console.WriteLine("ACTIVE");
+                activeList.ForEach((ch => Console.WriteLine(ch.ToString())));
+                Console.WriteLine("NON ACTIVE");
+                nonActiveList.ForEach((ch => Console.WriteLine(ch.ToString())));
+
+                /* send "OFF" to all channels that weren't checked - in nonActiveList
+                   *send "ON"  to all channels in activeList Enum.ToString(channel)*/
+
                 //var body = Encoding.UTF8.GetBytes(message); // create a body to send via xchange
             }
-            
+
         }
     }
 }
