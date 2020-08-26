@@ -8,6 +8,9 @@ namespace LD_18
 {
     class UserInput
     {
+        public void PrintError() {
+            Console.WriteLine("argument is not a valid channel, input denied");
+        }
         public List<ChannelNames> GetChannelsToActivate()
         {
             var channelsList = new List<ChannelNames>();
@@ -19,11 +22,16 @@ namespace LD_18
                     try
                     {
                         ChannelNames channel = (ChannelNames)Enum.Parse(typeof(ChannelNames), message);
-                        channelsList.Add(channel);
+                        if (Enum.IsDefined(typeof(ChannelNames), channel))
+                            channelsList.Add(channel);
+                        else {
+                            PrintError();
+                            return new List<ChannelNames>();
+                        }
                     }
                     catch (ArgumentException)
                     {
-                        Console.WriteLine("argument is not a valid channel, input denied");
+                        PrintError();
                         return new List<ChannelNames>();
                     }
                 }
