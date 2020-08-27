@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.1209
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucid-Dream-Backend", "Lucid-Dream-Backend\Lucid-Dream-Backend.csproj", "{40A9DD67-B3DA-4131-B56F-9ECB0DEA9E4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayingLiveStreams", "DisplayingLiveStreams\DisplayingLiveStreams.csproj", "{115E97EE-48BB-42A6-9F11-D7D1548BA69A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalResourses", "GlobalResourses\GlobalResourses.csproj", "{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{40A9DD67-B3DA-4131-B56F-9ECB0DEA9E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40A9DD67-B3DA-4131-B56F-9ECB0DEA9E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40A9DD67-B3DA-4131-B56F-9ECB0DEA9E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{115E97EE-48BB-42A6-9F11-D7D1548BA69A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{115E97EE-48BB-42A6-9F11-D7D1548BA69A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{115E97EE-48BB-42A6-9F11-D7D1548BA69A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{115E97EE-48BB-42A6-9F11-D7D1548BA69A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
