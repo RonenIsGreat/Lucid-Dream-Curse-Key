@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
@@ -11,12 +12,20 @@ namespace SaveStream
         private BufferBlock<byte[]> dataBufferBlock;
         private TransformBlock<byte[], char[]> transformDataBlock;
         private string saveFileName;
+        private readonly string savePath;
+
         public SaveStreamHelper(string savePathFolder)
         {
-            InitilaizeDataBlocks(savePathFolder);
+            this.savePath = savePathFolder;
+            if (!Directory.Exists(savePath))
+            {
+                Console.WriteLine("Directory does not exist, creating directory...");
+                Directory.CreateDirectory(savePath);
+            }
+            InitilaizeDataBlocks();
         }
 
-        private void InitilaizeDataBlocks(string savePathFolder)
+        private void InitilaizeDataBlocks()
         {
             dataBufferBlock = new BufferBlock<byte[]>();
             transformDataBlock = new TransformBlock<byte[], char[]>((data) =>
@@ -25,7 +34,7 @@ namespace SaveStream
             });
             saveToFileBlock = new ActionBlock<char[]>( (data) =>
             {
-                saveFileCallback(savePathFolder, data);
+                saveFileCallback(savePath, data);
             });
             dataBufferBlock.LinkTo(transformDataBlock);
             transformDataBlock.LinkTo(saveToFileBlock);
@@ -64,13 +73,20 @@ namespace SaveStream
                 return false;
             }
         }
+        private string getBufferType(byte[] serverIdentData)
+        {
+            ushort serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
+            return "";
+        }
 
         public bool SaveData(byte[] data, string saveFileName)
         {
+           var streamTypes = ConfigurationManager.GetSection("streamTypes");
             this.saveFileName = saveFileName;
             try
             {
                 dataBufferBlock.Post(data);
+                return true;
 
             }
             catch (Exception e)

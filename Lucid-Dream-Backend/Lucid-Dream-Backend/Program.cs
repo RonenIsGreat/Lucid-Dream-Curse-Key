@@ -8,7 +8,8 @@ namespace Lucid_Dream_Backend
     {
         static void Main(string[] args)
         {
-           var test = ConfigurationManager.AppSettings["save-path"];
+            var streamTypes = ConfigurationManager.GetSection("streamTypes");
+
 
         }
     }

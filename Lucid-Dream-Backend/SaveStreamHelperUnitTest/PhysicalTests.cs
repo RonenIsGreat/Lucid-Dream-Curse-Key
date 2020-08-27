@@ -13,12 +13,11 @@ namespace Tests
         static SaveStreamHelper saveStreamHelper;
         static byte[] testData;
         const string testFileName = "TestFileName";
-        static string savePath;
+        const string savePath = "C:\\Recordings\\";
+
         [SetUp]
         public void Setup()
         {
-            savePath = ConfigurationManager.AppSettings["save-path"];
-
             int test = 0;
             testData = new byte[1400];
 
@@ -30,16 +29,11 @@ namespace Tests
             saveStreamHelper = new SaveStreamHelper(savePath);
         }
 
-        private static void TestTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            saveStreamHelper.SaveData(testData, "TestFile");
-        }
-
         [Test]
         public void SaveFile_FileExists_True()
         {
             saveStreamHelper.SaveData(testData, testFileName);
-            Assert.True(File.Exists(savePath + testFileName), "file does not exist");
+            Assert.True(File.Exists(savePath + testFileName), "File does not exist");
         }
     }
 }
