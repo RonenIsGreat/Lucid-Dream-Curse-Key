@@ -12,9 +12,8 @@ namespace LD_18
     {
         public void ListenToQueue(string rKey) {
             var factory = new ConnectionFactory() { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
                 channel.ExchangeDeclare(exchange: "channelControl",
                                         type: "direct", durable: true);
                 var queueName = channel.QueueDeclare().QueueName;
@@ -38,7 +37,7 @@ namespace LD_18
                 channel.BasicConsume(queue: queueName,
                                      autoAck: true,
                                      consumer: consumer);
-            }
+            
         }
     }
 }
