@@ -1,5 +1,6 @@
 ﻿
 
+using System.Collections.Specialized;
 using System.Configuration;
 
 namespace Lucid_Dream_Backend
@@ -8,8 +9,6 @@ namespace Lucid_Dream_Backend
     {
         static void Main(string[] args)
         {
-            var streamTypes = ConfigurationManager.GetSection("streamTypes");
-
 
         }
     }

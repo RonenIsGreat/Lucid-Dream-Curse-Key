@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
 using System.Text;
@@ -11,18 +13,33 @@ namespace SaveStream
         private ActionBlock<char[]> saveToFileBlock;
         private BufferBlock<byte[]> dataBufferBlock;
         private TransformBlock<byte[], char[]> transformDataBlock;
+        private readonly Dictionary<ushort, string> streamTypes;
         private string saveFileName;
         private readonly string savePath;
 
         public SaveStreamHelper(string savePathFolder)
         {
             this.savePath = savePathFolder;
+            streamTypes = new Dictionary<ushort, string>();
+            InitializeStreamTypes();
+
             if (!Directory.Exists(savePath))
             {
                 Console.WriteLine("Directory does not exist, creating directory...");
                 Directory.CreateDirectory(savePath);
             }
             InitilaizeDataBlocks();
+        }
+
+        private void InitializeStreamTypes()
+        {
+            var streamTypesConfig = ConfigurationManager.GetSection("Enums/streamTypes") as NameValueCollection;
+            var streamNames = streamTypesConfig.GetValues(0);
+            var streamValues = streamTypesConfig.AllKeys;
+            for (int i = 0; i < streamValues.Length; i++)
+            {
+                streamTypes.Add(ushort.Parse(streamValues[i]), streamNames[i]);
+            }
         }
 
         private void InitilaizeDataBlocks()
@@ -79,9 +96,15 @@ namespace SaveStream
             return "";
         }
 
+        private static string getStreamType(byte[] data, string fileName)
+        {
+            string fileNameWithType = "";
+            BitConverter.ToInt16(data, 0).ToString();
+            return fileNameWithType;
+        }
+
         public bool SaveData(byte[] data, string saveFileName)
         {
-           var streamTypes = ConfigurationManager.GetSection("streamTypes");
             this.saveFileName = saveFileName;
             try
             {
