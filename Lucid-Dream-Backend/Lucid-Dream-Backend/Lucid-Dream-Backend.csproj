@@ -53,6 +53,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DisplayingLiveStreams\LiveStreamsDisplay.csproj">
+      <Project>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</Project>
+      <Name>LiveStreamsDisplay</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
+      <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
+      <Name>GlobalResourses</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SaveStreamHelper\SaveStreamHelper.csproj">
       <Project>{4EC3755B-B4B7-48DD-9DFE-4F4C3F35C13B}</Project>
       <Name>SaveStreamHelper</Name>

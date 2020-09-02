@@ -23,7 +23,7 @@ namespace LiveStreamsDisplay
             for (int i = 0; i < _UdpListeners.Length; i++)
             {
                 _UdpListeners[i] = new UDPListener(_Ports[i]);
-                _UdpListeners[i].OpenQChannel();
+               // _UdpListeners[i].OpenQChannel();
 
             }//End For
 
@@ -43,6 +43,10 @@ namespace LiveStreamsDisplay
             _CasBeamThread.Start();
             _FasTasBeamThread.Start();
             _AtmIdrsThread.Start();
+            while (true)
+            {
+                Thread.Sleep(100);
+            }
 
         }//End Main
 
