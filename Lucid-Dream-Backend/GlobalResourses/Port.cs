@@ -3,11 +3,11 @@ namespace GlobalResourses
 {
     public class Port
     {
-        protected readonly string _name;
+        protected readonly ChannelNames _name;
         protected readonly int _number;
         protected bool _status;
 
-        public Port(string name, int number)
+        public Port(ChannelNames name, int number)
         {
             this._name = name;
             this._number = number;
@@ -33,7 +33,7 @@ namespace GlobalResourses
 
         }//End GetPortNumber
 
-        public string GetName()
+        public ChannelNames GetName()
         {
             return this._name;
 

@@ -11,20 +11,21 @@ namespace DisplayingLiveStreams
             //Initializing The Ports
             Port[] _Ports = new Port[6];
 
-            _Ports[0] = new Port("CAS Stave", 25101);
-            _Ports[1] = new Port("FAS/TAS Stave", 25102);
-            _Ports[2] = new Port("PRS Stave", 25103);
-            _Ports[3] = new Port("CAS Beam", 25104);
-            _Ports[4] = new Port("FAS/TAS Beam", 25105);
-            _Ports[5] = new Port("ATM IDRS", 25106);
+            _Ports[0] = new Port(ChannelNames.CasStave, 25101);
+            _Ports[1] = new Port(ChannelNames.FasTasStave, 25102);
+            _Ports[2] = new Port(ChannelNames.PRSStave, 25103);
+            _Ports[3] = new Port(ChannelNames.CasBeam, 25104);
+            _Ports[4] = new Port(ChannelNames.FasTasBeam, 25105);
+            _Ports[5] = new Port(ChannelNames.IDRSBus, 25106);
 
             UDPListener[] _UdpListeners = new UDPListener[6];
-            _UdpListeners[0] = new UDPListener(_Ports[0]);
-            _UdpListeners[1] = new UDPListener(_Ports[1]);
-            _UdpListeners[2] = new UDPListener(_Ports[2]);
-            _UdpListeners[3] = new UDPListener(_Ports[3]);
-            _UdpListeners[4] = new UDPListener(_Ports[4]);
-            _UdpListeners[5] = new UDPListener(_Ports[5]);
+            
+            for (int i = 0; i < _UdpListeners.Length; i++)
+            {
+                _UdpListeners[i] = new UDPListener(_Ports[i]);
+                _UdpListeners[i].OpenQChannel();
+
+            }//End For
 
             Thread _CasStaveThread = new Thread(_UdpListeners[0].StartListener);
             Thread _FasTasStaveThread = new Thread(_UdpListeners[1].StartListener);

@@ -12,11 +12,13 @@ namespace DisplayingLiveStreams
     {
         private Port _Port;
         private Stopwatch _StopWatch;
+        private Consumer _Consumer;
         int count = 0;
 
         public UDPListener(Port port)
         {
             this._Port = port;
+            this._Consumer = new Consumer();
 
         }//End UDPListener Constructor
 
@@ -75,6 +77,12 @@ namespace DisplayingLiveStreams
             
 
         }//End OnTimeEvent
+
+        public void OpenQChannel()
+        {
+            this._Consumer.ListenToQueue(this._Port.GetName().ToString());
+
+        }//End OpenQChannel
 
     }//End UDPListener
 
