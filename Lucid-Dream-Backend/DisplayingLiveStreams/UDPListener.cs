@@ -4,79 +4,119 @@ using System.Net.Sockets;
 using GlobalResourses;
 using System.Timers;
 using System.Diagnostics;
+using System.Threading;
+using System.Numerics;
 
-
-namespace DisplayingLiveStreams
+namespace LiveStreamsDisplay
 {
     public class UDPListener
     {
         private Port _Port;
-        private Stopwatch _StopWatch;
         private Consumer _Consumer;
-        int count = 0;
+        private UdpClient listener;
+        private IPEndPoint groupEP;
+        public BigInteger MessageCount { get; private set; }
 
         public UDPListener(Port port)
         {
+            //Initalize client port
+            int clientPort = this._Port.GetPortNumber();
+
             this._Port = port;
+
             this._Consumer = new Consumer();
+
+            listener = new UdpClient(clientPort);
+            //Initialize udp endpoint(server)
+            groupEP = new IPEndPoint(IPAddress.Any, clientPort);
+            //specefies the number of 1400 bytes messages that have been received
+            MessageCount = 0;
+
+            InitSocket();
+
 
         }//End UDPListener Constructor
 
+        private void InitSocket()
+        {
+            listener.Client.ReceiveTimeout = 1000;
+            listener.Client.ReceiveBufferSize = 1400;
+        }
+
         public void StartListener()
         {
-            int ListenPort = this._Port.GetPortNumber();
-            UdpClient listener = new UdpClient(ListenPort);
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, ListenPort);
-            Timer RecieveTimer = new Timer(1000);
-            RecieveTimer.Elapsed += OnTimedEvent;
-           
-            _StopWatch = new Stopwatch();
-            RecieveTimer.Start();
+            if (listener != null)
+            {
+                listener.Connect(groupEP);
+                BeginReceivingNewData();
+            }
+        }//End StartListener
+
+        public void StopListener()
+        {
+            if (listener != null)
+            {
+                listener.Close();
+            }
+        }
+
+        private void OnDataRecived(IAsyncResult result)
+        {
             try
             {
-                while (true)
+                //get current message
+                byte[] received = listener.EndReceive(result, ref groupEP);
+                if (received != null)
                 {
-                    _StopWatch.Start();
-                    byte[] bytes = listener.Receive(ref groupEP);
-                    count++;
-                    _StopWatch.Reset();
-                    
+                    MessageCount++;
+                }
 
-
-                }//End While
-
-            }//End Try
-
-            catch (SocketException e)
+                //Start receiving next message
+                BeginReceivingNewData();
+            }
+            catch (Exception e)
             {
-                Console.WriteLine(e);
+                OnReceiveError(e);
             }
             finally
             {
-                listener.Close();
-                RecieveTimer.Stop();
-                _StopWatch.Stop();
-                this._Port.SetStatus(false);
+                if (this._Port.GetStatus() == false)
+                    this._Port.SetStatus(true);
             }
 
-        }//End StartListener
+            Console.WriteLine("{0} : {1}", this._Port.GetName(), _Port.GetStatus());
+            // Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetS);
 
-        public void OnTimedEvent(Object source, ElapsedEventArgs e)
+        }
+
+        private void OnReceiveError(Exception e)
         {
-            double Mili = _StopWatch.ElapsedMilliseconds;
+            switch (e)
+            {
+                case SocketException socketException:
+                    if (socketException.ErrorCode == (int)SocketError.TimedOut)
+                    {
+                        _Port.SetStatus(false);
+                    }
+                    break;
+                default:
+                    Console.WriteLine(e.Message);
+                    break;
+            }
+        }
 
-            if (Mili > 1000)
-                this._Port.SetStatus(false);
-            else
-                if (this._Port.GetStatus() == false)
-                this._Port.SetStatus(true);
+        private void BeginReceivingNewData()
+        {
+            try
+            {
+                IAsyncResult result = listener.BeginReceive(new AsyncCallback(OnDataRecived), null);
 
-            Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetStatus());
-           // Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetS);
-            count = 0;
-            
-
-        }//End OnTimeEvent
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
         public void OpenQChannel()
         {

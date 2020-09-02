@@ -2,7 +2,7 @@
 using GlobalResourses;
 using System.Threading;
 
-namespace DisplayingLiveStreams
+namespace LiveStreamsDisplay
 {
     class Program
     {

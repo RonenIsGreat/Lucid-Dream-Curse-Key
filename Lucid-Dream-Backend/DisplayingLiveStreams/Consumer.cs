@@ -8,7 +8,7 @@ using RabbitMQ.Client.Events;
 
 
 
-namespace DisplayingLiveStreams
+namespace LiveStreamsDisplay
 {
     class Consumer
     {
