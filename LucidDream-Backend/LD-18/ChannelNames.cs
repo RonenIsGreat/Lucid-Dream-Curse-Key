@@ -8,11 +8,11 @@ namespace GlobalResourses
 {
     public enum ChannelNames
     {
-        CasBeam,
-        CasStave,
-        FasTasBeam,
-        FasTasStave,
-        PRSStave,
-        IDRSBus
+        CasStave, //0
+        FasTasStave, //1
+        PRSStave, //2
+        CasBeam, //3
+        FasTasBeam, //4
+        IDRSBus //
     }
 }

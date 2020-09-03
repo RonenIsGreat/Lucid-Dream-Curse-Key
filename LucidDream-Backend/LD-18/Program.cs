@@ -23,6 +23,7 @@ namespace LD_18
  
         static void Main(string[] args)
         {
+            DisplayApp LiveStrams = new DisplayApp();
             UserInput input = new UserInput();
             Producer controller = new Producer();
 
@@ -36,7 +37,7 @@ namespace LD_18
                 consumersArray[i].ListenToQueue(channelName);
                 i++;
             }*/
-            DisplayApp.Run();
+    
             while (true)
             {
                 WelcomeMessage.WriteMessage();
@@ -62,11 +63,13 @@ namespace LD_18
                    *send "ON"  to all channels in activeList Enum.ToString(channel)*/
 
                 foreach (var channelToActivate in activeList) {
+                    LiveStrams.ActivatePort((int)channelToActivate);
                     controller.SendMessage(Activate, channelToActivate.ToString());
                 }
 
                 foreach (var channelToDeactivate in nonActiveList)
                 {
+                    LiveStrams.DeactivatePort((int)channelToDeactivate);
                     controller.SendMessage(Deactivate, channelToDeactivate.ToString());
                 }
             }
