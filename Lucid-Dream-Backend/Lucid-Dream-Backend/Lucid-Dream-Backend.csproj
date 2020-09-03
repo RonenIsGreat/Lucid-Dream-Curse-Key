@@ -38,6 +38,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,9 +54,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DisplayingLiveStreams\LiveStreamsDisplay.csproj">
+    <ProjectReference Include="..\DisplayingLiveStreams\Controller.csproj">
       <Project>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</Project>
-      <Name>LiveStreamsDisplay</Name>
+      <Name>Controller</Name>
     </ProjectReference>
     <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
       <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using GlobalResourses;
 using System.Numerics;
+using GlobalResourses;
 
-namespace LiveStreamsDisplay
+namespace Controller
 {
     public class UDPListener
     {
-        private Port _Port;
+        public Port _Port { get; private set; }
         private UdpClient listener;
         private IPEndPoint groupEP;
         public BigInteger MessageCount { get; private set; }

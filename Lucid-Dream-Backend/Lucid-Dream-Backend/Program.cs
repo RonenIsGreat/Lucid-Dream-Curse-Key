@@ -7,9 +7,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using GlobalResourses;
-using LiveStreamsDisplay;
 using SaveStream;
 using System.Configuration;
+using Controller;
 
 namespace Lucid_Dream_Backend
 {
@@ -58,6 +58,8 @@ namespace Lucid_Dream_Backend
             _CasBeamThread.Start();
             _FasTasBeamThread.Start();
             _AtmIdrsThread.Start();
+
+            Controller.Controller.Run();
             while (true)
             {
                 Thread.Sleep(100);

@@ -5,15 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using GlobalResourses;
 
 
 
-namespace LiveStreamsDisplay
+namespace Controller
 {
     class Consumer
     {
-        public void ListenToQueue(string rKey)
+        public void ListenToQueue(UDPListener udpClient)
         {
+            var port = udpClient._Port;
             var factory = new ConnectionFactory() { HostName = "localhost" };
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
@@ -23,10 +25,10 @@ namespace LiveStreamsDisplay
 
             channel.QueueBind(queue: queueName,
                                 exchange: "channelControl",
-                                routingKey: rKey);
+                                routingKey: port.GetName().ToString());
 
 
-            Console.WriteLine(" [*] {0} Is waiting for messages.", rKey);
+            Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
 
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -34,6 +36,10 @@ namespace LiveStreamsDisplay
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var routingKey = ea.RoutingKey;
+                if (message.Equals("ON"))
+                    udpClient.StartListener();
+                else if (message.Equals("OFF"))
+                    udpClient.StopListener();
                 Console.WriteLine(" [x] Received '{0}':'{1}'",
                                   routingKey, message);
             };
