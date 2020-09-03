@@ -18,7 +18,7 @@ namespace Controller
 
         static private List<ChannelNames> activeList = new List<ChannelNames>(),
                                    nonActiveList = new List<ChannelNames>();
-        private readonly static string Activate = "ON", Deactivate = "OFF";
+        private const string Activate = "ON", Deactivate = "OFF";
 
  
         public static void Run()

@@ -13,7 +13,12 @@ namespace Controller
 {
     public class Consumer
     {
-        public void ListenToQueue(UDPListener udpClient)
+        UDPListener udpClient;
+        public Consumer(UDPListener uDP)
+        {
+            udpClient = uDP;
+        }
+        public void ListenToQueue()
         {
             var port = udpClient._Port;
             var factory = new ConnectionFactory() { HostName = "localhost" };

@@ -4,11 +4,11 @@ using System.Net.Sockets;
 using System.Numerics;
 using GlobalResourses;
 
-namespace Controller
+namespace Lucid_Dream_Backend
 {
     public class UDPListener
     {
-        public Port _Port { get; private set; }
+        private Port _Port;
         private UdpClient listener;
         private IPEndPoint groupEP;
         public BigInteger MessageCount { get; private set; }
@@ -44,16 +44,13 @@ namespace Controller
 
         public void StartListener()
         {
-            if (!IsAlreadyListening())
+            try
             {
-                try
-                {
-                    listener?.Connect(groupEP);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
+                listener?.Connect(groupEP);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
             BeginReceivingNewData();
         }//End StartListener
@@ -67,19 +64,6 @@ namespace Controller
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-            }
-        }
-
-        private bool IsAlreadyListening()
-        {
-            try
-            {
-                return listener.Client.Connected;
-            }
-            catch (Exception)
-            {
-
-                return false;
             }
         }
 

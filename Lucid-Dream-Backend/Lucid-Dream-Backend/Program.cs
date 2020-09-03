@@ -40,30 +40,30 @@ namespace Lucid_Dream_Backend
             {
                 _UdpListeners[i] = new UDPListener(_Ports[i]);
                 _UdpListeners[i].OnDataReceived += onDataReceived;
-                _Consumers[i] = new Consumer();
-                _Consumers[i].ListenToQueue(_UdpListeners[i]);
+                _Consumers[i] = new Consumer(_UdpListeners[i]);
+                _Consumers[i].ListenToQueue();
 
             }//End For
 
           
             Console.WriteLine("Live Streams :");
-
-            
-
             Controller.Controller.Run();
-            while (true)
-            {
-                Thread.Sleep(100);
-            }
 
         }//End Main
 
         private static void onDataReceived(object sender, byte[] data)
         {
-            bool succeeded = saveStreamHelper.SaveData(data, DateTime.Now.ToShortDateString());
+            //This date format can be saved as file name
+            var dateAsString = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
+            bool succeeded = saveStreamHelper.SaveData(data, dateAsString);
             if (!succeeded)
             {
                 Console.WriteLine("Failed to save message");
+            }
+            else
+            {
+                //Also write data in console
+                var dataAsUtf8 = Encoding.UTF8.GetString(data);
             }
             //Data goes in here
         }

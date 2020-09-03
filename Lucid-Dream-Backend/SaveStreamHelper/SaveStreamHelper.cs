@@ -17,7 +17,7 @@ namespace SaveStream
         private string saveFileName;
         public string SavePath { get; private set; }
 
-        private static SaveStreamHelper _instance;
+        private static readonly SaveStreamHelper _instance;
         public static SaveStreamHelper Instance => _instance ?? new SaveStreamHelper();
 
         private SaveStreamHelper()
