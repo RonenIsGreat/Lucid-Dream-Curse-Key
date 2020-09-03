@@ -15,20 +15,29 @@ namespace SaveStream
         private TransformBlock<byte[], char[]> transformDataBlock;
         private readonly Dictionary<ushort, string> streamTypes;
         private string saveFileName;
-        private readonly string savePath;
+        public string SavePath { get; private set; }
 
-        public SaveStreamHelper(string savePathFolder)
+        public static SaveStreamHelper Instance => Instance ?? new SaveStreamHelper();
+
+        private SaveStreamHelper()
         {
-            this.savePath = savePathFolder;
             streamTypes = new Dictionary<ushort, string>();
+
             InitializeStreamTypes();
 
-            if (!Directory.Exists(savePath))
+            InitilaizeDataBlocks();
+
+        }
+
+        public void InitSaveStreamHelper(string savePathFolder)
+        {
+            SavePath = savePathFolder;
+
+            if (!Directory.Exists(SavePath))
             {
                 Console.WriteLine("Directory does not exist, creating directory...");
-                Directory.CreateDirectory(savePath);
+                Directory.CreateDirectory(SavePath);
             }
-            InitilaizeDataBlocks();
         }
 
         private void InitializeStreamTypes()
@@ -51,7 +60,7 @@ namespace SaveStream
             });
             saveToFileBlock = new ActionBlock<char[]>( (data) =>
             {
-                saveFileCallback(savePath, data);
+                saveFileCallback(SavePath, data);
             });
             dataBufferBlock.LinkTo(transformDataBlock);
             transformDataBlock.LinkTo(saveToFileBlock);
@@ -90,22 +99,19 @@ namespace SaveStream
                 return false;
             }
         }
-        private string getBufferType(byte[] serverIdentData)
+        private string GetBufferType(byte[] serverIdentData)
         {
             ushort serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            return "";
-        }
-
-        private static string getStreamType(byte[] data, string fileName)
-        {
-            string fileNameWithType = "";
-            BitConverter.ToInt16(data, 0).ToString();
-            return fileNameWithType;
+            if (streamTypes.Count > 0 && streamTypes.ContainsKey(serverIdent))
+            {
+                return streamTypes[serverIdent];
+            }
+            return null;
         }
 
         public bool SaveData(byte[] data, string saveFileName)
         {
-            this.saveFileName = saveFileName;
+            this.saveFileName = GetBufferType(data) + "_" + saveFileName;
             try
             {
                 dataBufferBlock.Post(data);

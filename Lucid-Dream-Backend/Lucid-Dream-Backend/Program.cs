@@ -8,13 +8,21 @@ using System.Net.Sockets;
 using System.Threading;
 using GlobalResourses;
 using LiveStreamsDisplay;
+using SaveStream;
+using System.Configuration;
 
 namespace Lucid_Dream_Backend
 {
     class Program
     {
+        static SaveStreamHelper saveStreamHelper;
         static void Main(string[] args)
         {
+            //Initlize and get the save stream helper instance
+            var savePath = ConfigurationManager.AppSettings["save-path"];
+            saveStreamHelper = SaveStreamHelper.Instance;
+            saveStreamHelper.InitSaveStreamHelper(savePath);
+
             //Initializing The Ports
             Port[] _Ports = new Port[6];
 
@@ -30,8 +38,7 @@ namespace Lucid_Dream_Backend
             for (int i = 0; i < _UdpListeners.Length; i++)
             {
                 _UdpListeners[i] = new UDPListener(_Ports[i]);
-                _UdpListeners[i].OnDataReceived += Program_OnDataReceived;
-               // _UdpListeners[i].OpenQChannel();
+                _UdpListeners[i].OnDataReceived += onDataReceived;
 
             }//End For
 
@@ -58,8 +65,13 @@ namespace Lucid_Dream_Backend
 
         }//End Main
 
-        private static void Program_OnDataReceived(object sender, byte[] data)
+        private static void onDataReceived(object sender, byte[] data)
         {
+            bool succeeded = saveStreamHelper.SaveData(data, DateTime.Now.ToShortDateString());
+            if (!succeeded)
+            {
+                Console.WriteLine("Failed to save message");
+            }
             //Data goes in here
         }
     }//End Program

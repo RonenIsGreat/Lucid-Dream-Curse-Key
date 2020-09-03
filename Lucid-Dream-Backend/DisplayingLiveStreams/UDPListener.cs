@@ -2,9 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using GlobalResourses;
-using System.Timers;
-using System.Diagnostics;
-using System.Threading;
 using System.Numerics;
 
 namespace LiveStreamsDisplay
@@ -23,13 +20,13 @@ namespace LiveStreamsDisplay
 
         public UDPListener(Port port)
         {
-            this._Port = port;
+            _Port = port;
 
             //Initalize client port
             int clientPort = this._Port.GetPortNumber();
 
             //Initialize udp endpoint(server)
-            groupEP = new IPEndPoint(IPAddress.Any, clientPort);
+            groupEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
             listener = new UdpClient(groupEP);
             //specefies the number of 1400 bytes messages that have been received
             MessageCount = 0;
@@ -47,17 +44,26 @@ namespace LiveStreamsDisplay
 
         public void StartListener()
         {
-            if (listener != null)
+            try
             {
-                BeginReceivingNewData();
+                listener?.Connect(groupEP);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            BeginReceivingNewData();
         }//End StartListener
 
         public void StopListener()
         {
-            if (listener != null)
+            try
             {
-                listener.Client.Shutdown(SocketShutdown.Both);
+                listener?.Client?.Shutdown(SocketShutdown.Both);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -75,6 +81,7 @@ namespace LiveStreamsDisplay
 
             //Start receiving next message
 
+            //TODO: remember to delete this
             Console.WriteLine("{0} : {1}", this._Port.GetName(), _Port.GetStatus());
             // Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetS);
 
@@ -87,9 +94,11 @@ namespace LiveStreamsDisplay
                 switch (socketException.ErrorCode)
                 {
                     case (int)SocketError.TimedOut:
+                        //Request timed out
                         _Port.SetStatus(false);
                         break;
                     case (int)SocketError.Shutdown:
+                        //Socket has been closed
                         _Port.SetStatus(false);
                         break;
                     default:
@@ -104,7 +113,6 @@ namespace LiveStreamsDisplay
             try
             {
                 listener.BeginReceive(new AsyncCallback(OnDataRecived), null);
-
             }
             catch (Exception e)
             {
