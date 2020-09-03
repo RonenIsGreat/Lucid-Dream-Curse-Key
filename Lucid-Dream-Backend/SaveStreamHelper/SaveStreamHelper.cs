@@ -18,7 +18,7 @@ namespace SaveStream
         public string SavePath { get; private set; }
 
         private static SaveStreamHelper _instance;
-        public static SaveStreamHelper Instance => _instance != null ? _instance : new SaveStreamHelper();
+        public static SaveStreamHelper Instance => _instance ?? new SaveStreamHelper();
 
         private SaveStreamHelper()
         {
@@ -44,11 +44,10 @@ namespace SaveStream
         private void InitializeStreamTypes()
         {
             var streamTypesConfig = ConfigurationManager.GetSection("Enums/streamTypes") as NameValueCollection;
-            var streamNames = streamTypesConfig.GetValues(0);
             var streamValues = streamTypesConfig.AllKeys;
             for (int i = 0; i < streamValues.Length; i++)
             {
-                streamTypes.Add(ushort.Parse(streamValues[i]), streamNames[i]);
+                streamTypes.Add(ushort.Parse(streamValues[i]), streamTypesConfig[i]);
             }
         }
 

@@ -11,7 +11,7 @@ using GlobalResourses;
 
 namespace Controller
 {
-    class Consumer
+    public class Consumer
     {
         public void ListenToQueue(UDPListener udpClient)
         {
