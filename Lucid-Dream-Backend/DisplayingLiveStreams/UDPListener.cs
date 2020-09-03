@@ -12,7 +12,6 @@ namespace LiveStreamsDisplay
     public class UDPListener
     {
         private Port _Port;
-        private Consumer _Consumer;
         private UdpClient listener;
         private IPEndPoint groupEP;
         public BigInteger MessageCount { get; private set; }
@@ -29,7 +28,6 @@ namespace LiveStreamsDisplay
             //Initalize client port
             int clientPort = this._Port.GetPortNumber();
 
-            this._Consumer = new Consumer();
             //Initialize udp endpoint(server)
             groupEP = new IPEndPoint(IPAddress.Any, clientPort);
             listener = new UdpClient(groupEP);
@@ -67,14 +65,15 @@ namespace LiveStreamsDisplay
         {
             //get current message
             byte[] received = listener.EndReceive(result, ref groupEP);
+            BeginReceivingNewData();
+
             if (received != null)
             {
-                SampleEvent?.Invoke(this, received);
+                OnDataReceived?.Invoke(this, received);
                 MessageCount++;
             }
 
             //Start receiving next message
-            BeginReceivingNewData();
 
             Console.WriteLine("{0} : {1}", this._Port.GetName(), _Port.GetStatus());
             // Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetS);
@@ -104,7 +103,7 @@ namespace LiveStreamsDisplay
         {
             try
             {
-                IAsyncResult result = listener.BeginReceive(new AsyncCallback(OnDataRecived), null);
+                listener.BeginReceive(new AsyncCallback(OnDataRecived), null);
 
             }
             catch (Exception e)
@@ -117,12 +116,6 @@ namespace LiveStreamsDisplay
                     _Port.SetStatus(true);
             }
         }
-
-        public void OpenQChannel()
-        {
-            this._Consumer.ListenToQueue(this._Port.GetName().ToString());
-
-        }//End OpenQChannel
 
     }//End UDPListener
 

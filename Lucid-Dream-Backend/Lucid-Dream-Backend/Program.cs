@@ -30,6 +30,7 @@ namespace Lucid_Dream_Backend
             for (int i = 0; i < _UdpListeners.Length; i++)
             {
                 _UdpListeners[i] = new UDPListener(_Ports[i]);
+                _UdpListeners[i].OnDataReceived += Program_OnDataReceived;
                // _UdpListeners[i].OpenQChannel();
 
             }//End For
@@ -57,6 +58,10 @@ namespace Lucid_Dream_Backend
 
         }//End Main
 
+        private static void Program_OnDataReceived(object sender, byte[] data)
+        {
+            //Data goes in here
+        }
     }//End Program
 
 }//End Lucid_Dream_Backend
