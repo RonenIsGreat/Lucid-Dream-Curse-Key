@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</ProjectGuid>
+    <ProjectGuid>{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>LiveStreamsDisplay</RootNamespace>
-    <AssemblyName>LiveStreamsDisplay</AssemblyName>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Consumer</RootNamespace>
+    <AssemblyName>Consumer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,16 +23,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RabbitMQ.Client, Version=6.0.0.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
@@ -69,22 +64,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consumer.cs" />
-    <Compile Include="Producer.cs" />
-    <Compile Include="Controller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UDPListener.cs" />
-    <Compile Include="UserInput.cs" />
-    <Compile Include="WelcomeMessage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
+      <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
+      <Name>GlobalResourses</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SaveStreamHelper\SaveStreamHelper.csproj">
+      <Project>{4EC3755B-B4B7-48DD-9DFE-4F4C3F35C13B}</Project>
+      <Name>SaveStreamHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UDPListener\UDPListener.csproj">
+      <Project>{C4BAA696-5CD7-4EBA-A143-1C42BEDEF314}</Project>
+      <Name>UDPListener</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
-      <Project>{fa571ae4-c20c-4932-a168-ea30c2da2b8b}</Project>
-      <Name>GlobalResourses</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

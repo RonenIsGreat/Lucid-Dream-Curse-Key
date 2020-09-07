@@ -1,129 +1,122 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
+using GlobalResourses;
 
 namespace SaveStream
 {
     public class SaveStreamHelper
     {
-        private ActionBlock<char[]> saveToFileBlock;
-        private BufferBlock<byte[]> dataBufferBlock;
-        private TransformBlock<byte[], char[]> transformDataBlock;
-        private readonly Dictionary<ushort, string> streamTypes;
-        private string saveFileName;
-        public string SavePath { get; private set; }
+        private BinaryWriter _bytesWriter;
+        private BufferBlock<byte[]> _dataBufferBlock;
+        private string _dateFileName;
+        private ActionBlock<byte[]> _saveToFileBlock;
+        private TransformBlock<byte[], byte[]> _transformDataBlock;
+        private FileStream _currentFileStream;
 
-        private static readonly SaveStreamHelper _instance;
-        public static SaveStreamHelper Instance => _instance ?? new SaveStreamHelper();
 
-        private SaveStreamHelper()
+        public SaveStreamHelper(string savePathFolder)
         {
-            streamTypes = new Dictionary<ushort, string>();
+            InitializeDataBlocks();
 
-            InitializeStreamTypes();
-
-            InitilaizeDataBlocks();
-
-        }
-
-        public void InitSaveStreamHelper(string savePathFolder)
-        {
             SavePath = savePathFolder;
 
-            if (!Directory.Exists(SavePath))
-            {
-                Console.WriteLine("Directory does not exist, creating directory...");
-                Directory.CreateDirectory(SavePath);
-            }
+            if (Directory.Exists(SavePath)) return;
+            Console.WriteLine("Directory does not exist, creating directory...");
+            Directory.CreateDirectory(SavePath);
         }
 
-        private void InitializeStreamTypes()
+        public string SavePath { get; }
+
+        /// <summary>
+        ///     Set file name
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void SetFileName(string fileName)
         {
-            var streamTypesConfig = ConfigurationManager.GetSection("Enums/streamTypes") as NameValueCollection;
-            var streamValues = streamTypesConfig.AllKeys;
-            for (int i = 0; i < streamValues.Length; i++)
-            {
-                streamTypes.Add(ushort.Parse(streamValues[i]), streamTypesConfig[i]);
-            }
+            _bytesWriter?.Dispose();
+            var pathWithFileName = SavePath + '/' + fileName;
+            _currentFileStream = File.Open(pathWithFileName, FileMode.OpenOrCreate);
+            _bytesWriter = new BinaryWriter(_currentFileStream, Encoding.UTF8);
         }
 
-        private void InitilaizeDataBlocks()
+        public double GetCurrentFileSize()
         {
-            dataBufferBlock = new BufferBlock<byte[]>();
-            transformDataBlock = new TransformBlock<byte[], char[]>((data) =>
+            var fileSize = ConvertBytesToMegabytes(_currentFileStream.Length);
+            return fileSize;
+        }
+
+        private static long ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024) / 1024;
+        }
+
+
+        private void InitializeDataBlocks()
+        {
+            _dataBufferBlock = new BufferBlock<byte[]>();
+            _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data));
+            _saveToFileBlock = new ActionBlock<byte[]>(data =>
             {
-                return transformDataCallback(data);
+                SaveFileCallback(data);
             });
-            saveToFileBlock = new ActionBlock<char[]>( (data) =>
-            {
-                saveFileCallback(SavePath, data);
-            });
-            dataBufferBlock.LinkTo(transformDataBlock);
-            transformDataBlock.LinkTo(saveToFileBlock);
+
+            _dataBufferBlock.LinkTo(_transformDataBlock);
+            _transformDataBlock.LinkTo(_saveToFileBlock);
         }
 
-        private static char[] transformDataCallback(byte[] data)
+        private static byte[] TransformDataCallback(byte[] data)
         {
-            var encodedData = Encoding.UTF8.GetChars(data);
             //TODO: transform data here if needed
-            return encodedData;
+            return data;
         }
 
-        private void saveFileCallback(string savePathFolder, char[] data)
+        private void SaveFileCallback(byte[] data)
         {
-            ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
-            var readedBytes = File.ReadAllLines(savePathFolder + '/' + saveFileName, Encoding.UTF8);
-
-            Console.WriteLine("Saved file: " + saveFileName);
+            ByteArrayToFile(data);
         }
 
-        private static bool ByteArrayToFile(string path, char[] byteArray)
+        private void ByteArrayToFile(byte[] byteArray)
         {
             try
             {
-                using (var fs = new StreamWriter(path, true, Encoding.UTF8))
-                {
-                    fs.WriteLine(byteArray);
-                    fs.Flush();
-                    fs.Dispose();
-                    return true;
-                }
+                _bytesWriter.Write(byteArray);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception caught in process: {0}", ex);
-                return false;
             }
-        }
-        private string GetBufferType(byte[] serverIdentData)
-        {
-            ushort serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            if (streamTypes.Count > 0 && streamTypes.ContainsKey(serverIdent))
-            {
-                return streamTypes[serverIdent];
-            }
-            return null;
         }
 
-        public bool SaveData(byte[] data, string saveFileName)
+        private static string GetBufferType(byte[] serverIdentData)
         {
-            this.saveFileName = GetBufferType(data) + "_" + saveFileName;
+            var serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
+            ChannelNames channel = (ChannelNames) serverIdent;
+            var channelName = Enum.GetName(typeof(ChannelNames), channel);
+            return channelName != "" ? channelName : null;
+        }
+
+        public bool SaveData(byte[] data, string newFileName)
+        {
+            //Checks wether to change file name
+            if (_dateFileName != newFileName)
+            {
+                _dateFileName = newFileName;
+                SetFileName(GetBufferType(data) + "_" + newFileName);
+            }
+
             try
             {
-                dataBufferBlock.Post(data);
+                _dataBufferBlock.Post(data);
                 return true;
-
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error: "+e.Message);
+                Console.WriteLine("Error: " + e.Message);
             }
+
             return false;
         }
-
     }
 }

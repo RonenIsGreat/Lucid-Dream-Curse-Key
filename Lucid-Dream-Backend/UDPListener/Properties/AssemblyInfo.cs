@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SaveStreamHelper")]
+[assembly: AssemblyTitle("UDPListener")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SaveStreamHelper")]
+[assembly: AssemblyProduct("UDPListener")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4ec3755b-b4b7-48dd-9dfe-4f4c3f35c13b")]
+[assembly: Guid("c4baa696-5cd7-4eba-a143-1c42bedef314")]
 
 // Version information for an assembly consists of the following four values:
 //
