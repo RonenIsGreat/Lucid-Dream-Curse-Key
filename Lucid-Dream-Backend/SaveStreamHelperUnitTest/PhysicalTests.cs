@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using SaveStream;
 using static Tests.StaticVariables;
 
 namespace Tests
@@ -27,7 +28,7 @@ namespace Tests
                 }
         }
 
-        private static SaveStream.SaveStreamHelper _saveStreamHelper;
+        private static SaveStreamHelper _saveStreamHelper;
         private static byte[] testData;
         private string fileName = "TestFileName";
         private const string savePath = "C:\\Recordings\\";

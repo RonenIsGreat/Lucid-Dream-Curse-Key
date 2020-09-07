@@ -10,9 +10,10 @@ namespace SaveStream
     {
         private BinaryWriter _bytesWriter;
         private BufferBlock<byte[]> _dataBufferBlock;
-        private string _saveFileName;
+        private string _dateFileName;
         private ActionBlock<byte[]> _saveToFileBlock;
         private TransformBlock<byte[], byte[]> _transformDataBlock;
+        private FileStream _currentFileStream;
 
 
         public SaveStreamHelper(string savePathFolder)
@@ -35,15 +36,32 @@ namespace SaveStream
         public void SetFileName(string fileName)
         {
             _bytesWriter?.Dispose();
-            var pathWithFileName = SavePath + '/' + _saveFileName;
-            _bytesWriter = new BinaryWriter(File.Open(pathWithFileName, FileMode.OpenOrCreate), Encoding.UTF8);
+            var pathWithFileName = SavePath + '/' + fileName;
+            _currentFileStream = File.Open(pathWithFileName, FileMode.OpenOrCreate);
+            _bytesWriter = new BinaryWriter(_currentFileStream, Encoding.UTF8);
         }
+
+        public double GetCurrentFileSize()
+        {
+            var fileSize = ConvertBytesToMegabytes(_currentFileStream.Length);
+            return fileSize;
+        }
+
+        private static long ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024) / 1024;
+        }
+
 
         private void InitializeDataBlocks()
         {
             _dataBufferBlock = new BufferBlock<byte[]>();
             _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data));
-            _saveToFileBlock = new ActionBlock<byte[]>(data => { SaveFileCallback(SavePath, data); });
+            _saveToFileBlock = new ActionBlock<byte[]>(data =>
+            {
+                SaveFileCallback(data);
+            });
+
             _dataBufferBlock.LinkTo(_transformDataBlock);
             _transformDataBlock.LinkTo(_saveToFileBlock);
         }
@@ -54,13 +72,12 @@ namespace SaveStream
             return data;
         }
 
-        private void SaveFileCallback(string savePathFolder, byte[] data)
+        private void SaveFileCallback(byte[] data)
         {
-            ByteArrayToFile(savePathFolder + '/' + _saveFileName, data);
-            Console.WriteLine("Saved file: " + _saveFileName);
+            ByteArrayToFile(data);
         }
 
-        private void ByteArrayToFile(string path, byte[] byteArray)
+        private void ByteArrayToFile(byte[] byteArray)
         {
             try
             {
@@ -83,9 +100,9 @@ namespace SaveStream
         public bool SaveData(byte[] data, string newFileName)
         {
             //Checks wether to change file name
-            if (_saveFileName != newFileName)
+            if (_dateFileName != newFileName)
             {
-                _saveFileName = newFileName;
+                _dateFileName = newFileName;
                 SetFileName(GetBufferType(data) + "_" + newFileName);
             }
 

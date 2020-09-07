@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using Controller;
 using GlobalResourses;
 using UDPListener;
 
@@ -29,7 +28,7 @@ namespace Lucid_Dream_Backend
             for (var i = 0; i < udpListeners.Length; i++)
             {
                 udpListeners[i] = new UdpListener(_Ports[i]);
-               consumers[i] = new Consumer.Consumer(udpListeners[i], savePath);
+                consumers[i] = new Consumer.Consumer(udpListeners[i], savePath);
                 consumers[i].ListenToQueue();
             } //End For
 
