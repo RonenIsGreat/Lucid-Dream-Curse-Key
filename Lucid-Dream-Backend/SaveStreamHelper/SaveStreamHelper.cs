@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GlobalResourses;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -10,24 +11,28 @@ namespace SaveStream
 {
     public class SaveStreamHelper
     {
-        private ActionBlock<char[]> saveToFileBlock;
+        private ActionBlock<byte[]> saveToFileBlock;
         private BufferBlock<byte[]> dataBufferBlock;
-        private TransformBlock<byte[], char[]> transformDataBlock;
-        private readonly Dictionary<ushort, string> streamTypes;
+        private TransformBlock<byte[], byte[]> transformDataBlock;
         private string saveFileName;
         public string SavePath { get; private set; }
+        private BinaryWriter bytesWriter;
 
-        private static readonly SaveStreamHelper _instance;
-        public static SaveStreamHelper Instance => _instance ?? new SaveStreamHelper();
 
-        private SaveStreamHelper()
+        public SaveStreamHelper()
         {
-            streamTypes = new Dictionary<ushort, string>();
-
-            InitializeStreamTypes();
-
             InitilaizeDataBlocks();
+        }
 
+        /// <summary>
+        /// Set file name
+        /// </summary>
+        /// <param name="path"></param>
+        public void SetFileName(string fileName)
+        {
+            bytesWriter?.Dispose();
+            var pathWithFileName = SavePath + '/' + saveFileName;
+            bytesWriter = new BinaryWriter(File.Open(pathWithFileName, FileMode.OpenOrCreate), Encoding.UTF8);
         }
 
         public void InitSaveStreamHelper(string savePathFolder)
@@ -41,24 +46,14 @@ namespace SaveStream
             }
         }
 
-        private void InitializeStreamTypes()
-        {
-            var streamTypesConfig = ConfigurationManager.GetSection("Enums/streamTypes") as NameValueCollection;
-            var streamValues = streamTypesConfig.AllKeys;
-            for (int i = 0; i < streamValues.Length; i++)
-            {
-                streamTypes.Add(ushort.Parse(streamValues[i]), streamTypesConfig[i]);
-            }
-        }
-
         private void InitilaizeDataBlocks()
         {
             dataBufferBlock = new BufferBlock<byte[]>();
-            transformDataBlock = new TransformBlock<byte[], char[]>((data) =>
+            transformDataBlock = new TransformBlock<byte[], byte[]>((data) =>
             {
                 return transformDataCallback(data);
             });
-            saveToFileBlock = new ActionBlock<char[]>( (data) =>
+            saveToFileBlock = new ActionBlock<byte[]>( (data) =>
             {
                 saveFileCallback(SavePath, data);
             });
@@ -66,32 +61,24 @@ namespace SaveStream
             transformDataBlock.LinkTo(saveToFileBlock);
         }
 
-        private static char[] transformDataCallback(byte[] data)
+        private static byte[] transformDataCallback(byte[] data)
         {
-            var encodedData = Encoding.UTF8.GetChars(data);
             //TODO: transform data here if needed
-            return encodedData;
+            return data;
         }
 
-        private void saveFileCallback(string savePathFolder, char[] data)
+        private void saveFileCallback(string savePathFolder, byte[] data)
         {
             ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
-            var readedBytes = File.ReadAllLines(savePathFolder + '/' + saveFileName, Encoding.UTF8);
-
             Console.WriteLine("Saved file: " + saveFileName);
         }
 
-        private static bool ByteArrayToFile(string path, char[] byteArray)
+        private bool ByteArrayToFile(string path, byte[] byteArray)
         {
             try
             {
-                using (var fs = new StreamWriter(path, true, Encoding.UTF8))
-                {
-                    fs.WriteLine(byteArray);
-                    fs.Flush();
-                    fs.Dispose();
-                    return true;
-                }
+                bytesWriter.Write(byteArray);
+                return true;
             }
             catch (Exception ex)
             {
@@ -102,16 +89,21 @@ namespace SaveStream
         private string GetBufferType(byte[] serverIdentData)
         {
             ushort serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            if (streamTypes.Count > 0 && streamTypes.ContainsKey(serverIdent))
-            {
-                return streamTypes[serverIdent];
-            }
+            ChannelNames channel = (ChannelNames) serverIdent;
+            var channelName = Enum.GetName(typeof(ChannelNames), channel);
+            if (channelName != "")
+                return channelName;
             return null;
         }
 
-        public bool SaveData(byte[] data, string saveFileName)
+        public bool SaveData(byte[] data, string newFileName)
         {
-            this.saveFileName = GetBufferType(data) + "_" + saveFileName;
+            //Checks wether to change file name
+            if(this.saveFileName != newFileName)
+            {
+                this.saveFileName = newFileName;
+                SetFileName(GetBufferType(data) + "_" + newFileName);
+            }
             try
             {
                 dataBufferBlock.Post(data);

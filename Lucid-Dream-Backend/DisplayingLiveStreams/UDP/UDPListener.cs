@@ -8,26 +8,26 @@ namespace Controller
 {
     public class UDPListener
     {
-        public Port _Port { get; private set; }
-        private UdpClient listener;
-        private IPEndPoint groupEP;
+        public ChannelDetails _Param { get; private set; }
+        private Socket listener;
+        private readonly IPEndPoint groupEP;
         public BigInteger MessageCount { get; private set; }
 
-        public delegate void OnDataReceivedDelegate(object sender, byte[] data);
+        public delegate void OnDataReceivedDelegate(object sender, StateObject data);
 
         // Declare the event.
         public event OnDataReceivedDelegate OnDataReceived;
 
-        public UDPListener(Port port)
+        public UDPListener(ChannelDetails port)
         {
-            _Port = port;
+            _Param = port;
 
             //Initalize client port
-            int clientPort = this._Port.GetPortNumber();
+            int clientPort = this._Param.GetPortNumber();
 
             //Initialize udp endpoint(server)
             groupEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
-            listener = new UdpClient(groupEP);
+            listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             //specefies the number of 1400 bytes messages that have been received
             MessageCount = 0;
 
@@ -38,69 +38,79 @@ namespace Controller
 
         private void InitSocket()
         {
-            listener.Client.ReceiveTimeout = 1000;
-            listener.Client.ReceiveBufferSize = 1400;
+            listener.ReceiveTimeout = 1000;
+            listener.ReceiveBufferSize = 1400;
         }
 
         public void StartListener()
         {
-            if (!IsAlreadyListening())
+            if (!IsListening())
             {
                 try
                 {
-                    listener?.Connect(groupEP);
+                    if(listener== null)
+                        listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
+                    listener.ExclusiveAddressUse = false;
+                    listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    listener.Bind(groupEP);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    OnReceiveError(e);
                 }
+                BeginReceivingNewData();
             }
-            BeginReceivingNewData();
         }//End StartListener
 
+        /// <summary>
+        /// Stops the listener temporerly
+        /// </summary>
         public void StopListener()
         {
             try
             {
-                listener?.Client?.Shutdown(SocketShutdown.Both);
+                listener.Shutdown(SocketShutdown.Both);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                OnReceiveError(e);
             }
         }
 
-        private bool IsAlreadyListening()
+        /// <summary>
+        /// Hard stops the listner and frees resources
+        /// </summary>
+        public void HardStop()
         {
             try
             {
-                return listener.Client.Connected;
+                listener.Shutdown(SocketShutdown.Both);
+                listener.Close();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                return false;
+                OnReceiveError(e);
             }
+        }
+
+        public bool IsListening()
+        {
+            return listener.IsBound;
         }
 
         private void OnDataRecived(IAsyncResult result)
         {
+            StateObject state = (StateObject)result.AsyncState;
+
             //get current message
-            byte[] received = listener.EndReceive(result, ref groupEP);
+            state.bytesCount = listener.EndReceive(result);
             BeginReceivingNewData();
 
-            if (received != null)
+            if (state.buffer != null)
             {
-                OnDataReceived?.Invoke(this, received);
+                OnDataReceived?.Invoke(this, state);
                 MessageCount++;
             }
-
-            //Start receiving next message
-
-            //TODO: remember to delete this
-            Console.WriteLine("{0} : {1}", this._Port.GetName(), _Port.GetStatus());
-            // Console.WriteLine("{0} : {1}", this._Port.GetName(), this._Port.GetS);
-
         }
 
         private void OnReceiveError(Exception e)
@@ -111,11 +121,11 @@ namespace Controller
                 {
                     case (int)SocketError.TimedOut:
                         //Request timed out
-                        _Port.SetStatus(false);
+                        _Param.SetStatus(false);
                         break;
                     case (int)SocketError.Shutdown:
                         //Socket has been closed
-                        _Port.SetStatus(false);
+                        _Param.SetStatus(false);
                         break;
                     default:
                         Console.WriteLine(e.Message);
@@ -126,9 +136,11 @@ namespace Controller
 
         private void BeginReceivingNewData()
         {
+            StateObject state = new StateObject();
             try
             {
-                listener.BeginReceive(new AsyncCallback(OnDataRecived), null);
+                listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
+                    OnDataRecived, state);
             }
             catch (Exception e)
             {
@@ -136,8 +148,8 @@ namespace Controller
             }
             finally
             {
-                if (_Port.GetStatus() == false)
-                    _Port.SetStatus(true);
+                if (_Param.GetStatus() == false)
+                    _Param.SetStatus(true);
             }
         }
 

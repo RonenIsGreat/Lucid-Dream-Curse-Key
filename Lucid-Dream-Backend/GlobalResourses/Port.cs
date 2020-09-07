@@ -1,13 +1,13 @@
 ﻿
 namespace GlobalResourses
 {
-    public class Port
+    public class ChannelDetails
     {
         protected readonly ChannelNames _name;
         protected readonly int _number;
         protected bool _status;
 
-        public Port(ChannelNames name, int number)
+        public ChannelDetails(ChannelNames name, int number)
         {
             this._name = name;
             this._number = number;

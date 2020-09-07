@@ -51,5 +51,11 @@
     <Compile Include="SaveStreamHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
+      <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
+      <Name>GlobalResourses</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

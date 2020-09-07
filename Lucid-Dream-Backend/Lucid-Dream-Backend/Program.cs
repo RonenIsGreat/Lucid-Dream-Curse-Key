@@ -24,14 +24,14 @@ namespace Lucid_Dream_Backend
             saveStreamHelper.InitSaveStreamHelper(savePath);
 
             //Initializing The Ports
-            Port[] _Ports = new Port[6];
+            ChannelDetails[] _Ports = new ChannelDetails[6];
 
-            _Ports[0] = new Port(ChannelNames.CasStave, 25101);
-            _Ports[1] = new Port(ChannelNames.FasTasStave, 25102);
-            _Ports[2] = new Port(ChannelNames.PRSStave, 25103);
-            _Ports[3] = new Port(ChannelNames.CasBeam, 25104);
-            _Ports[4] = new Port(ChannelNames.FasTasBeam, 25105);
-            _Ports[5] = new Port(ChannelNames.IDRSBus, 25106);
+            _Ports[0] = new ChannelDetails(ChannelNames.CasStave, 25101);
+            _Ports[1] = new ChannelDetails(ChannelNames.FasTasStave, 25102);
+            _Ports[2] = new ChannelDetails(ChannelNames.PRSStave, 25103);
+            _Ports[3] = new ChannelDetails(ChannelNames.CasBeam, 25104);
+            _Ports[4] = new ChannelDetails(ChannelNames.FasTasBeam, 25105);
+            _Ports[5] = new ChannelDetails(ChannelNames.IDRSBus, 25106);
 
             UDPListener[] _UdpListeners = new UDPListener[6];
             Consumer[] _Consumers = new Consumer[6];
@@ -51,19 +51,16 @@ namespace Lucid_Dream_Backend
 
         }//End Main
 
-        private static void onDataReceived(object sender, byte[] data)
+        private static void onDataReceived(object sender, StateObject data)
         {
+            UDPListener currentListener = (UDPListener)sender;
+
             //This date format can be saved as file name
-            var dateAsString = DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss");
-            bool succeeded = saveStreamHelper.SaveData(data, dateAsString);
+            var dateAsString = DateTime.Now.ToString("yyyy-dd-M--HH-mm");
+            bool succeeded = saveStreamHelper.SaveData(data.buffer, dateAsString);
             if (!succeeded)
             {
                 Console.WriteLine("Failed to save message");
-            }
-            else
-            {
-                //Also write data in console
-                var dataAsUtf8 = Encoding.UTF8.GetString(data);
             }
             //Data goes in here
         }

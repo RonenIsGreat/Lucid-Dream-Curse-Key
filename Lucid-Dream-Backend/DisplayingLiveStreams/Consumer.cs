@@ -20,7 +20,7 @@ namespace Controller
         }
         public void ListenToQueue()
         {
-            var port = udpClient._Port;
+            var port = udpClient._Param;
             var factory = new ConnectionFactory() { HostName = "localhost" };
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();

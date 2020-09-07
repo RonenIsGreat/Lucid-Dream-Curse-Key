@@ -35,7 +35,7 @@ namespace Tests
                     testData[i] = num[0];
                 }
             }
-            saveStreamHelper = new SaveStreamHelper(savePath);
+            saveStreamHelper = SaveStreamHelper.Instance;
         }
 
         [Test]

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>LiveStreamsDisplay</RootNamespace>
-    <AssemblyName>LiveStreamsDisplay</AssemblyName>
+    <RootNamespace>Controller</RootNamespace>
+    <AssemblyName>Controller</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -72,12 +72,12 @@
     <Compile Include="Producer.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UDPListener.cs" />
+    <Compile Include="UDP\UDPListener.cs" />
+    <Compile Include="UDP\StateObject.cs" />
     <Compile Include="UserInput.cs" />
     <Compile Include="WelcomeMessage.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
