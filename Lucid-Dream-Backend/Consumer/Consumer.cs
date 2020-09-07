@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Text;
+using GlobalResourses;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using SaveStream;
 using UDPListener;
 
-namespace Controller
+namespace Consumer
 {
     public class Consumer
     {
-        private readonly SaveStreamHelper.SaveStreamHelper _streamSaver;
+        private readonly SaveStreamHelper _streamSaver;
         private readonly UdpListener _udpClient;
 
         public Consumer(UdpListener uDP, string savePath)
         {
             _udpClient = uDP;
-            _streamSaver = new SaveStreamHelper.SaveStreamHelper(savePath);
+            _streamSaver = new SaveStreamHelper(savePath);
         }
 
         public void ListenToQueue()
         {
-            var port = _udpClient.Param;
-            var factory = new ConnectionFactory {HostName = "localhost"};
-            var connection = factory.CreateConnection();
-            var channel = connection.CreateModel();
+            ChannelDetails port = _udpClient.Param;
+            ConnectionFactory factory = new ConnectionFactory {HostName = "localhost"};
+            IConnection connection = factory.CreateConnection();
+            IModel channel = connection.CreateModel();
             channel.ExchangeDeclare("channelControl",
                 "direct", true);
             var queueName = channel.QueueDeclare().QueueName;

@@ -10,7 +10,7 @@ namespace Lucid_Dream_Backend
     {
         private static void Main(string[] args)
         {
-            //Initlize and get the save stream helper instance
+            //Initialize and get the save stream helper instance
             var savePath = ConfigurationManager.AppSettings["save-path"];
 
             //Initializing The Ports
@@ -23,13 +23,13 @@ namespace Lucid_Dream_Backend
             _Ports[4] = new ChannelDetails(ChannelNames.FasTasBeam, 25105);
             _Ports[5] = new ChannelDetails(ChannelNames.IDRSBus, 25106);
 
-            UdpListener[] udpListeners = new UdpListener[6];
-            Consumer[] consumers = new Consumer[6];
+            var udpListeners = new UdpListener[6];
+            var consumers = new Consumer.Consumer[6];
 
             for (var i = 0; i < udpListeners.Length; i++)
             {
                 udpListeners[i] = new UdpListener(_Ports[i]);
-               consumers[i] = new Consumer(udpListeners[i], savePath);
+               consumers[i] = new Consumer.Consumer(udpListeners[i], savePath);
                 consumers[i].ListenToQueue();
             } //End For
 

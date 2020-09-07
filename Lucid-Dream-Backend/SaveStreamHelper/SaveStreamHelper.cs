@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks.Dataflow;
 using GlobalResourses;
 
-namespace SaveStreamHelper
+namespace SaveStream
 {
     public class SaveStreamHelper
     {
