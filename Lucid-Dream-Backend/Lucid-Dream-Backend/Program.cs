@@ -20,8 +20,7 @@ namespace Lucid_Dream_Backend
         {
             //Initlize and get the save stream helper instance
             var savePath = ConfigurationManager.AppSettings["save-path"];
-            saveStreamHelper = SaveStreamHelper.Instance;
-            saveStreamHelper.InitSaveStreamHelper(savePath);
+            saveStreamHelper = new SaveStreamHelper(savePath);
 
             //Initializing The Ports
             ChannelDetails[] _Ports = new ChannelDetails[6];

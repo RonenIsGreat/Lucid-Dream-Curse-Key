@@ -1,36 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using GlobalResourses;
-
-
 
 namespace Controller
 {
     public class Consumer
     {
-        UDPListener udpClient;
+        private readonly UDPListener udpClient;
+
         public Consumer(UDPListener uDP)
         {
             udpClient = uDP;
         }
+
         public void ListenToQueue()
         {
             var port = udpClient._Param;
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory {HostName = "localhost"};
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
-            channel.ExchangeDeclare(exchange: "channelControl",
-                                    type: "direct", durable: true);
+            channel.ExchangeDeclare("channelControl",
+                "direct", true);
             var queueName = channel.QueueDeclare().QueueName;
 
-            channel.QueueBind(queue: queueName,
-                                exchange: "channelControl",
-                                routingKey: port.GetName().ToString());
+            channel.QueueBind(queueName,
+                "channelControl",
+                port.GetName().ToString());
 
 
             Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
@@ -46,12 +42,11 @@ namespace Controller
                 else if (message.Equals("OFF"))
                     udpClient.StopListener();
                 Console.WriteLine(" [x] Received '{0}':'{1}'",
-                                  routingKey, message);
+                    routingKey, message);
             };
-            channel.BasicConsume(queue: queueName,
-                                 autoAck: true,
-                                 consumer: consumer);
-
+            channel.BasicConsume(queueName,
+                true,
+                consumer);
         }
     }
 }

@@ -11,17 +11,25 @@ namespace SaveStream
 {
     public class SaveStreamHelper
     {
-        private ActionBlock<byte[]> saveToFileBlock;
-        private BufferBlock<byte[]> dataBufferBlock;
+        private ActionBlock<byte[]> _saveToFileBlock;
+        private BufferBlock<byte[]> _dataBufferBlock;
         private TransformBlock<byte[], byte[]> transformDataBlock;
         private string saveFileName;
         public string SavePath { get; private set; }
         private BinaryWriter bytesWriter;
 
 
-        public SaveStreamHelper()
+        public SaveStreamHelper(string savePathFolder)
         {
             InitilaizeDataBlocks();
+
+            SavePath = savePathFolder;
+
+            if (!Directory.Exists(SavePath))
+            {
+                Console.WriteLine("Directory does not exist, creating directory...");
+                Directory.CreateDirectory(SavePath);
+            }
         }
 
         /// <summary>
@@ -35,30 +43,19 @@ namespace SaveStream
             bytesWriter = new BinaryWriter(File.Open(pathWithFileName, FileMode.OpenOrCreate), Encoding.UTF8);
         }
 
-        public void InitSaveStreamHelper(string savePathFolder)
-        {
-            SavePath = savePathFolder;
-
-            if (!Directory.Exists(SavePath))
-            {
-                Console.WriteLine("Directory does not exist, creating directory...");
-                Directory.CreateDirectory(SavePath);
-            }
-        }
-
         private void InitilaizeDataBlocks()
         {
-            dataBufferBlock = new BufferBlock<byte[]>();
+            _dataBufferBlock = new BufferBlock<byte[]>();
             transformDataBlock = new TransformBlock<byte[], byte[]>((data) =>
             {
                 return transformDataCallback(data);
             });
-            saveToFileBlock = new ActionBlock<byte[]>( (data) =>
+            _saveToFileBlock = new ActionBlock<byte[]>( (data) =>
             {
                 saveFileCallback(SavePath, data);
             });
-            dataBufferBlock.LinkTo(transformDataBlock);
-            transformDataBlock.LinkTo(saveToFileBlock);
+            _dataBufferBlock.LinkTo(transformDataBlock);
+            transformDataBlock.LinkTo(_saveToFileBlock);
         }
 
         private static byte[] transformDataCallback(byte[] data)
@@ -106,7 +103,7 @@ namespace SaveStream
             }
             try
             {
-                dataBufferBlock.Post(data);
+                _dataBufferBlock.Post(data);
                 return true;
 
             }

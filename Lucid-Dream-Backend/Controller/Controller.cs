@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RabbitMQ.Client;
-using Controller;
 using GlobalResourses;
 
 /* every time the user presses 'Accept', it will be translated to a list of all channels we
@@ -14,17 +10,19 @@ using GlobalResourses;
 
 namespace Controller
 {
-    public class Controller {
-
-        static private List<ChannelNames> activeList = new List<ChannelNames>(),
-                                   nonActiveList = new List<ChannelNames>();
+    public class Controller
+    {
         private const string Activate = "ON", Deactivate = "OFF";
 
- 
+        private static readonly List<ChannelNames> activeList = new List<ChannelNames>();
+
+        private static List<ChannelNames> nonActiveList = new List<ChannelNames>();
+
+
         public static void Run()
         {
-            UserInput input = new UserInput();
-            Producer controller = new Producer();
+            var input = new UserInput();
+            var controller = new Producer();
 
             /*
             Consumer[] consumersArray = new Consumer[6];
@@ -43,12 +41,11 @@ namespace Controller
                 // all channels are non active by default
                 activeList.Clear();
                 nonActiveList = Enum.GetValues(typeof(ChannelNames)).Cast<ChannelNames>().ToList();
-                foreach (var channel in channelsList) {
- 
-                    activeList.Add(channel);                     // update checked channels
+                foreach (var channel in channelsList)
+                {
+                    activeList.Add(channel); // update checked channels
 
-                    nonActiveList.Remove(channel);               // update non-checked channels
-
+                    nonActiveList.Remove(channel); // update non-checked channels
                 }
                 /* 
                 Console.WriteLine("ACTIVE");
@@ -60,16 +57,12 @@ namespace Controller
                 /* send "OFF" to all channels that weren't checked - in nonActiveList
                    *send "ON"  to all channels in activeList Enum.ToString(channel)*/
 
-                foreach (var channelToActivate in activeList) {
+                foreach (var channelToActivate in activeList)
                     controller.SendMessage(Activate, channelToActivate.ToString());
-                }
 
                 foreach (var channelToDeactivate in nonActiveList)
-                {
                     controller.SendMessage(Deactivate, channelToDeactivate.ToString());
-                }
             }
-
         }
     }
 }

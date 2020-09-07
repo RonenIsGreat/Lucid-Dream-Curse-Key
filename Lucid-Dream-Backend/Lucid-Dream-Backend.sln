@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveStreamHelper", "SaveStr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveStreamHelperUnitTest", "SaveStreamHelperUnitTest\SaveStreamHelperUnitTest.csproj", "{3A5645A0-8DA9-40C0-84FC-E1724BF48F97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller", "DisplayingLiveStreams\Controller.csproj", "{115E97EE-48BB-42A6-9F11-D7D1548BA69A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller", "Controller\Controller.csproj", "{115E97EE-48BB-42A6-9F11-D7D1548BA69A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalResourses", "GlobalResourses\GlobalResourses.csproj", "{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}"
 EndProject

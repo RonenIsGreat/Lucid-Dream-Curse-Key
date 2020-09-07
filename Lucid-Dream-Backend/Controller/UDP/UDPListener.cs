@@ -8,22 +8,17 @@ namespace Controller
 {
     public class UDPListener
     {
-        public ChannelDetails _Param { get; private set; }
-        private Socket listener;
-        private readonly IPEndPoint groupEP;
-        public BigInteger MessageCount { get; private set; }
-
         public delegate void OnDataReceivedDelegate(object sender, StateObject data);
 
-        // Declare the event.
-        public event OnDataReceivedDelegate OnDataReceived;
+        private readonly IPEndPoint groupEP;
+        private Socket listener;
 
         public UDPListener(ChannelDetails port)
         {
             _Param = port;
 
             //Initalize client port
-            int clientPort = this._Param.GetPortNumber();
+            var clientPort = _Param.GetPortNumber();
 
             //Initialize udp endpoint(server)
             groupEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
@@ -32,9 +27,13 @@ namespace Controller
             MessageCount = 0;
 
             InitSocket();
+        } //End UDPListener Constructor
 
+        public ChannelDetails _Param { get; }
+        public BigInteger MessageCount { get; private set; }
 
-        }//End UDPListener Constructor
+        // Declare the event.
+        public event OnDataReceivedDelegate OnDataReceived;
 
         private void InitSocket()
         {
@@ -44,12 +43,12 @@ namespace Controller
 
         public void StartListener()
         {
+            if (listener == null)
+                listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             if (!IsListening())
             {
                 try
                 {
-                    if(listener== null)
-                        listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
                     listener.ExclusiveAddressUse = false;
                     listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                     listener.Bind(groupEP);
@@ -58,12 +57,13 @@ namespace Controller
                 {
                     OnReceiveError(e);
                 }
+
                 BeginReceivingNewData();
             }
-        }//End StartListener
+        } //End StartListener
 
         /// <summary>
-        /// Stops the listener temporerly
+        ///     Stops the listener temporerly
         /// </summary>
         public void StopListener()
         {
@@ -78,7 +78,7 @@ namespace Controller
         }
 
         /// <summary>
-        /// Hard stops the listner and frees resources
+        ///     Hard stops the listner and frees resources
         /// </summary>
         public void HardStop()
         {
@@ -100,7 +100,7 @@ namespace Controller
 
         private void OnDataRecived(IAsyncResult result)
         {
-            StateObject state = (StateObject)result.AsyncState;
+            var state = (StateObject) result.AsyncState;
 
             //get current message
             state.bytesCount = listener.EndReceive(result);
@@ -116,14 +116,13 @@ namespace Controller
         private void OnReceiveError(Exception e)
         {
             if (e is SocketException socketException)
-            {
                 switch (socketException.ErrorCode)
                 {
-                    case (int)SocketError.TimedOut:
+                    case (int) SocketError.TimedOut:
                         //Request timed out
                         _Param.SetStatus(false);
                         break;
-                    case (int)SocketError.Shutdown:
+                    case (int) SocketError.Shutdown:
                         //Socket has been closed
                         _Param.SetStatus(false);
                         break;
@@ -131,12 +130,11 @@ namespace Controller
                         Console.WriteLine(e.Message);
                         break;
                 }
-            }
         }
 
         private void BeginReceivingNewData()
         {
-            StateObject state = new StateObject();
+            var state = new StateObject();
             try
             {
                 listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
@@ -152,7 +150,5 @@ namespace Controller
                     _Param.SetStatus(true);
             }
         }
-
-    }//End UDPListener
-
-}//End Displaying Listener
+    } //End UDPListener
+} //End Displaying Listener
