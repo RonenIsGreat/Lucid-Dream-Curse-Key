@@ -4,54 +4,53 @@ using System.Net.Sockets;
 using System.Numerics;
 using GlobalResourses;
 
-namespace Controller
+namespace UDPListener
 {
-    public class UDPListener
+    public class UdpListener
     {
         public delegate void OnDataReceivedDelegate(object sender, StateObject data);
 
-        private readonly IPEndPoint groupEP;
-        private Socket listener;
+        private readonly IPEndPoint _groupEp;
+        private Socket _listener;
+        public ChannelDetails Param { get; }
+        public BigInteger MessageCount { get; private set; }
 
-        public UDPListener(ChannelDetails port)
+        public UdpListener(ChannelDetails port)
         {
-            _Param = port;
+            Param = port;
 
-            //Initalize client port
-            var clientPort = _Param.GetPortNumber();
+            //Initialize client port
+            var clientPort = Param.GetPortNumber();
 
             //Initialize udp endpoint(server)
-            groupEP = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
-            listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
+            _groupEp = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
+            _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             //specefies the number of 1400 bytes messages that have been received
             MessageCount = 0;
 
             InitSocket();
         } //End UDPListener Constructor
 
-        public ChannelDetails _Param { get; }
-        public BigInteger MessageCount { get; private set; }
-
         // Declare the event.
         public event OnDataReceivedDelegate OnDataReceived;
 
         private void InitSocket()
         {
-            listener.ReceiveTimeout = 1000;
-            listener.ReceiveBufferSize = 1400;
+            _listener.ReceiveTimeout = 1000;
+            _listener.ReceiveBufferSize = 1400;
         }
 
         public void StartListener()
         {
-            if (listener == null)
-                listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
+            if (_listener == null)
+                _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             if (!IsListening())
             {
                 try
                 {
-                    listener.ExclusiveAddressUse = false;
-                    listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    listener.Bind(groupEP);
+                    _listener.ExclusiveAddressUse = false;
+                    _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    _listener.Bind(_groupEp);
                 }
                 catch (Exception e)
                 {
@@ -69,7 +68,7 @@ namespace Controller
         {
             try
             {
-                listener.Shutdown(SocketShutdown.Both);
+                _listener.Shutdown(SocketShutdown.Both);
             }
             catch (Exception e)
             {
@@ -84,8 +83,8 @@ namespace Controller
         {
             try
             {
-                listener.Shutdown(SocketShutdown.Both);
-                listener.Close();
+                _listener.Shutdown(SocketShutdown.Both);
+                _listener.Close();
             }
             catch (Exception e)
             {
@@ -95,7 +94,7 @@ namespace Controller
 
         public bool IsListening()
         {
-            return listener.IsBound;
+            return _listener.IsBound;
         }
 
         private void OnDataRecived(IAsyncResult result)
@@ -103,7 +102,7 @@ namespace Controller
             var state = (StateObject) result.AsyncState;
 
             //get current message
-            state.bytesCount = listener.EndReceive(result);
+            state.bytesCount = _listener.EndReceive(result);
             BeginReceivingNewData();
 
             if (state.buffer != null)
@@ -120,11 +119,11 @@ namespace Controller
                 {
                     case (int) SocketError.TimedOut:
                         //Request timed out
-                        _Param.SetStatus(false);
+                        Param.SetStatus(false);
                         break;
                     case (int) SocketError.Shutdown:
                         //Socket has been closed
-                        _Param.SetStatus(false);
+                        Param.SetStatus(false);
                         break;
                     default:
                         Console.WriteLine(e.Message);
@@ -137,7 +136,7 @@ namespace Controller
             var state = new StateObject();
             try
             {
-                listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
+                _listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
                     OnDataRecived, state);
             }
             catch (Exception e)
@@ -146,8 +145,8 @@ namespace Controller
             }
             finally
             {
-                if (_Param.GetStatus() == false)
-                    _Param.SetStatus(true);
+                if (Param.GetStatus() == false)
+                    Param.SetStatus(true);
             }
         }
     } //End UDPListener

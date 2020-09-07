@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Controller
+namespace UDPListener
 {
     public class StateObject
     {

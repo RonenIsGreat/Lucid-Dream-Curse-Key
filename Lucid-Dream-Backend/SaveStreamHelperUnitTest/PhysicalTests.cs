@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using SaveStream;
 using static Tests.StaticVariables;
 
 namespace Tests
@@ -26,10 +25,9 @@ namespace Tests
                     var num = Encoding.UTF8.GetBytes(test.ToString());
                     testData[i] = num[0];
                 }
-
         }
 
-        private static SaveStreamHelper saveStreamHelper;
+        private static SaveStreamHelper.SaveStreamHelper _saveStreamHelper;
         private static byte[] testData;
         private string fileName = "TestFileName";
         private const string savePath = "C:\\Recordings\\";
@@ -38,7 +36,7 @@ namespace Tests
         public void SaveFile_FileExists_True()
         {
             fileName = getStreamType(testData, fileName);
-            saveStreamHelper.SaveData(testData, fileName);
+            _saveStreamHelper.SaveData(testData, fileName);
             Assert.True(File.Exists(savePath + fileName), "File does not exist");
         }
 

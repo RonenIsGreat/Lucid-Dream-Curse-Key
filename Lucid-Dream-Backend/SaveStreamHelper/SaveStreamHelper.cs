@@ -4,28 +4,26 @@ using System.Text;
 using System.Threading.Tasks.Dataflow;
 using GlobalResourses;
 
-namespace SaveStream
+namespace SaveStreamHelper
 {
     public class SaveStreamHelper
     {
+        private BinaryWriter _bytesWriter;
         private BufferBlock<byte[]> _dataBufferBlock;
+        private string _saveFileName;
         private ActionBlock<byte[]> _saveToFileBlock;
-        private BinaryWriter bytesWriter;
-        private string saveFileName;
-        private TransformBlock<byte[], byte[]> transformDataBlock;
+        private TransformBlock<byte[], byte[]> _transformDataBlock;
 
 
         public SaveStreamHelper(string savePathFolder)
         {
-            InitilaizeDataBlocks();
+            InitializeDataBlocks();
 
             SavePath = savePathFolder;
 
-            if (!Directory.Exists(SavePath))
-            {
-                Console.WriteLine("Directory does not exist, creating directory...");
-                Directory.CreateDirectory(SavePath);
-            }
+            if (Directory.Exists(SavePath)) return;
+            Console.WriteLine("Directory does not exist, creating directory...");
+            Directory.CreateDirectory(SavePath);
         }
 
         public string SavePath { get; }
@@ -33,65 +31,61 @@ namespace SaveStream
         /// <summary>
         ///     Set file name
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="fileName"></param>
         public void SetFileName(string fileName)
         {
-            bytesWriter?.Dispose();
-            var pathWithFileName = SavePath + '/' + saveFileName;
-            bytesWriter = new BinaryWriter(File.Open(pathWithFileName, FileMode.OpenOrCreate), Encoding.UTF8);
+            _bytesWriter?.Dispose();
+            var pathWithFileName = SavePath + '/' + _saveFileName;
+            _bytesWriter = new BinaryWriter(File.Open(pathWithFileName, FileMode.OpenOrCreate), Encoding.UTF8);
         }
 
-        private void InitilaizeDataBlocks()
+        private void InitializeDataBlocks()
         {
             _dataBufferBlock = new BufferBlock<byte[]>();
-            transformDataBlock = new TransformBlock<byte[], byte[]>(data => { return transformDataCallback(data); });
-            _saveToFileBlock = new ActionBlock<byte[]>(data => { saveFileCallback(SavePath, data); });
-            _dataBufferBlock.LinkTo(transformDataBlock);
-            transformDataBlock.LinkTo(_saveToFileBlock);
+            _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data));
+            _saveToFileBlock = new ActionBlock<byte[]>(data => { SaveFileCallback(SavePath, data); });
+            _dataBufferBlock.LinkTo(_transformDataBlock);
+            _transformDataBlock.LinkTo(_saveToFileBlock);
         }
 
-        private static byte[] transformDataCallback(byte[] data)
+        private static byte[] TransformDataCallback(byte[] data)
         {
             //TODO: transform data here if needed
             return data;
         }
 
-        private void saveFileCallback(string savePathFolder, byte[] data)
+        private void SaveFileCallback(string savePathFolder, byte[] data)
         {
-            ByteArrayToFile(savePathFolder + '/' + saveFileName, data);
-            Console.WriteLine("Saved file: " + saveFileName);
+            ByteArrayToFile(savePathFolder + '/' + _saveFileName, data);
+            Console.WriteLine("Saved file: " + _saveFileName);
         }
 
-        private bool ByteArrayToFile(string path, byte[] byteArray)
+        private void ByteArrayToFile(string path, byte[] byteArray)
         {
             try
             {
-                bytesWriter.Write(byteArray);
-                return true;
+                _bytesWriter.Write(byteArray);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Exception caught in process: {0}", ex);
-                return false;
             }
         }
 
-        private string GetBufferType(byte[] serverIdentData)
+        private static string GetBufferType(byte[] serverIdentData)
         {
             var serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            var channel = (ChannelNames) serverIdent;
+            ChannelNames channel = (ChannelNames) serverIdent;
             var channelName = Enum.GetName(typeof(ChannelNames), channel);
-            if (channelName != "")
-                return channelName;
-            return null;
+            return channelName != "" ? channelName : null;
         }
 
         public bool SaveData(byte[] data, string newFileName)
         {
             //Checks wether to change file name
-            if (saveFileName != newFileName)
+            if (_saveFileName != newFileName)
             {
-                saveFileName = newFileName;
+                _saveFileName = newFileName;
                 SetFileName(GetBufferType(data) + "_" + newFileName);
             }
 

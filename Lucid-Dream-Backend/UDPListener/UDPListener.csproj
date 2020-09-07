@@ -4,19 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{40A9DD67-B3DA-4131-B56F-9ECB0DEA9E4D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Lucid_Dream_Backend</RootNamespace>
-    <AssemblyName>Lucid-Dream-Backend</AssemblyName>
+    <ProjectGuid>{C4BAA696-5CD7-4EBA-A143-1C42BEDEF314}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UDPListener</RootNamespace>
+    <AssemblyName>UDPListener</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -36,7 +32,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
@@ -47,28 +42,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateObject.cs" />
+    <Compile Include="UDPListener.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Controller\Controller.csproj">
-      <Project>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</Project>
-      <Name>Controller</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
       <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
       <Name>GlobalResourses</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SaveStreamHelper\SaveStreamHelper.csproj">
-      <Project>{4EC3755B-B4B7-48DD-9DFE-4F4C3F35C13B}</Project>
-      <Name>SaveStreamHelper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UDPListener\UDPListener.csproj">
-      <Project>{C4BAA696-5CD7-4EBA-A143-1C42BEDEF314}</Project>
-      <Name>UDPListener</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
