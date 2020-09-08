@@ -62,6 +62,10 @@
       <Project>{115E97EE-48BB-42A6-9F11-D7D1548BA69A}</Project>
       <Name>Controller</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DBManager\DBManager.csproj">
+      <Project>{4546B72A-B9EE-412E-8C81-1F052C589C8A}</Project>
+      <Name>DBManager</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
       <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
       <Name>GlobalResourses</Name>

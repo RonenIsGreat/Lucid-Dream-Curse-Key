@@ -13,10 +13,10 @@ namespace Consumer
         private readonly SaveStreamHelper _streamSaver;
         private readonly UdpListener _udpClient;
 
-        public Consumer(UdpListener uDP, string savePath)
+        public Consumer(UdpListener uDp, string savePath, string dbConnectionUrl)
         {
-            _udpClient = uDP;
-            _streamSaver = new SaveStreamHelper(savePath);
+            _udpClient = uDp;
+            _streamSaver = new SaveStreamHelper(savePath, dbConnectionUrl);
         }
 
         public void ListenToQueue()
@@ -44,13 +44,13 @@ namespace Consumer
                 var routingKey = ea.RoutingKey;
                 if (message.Equals("ON"))
                 {
-                    _udpClient.OnDataReceived += _udpClient_OnDataReceived;
+                    _udpClient.DataReceivedDelegate += UdpClientDataReceivedDelegate;
                     _udpClient.StartListener();
                 }
                 else if (message.Equals("OFF"))
                 {
                     _udpClient.StopListener();
-                    _udpClient.OnDataReceived -= _udpClient_OnDataReceived;
+                    _udpClient.DataReceivedDelegate -= UdpClientDataReceivedDelegate;
                 }
 
                 Console.WriteLine(" [x] Received '{0}':'{1}'",
@@ -61,7 +61,7 @@ namespace Consumer
                 consumer);
         }
 
-        private void _udpClient_OnDataReceived(object sender, StateObject data)
+        private void UdpClientDataReceivedDelegate(object sender, StateObject data)
         {
             UdpListener currentListener = (UdpListener) sender;
 

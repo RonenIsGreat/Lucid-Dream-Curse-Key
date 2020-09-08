@@ -15,6 +15,9 @@ namespace UDPListener
         public ChannelDetails Param { get; }
         public BigInteger MessageCount { get; private set; }
 
+        // Declare the event.
+        public event OnDataReceivedDelegate DataReceivedDelegate;
+
         public UdpListener(ChannelDetails port)
         {
             Param = port;
@@ -31,38 +34,35 @@ namespace UDPListener
             InitSocket();
         } //End UDPListener Constructor
 
-        // Declare the event.
-        public event OnDataReceivedDelegate OnDataReceived;
-
         private void InitSocket()
         {
             _listener.ReceiveTimeout = 1000;
             _listener.ReceiveBufferSize = 1400;
         }
 
+        #region Public Methods
         public void StartListener()
         {
             if (_listener == null)
                 _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
-            if (!IsListening())
+            //If already listening return like nothing happened
+            if (IsListening()) return;
+            try
             {
-                try
-                {
-                    _listener.ExclusiveAddressUse = false;
-                    _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    _listener.Bind(_groupEp);
-                }
-                catch (Exception e)
-                {
-                    OnReceiveError(e);
-                }
-
-                BeginReceivingNewData();
+                _listener.ExclusiveAddressUse = false;
+                _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                _listener.Bind(_groupEp);
             }
+            catch (Exception e)
+            {
+                OnReceiveError(e);
+            }
+
+            BeginReceivingNewData();
         } //End StartListener
 
         /// <summary>
-        ///     Stops the listener temporerly
+        ///     Stops the listener temporally
         /// </summary>
         public void StopListener()
         {
@@ -77,7 +77,7 @@ namespace UDPListener
         }
 
         /// <summary>
-        ///     Hard stops the listner and frees resources
+        ///     Hard stops the listener and frees resources
         /// </summary>
         public void HardStop()
         {
@@ -96,39 +96,41 @@ namespace UDPListener
         {
             return _listener.IsBound;
         }
+        #endregion
 
-        private void OnDataRecived(IAsyncResult result)
+        #region Helper Methods
+        private void OnReceiveError(Exception e)
         {
-            var state = (StateObject) result.AsyncState;
+            if (!(e is SocketException socketException)) return;
+            switch (socketException.ErrorCode)
+            {
+                case (int)SocketError.TimedOut:
+                    //Request timed out
+                    Param.SetStatus(false);
+                    break;
+                case (int)SocketError.Shutdown:
+                    //Socket has been closed
+                    Param.SetStatus(false);
+                    break;
+                default:
+                    Console.WriteLine(e.Message);
+                    break;
+            }
+        }
+        #endregion
+
+        #region Callbacks
+        private void OnDataReceived(IAsyncResult result)
+        {
+            var state = (StateObject)result.AsyncState;
 
             //get current message
             state.bytesCount = _listener.EndReceive(result);
             BeginReceivingNewData();
 
-            if (state.buffer != null)
-            {
-                OnDataReceived?.Invoke(this, state);
-                MessageCount++;
-            }
-        }
-
-        private void OnReceiveError(Exception e)
-        {
-            if (e is SocketException socketException)
-                switch (socketException.ErrorCode)
-                {
-                    case (int) SocketError.TimedOut:
-                        //Request timed out
-                        Param.SetStatus(false);
-                        break;
-                    case (int) SocketError.Shutdown:
-                        //Socket has been closed
-                        Param.SetStatus(false);
-                        break;
-                    default:
-                        Console.WriteLine(e.Message);
-                        break;
-                }
+            if (state.buffer == null) return;
+            DataReceivedDelegate?.Invoke(this, state);
+            MessageCount++;
         }
 
         private void BeginReceivingNewData()
@@ -137,7 +139,7 @@ namespace UDPListener
             try
             {
                 _listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
-                    OnDataRecived, state);
+                    OnDataReceived, state);
             }
             catch (Exception e)
             {
@@ -149,5 +151,6 @@ namespace UDPListener
                     Param.SetStatus(true);
             }
         }
+        #endregion
     } //End UDPListener
 } //End Displaying Listener

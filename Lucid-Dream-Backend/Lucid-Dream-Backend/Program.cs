@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using DBManager;
 using GlobalResourses;
 using UDPListener;
 
@@ -11,6 +12,9 @@ namespace Lucid_Dream_Backend
         {
             //Initialize and get the save stream helper instance
             var savePath = ConfigurationManager.AppSettings["save-path"];
+            var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
+
+            DatabaseManager database = new DatabaseManager("mongodb://localhost");
 
             //Initializing The Ports
             var _Ports = new ChannelDetails[6];
@@ -28,7 +32,7 @@ namespace Lucid_Dream_Backend
             for (var i = 0; i < udpListeners.Length; i++)
             {
                 udpListeners[i] = new UdpListener(_Ports[i]);
-                consumers[i] = new Consumer.Consumer(udpListeners[i], savePath);
+                consumers[i] = new Consumer.Consumer(udpListeners[i], savePath, dbConnectionUrl);
                 consumers[i].ListenToQueue();
             } //End For
 

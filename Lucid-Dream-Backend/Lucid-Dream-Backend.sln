@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDPListener", "UDPListener\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer", "Consumer\Consumer.csproj", "{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBManager", "DBManager\DBManager.csproj", "{4546B72A-B9EE-412E-8C81-1F052C589C8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4546B72A-B9EE-412E-8C81-1F052C589C8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4546B72A-B9EE-412E-8C81-1F052C589C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4546B72A-B9EE-412E-8C81-1F052C589C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4546B72A-B9EE-412E-8C81-1F052C589C8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{FA571AE4-C20C-4932-A168-EA30C2DA2B8B} = {955F4B9D-8A9F-4115-A596-E5E0F6B3DD53}
 		{C4BAA696-5CD7-4EBA-A143-1C42BEDEF314} = {955F4B9D-8A9F-4115-A596-E5E0F6B3DD53}
 		{53F73DB9-191F-4D41-9AF1-BE2784ADE8BD} = {955F4B9D-8A9F-4115-A596-E5E0F6B3DD53}
+		{4546B72A-B9EE-412E-8C81-1F052C589C8A} = {955F4B9D-8A9F-4115-A596-E5E0F6B3DD53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {53D324DF-671F-4488-855A-C7E6700D5D01}
