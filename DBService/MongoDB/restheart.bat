@@ -8,7 +8,7 @@ if not exist "%restheartPath%" (
    echo given directory does not exist on the filesystem
    goto :END
 )
-if not exist "%restheartPath%/restheart.jar"(
+if not exist "%restheartPath%/restheart.jar" (
    echo restheart.jar file does not exist in folder
    goto :END
 ) 
@@ -25,7 +25,7 @@ if %errorlevel% == 9009 (
 echo ok
 
 :Start
-java -Dfile.encoding=UTF-8 -server -jar "%restheartPath%/restheart.jar" "%restheartPath%/etc/restheart.yml"
+java -Dfile.encoding=UTF-8 -server -jar "%restheartPath%/restheart.jar" "%restheartPath%/etc/restheart.yml" -e "%restheartPath%/etc/dev.properties"
 GOTO End
 
 :END

@@ -12,11 +12,6 @@ namespace UDPListener
 
         private readonly IPEndPoint _groupEp;
         private Socket _listener;
-        public ChannelDetails Param { get; }
-        public BigInteger MessageCount { get; private set; }
-
-        // Declare the event.
-        public event OnDataReceivedDelegate DataReceivedDelegate;
 
         public UdpListener(ChannelDetails port)
         {
@@ -34,13 +29,43 @@ namespace UDPListener
             InitSocket();
         } //End UDPListener Constructor
 
+        public ChannelDetails Param { get; }
+        public BigInteger MessageCount { get; private set; }
+
+        // Declare the event.
+        public event OnDataReceivedDelegate DataReceivedDelegate;
+
         private void InitSocket()
         {
             _listener.ReceiveTimeout = 1000;
             _listener.ReceiveBufferSize = 1400;
         }
 
+        #region Helper Methods
+
+        private void OnReceiveError(Exception e)
+        {
+            if (!(e is SocketException socketException)) return;
+            switch (socketException.ErrorCode)
+            {
+                case (int) SocketError.TimedOut:
+                    //Request timed out
+                    Param.SetStatus(false);
+                    break;
+                case (int) SocketError.Shutdown:
+                    //Socket has been closed
+                    Param.SetStatus(false);
+                    break;
+                default:
+                    Console.WriteLine(e.Message);
+                    break;
+            }
+        }
+
+        #endregion
+
         #region Public Methods
+
         public void StartListener()
         {
             if (_listener == null)
@@ -96,33 +121,14 @@ namespace UDPListener
         {
             return _listener.IsBound;
         }
-        #endregion
 
-        #region Helper Methods
-        private void OnReceiveError(Exception e)
-        {
-            if (!(e is SocketException socketException)) return;
-            switch (socketException.ErrorCode)
-            {
-                case (int)SocketError.TimedOut:
-                    //Request timed out
-                    Param.SetStatus(false);
-                    break;
-                case (int)SocketError.Shutdown:
-                    //Socket has been closed
-                    Param.SetStatus(false);
-                    break;
-                default:
-                    Console.WriteLine(e.Message);
-                    break;
-            }
-        }
         #endregion
 
         #region Callbacks
+
         private void OnDataReceived(IAsyncResult result)
         {
-            var state = (StateObject)result.AsyncState;
+            var state = (StateObject) result.AsyncState;
 
             //get current message
             state.bytesCount = _listener.EndReceive(result);
@@ -151,6 +157,7 @@ namespace UDPListener
                     Param.SetStatus(true);
             }
         }
+
         #endregion
     } //End UDPListener
 } //End Displaying Listener

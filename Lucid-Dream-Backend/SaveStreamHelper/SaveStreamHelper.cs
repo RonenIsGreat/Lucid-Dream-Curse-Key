@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using DBManager;
@@ -12,11 +10,11 @@ namespace SaveStream
     {
         //For saving into DB
         private static DatabaseManager _dbManager;
+        private readonly ConcurrentExclusiveSchedulerPair _scheduler;
 
         private BufferBlock<byte[]> _dataBufferBlock;
         private ActionBlock<byte[]> _saveToFileBlock;
         private TransformBlock<byte[], byte[]> _transformDataBlock;
-        private readonly ConcurrentExclusiveSchedulerPair _scheduler;
 
 
         public SaveStreamHelper(string savePathFolder, string dbConnectionUrl)
@@ -32,25 +30,26 @@ namespace SaveStream
 
         private void InitializeDataBlocks()
         {
-            var execOptions = new ExecutionDataflowBlockOptions()
+            var execOptions = new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount,
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
-            var generalOptions = new DataflowBlockOptions()
+            var generalOptions = new DataflowBlockOptions
             {
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
 
             _dataBufferBlock = new BufferBlock<byte[]>(generalOptions);
             _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data), execOptions);
-            _saveToFileBlock = new ActionBlock<byte[]>(data => { PushToDb(data); } , execOptions);
+            _saveToFileBlock = new ActionBlock<byte[]>(data => { PushToDb(data); }, execOptions);
 
             _dataBufferBlock.LinkTo(_transformDataBlock);
             _transformDataBlock.LinkTo(_saveToFileBlock);
         }
 
         #region Data Flow Actions
+
         private static void PushToDb(byte[] byteArray)
         {
             try
@@ -67,6 +66,7 @@ namespace SaveStream
         #endregion
 
         #region Public Methods
+
         public bool SaveData(byte[] data, string newFileName)
         {
             try
@@ -81,9 +81,11 @@ namespace SaveStream
 
             return false;
         }
+
         #endregion
 
         #region Helper Methods
+
         private static byte[] TransformDataCallback(byte[] data)
         {
             //TODO: transform data here if needed
@@ -93,9 +95,10 @@ namespace SaveStream
         private static ChannelNames GetBufferType(byte[] serverIdentData)
         {
             var serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            ChannelNames channel = (ChannelNames)serverIdent;
+            ChannelNames channel = (ChannelNames) serverIdent;
             return channel;
         }
+
         #endregion
     }
 }

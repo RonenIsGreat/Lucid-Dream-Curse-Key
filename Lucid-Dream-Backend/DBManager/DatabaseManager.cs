@@ -8,31 +8,60 @@ namespace DBManager
 {
     public class DatabaseManager
     {
-        private readonly IMongoCollection<MessageModel> _dbClient;
+        private readonly IMongoDatabase _dbClient;
 
         public DatabaseManager(string connectionString)
         {
-            _dbClient = new MongoClient(connectionString).GetDatabase("records").GetCollection<MessageModel>("records");
-            CreateIndexers();
+            // Get Database for all records
+            _dbClient = new MongoClient(connectionString).GetDatabase("records");
+            //Create collections for each stream type and indexers for dates
+            CreateAllCollections();
         }
 
-        private async void CreateIndexers()
+        private void CreateAllCollections()
         {
+            var channelTypes = Enum.GetNames(typeof(ChannelNames));
+
+            foreach (var channel in channelTypes)
+            {
+                var collection = _dbClient.GetCollection<MessageModel>(channel);
+                CreateIndexers(collection);
+            }
+        }
+
+        private static async void CreateIndexers(IMongoCollection<MessageModel> collection)
+        {
+            if (collection == null) return;
             var messageIndexBuilder = Builders<MessageModel>.IndexKeys;
             CreateIndexOptions options = new CreateIndexOptions
             {
                 Name = "expireAfterHoursIndex",
                 ExpireAfter = TimeSpan.FromHours(1)
             };
-            var indexModel = new CreateIndexModel<MessageModel>(messageIndexBuilder.Ascending(x => x.Date), options);
-            await _dbClient.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
+            var indexModel =
+                new CreateIndexModel<MessageModel>(messageIndexBuilder.Ascending(x => x.Date), options);
+            await collection.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
+        }
+
+        private IMongoCollection<MessageModel> GetCollectionByStreamType(MessageModel message)
+        {
+            return _dbClient.GetCollection<MessageModel>(Enum.GetName(typeof(ChannelNames), message.ChannelName));
         }
 
         public void SaveBinaryBased(byte[] content, ChannelNames channelType)
         {
-            MessageModel messageModel = new MessageModel
-                {Data = content, Date = BsonDateTime.Create(DateTime.Now), ChannelName = channelType};
-            _dbClient.InsertOneAsync(messageModel);
+            try
+            {
+                MessageModel messageModel = new MessageModel
+                    {Data = content, Date = BsonDateTime.Create(DateTime.Now), ChannelName = channelType};
+                var collectionByType = GetCollectionByStreamType(messageModel);
+                collectionByType.InsertOneAsync(messageModel);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                    \
+            }
         }
     }
 }
