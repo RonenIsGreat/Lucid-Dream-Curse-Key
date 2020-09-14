@@ -21,5 +21,23 @@ namespace Controller.RestAPIController
 
             _server = new HttpSelfHostServer(config);
         }
+
+        public async Task<bool> StartAsync()
+        {
+            try
+            {
+                await _server.OpenAsync();
+
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("FAILED");
+                return false;
+            }
+
+
+
+          return true;
+        }
     }
 }
