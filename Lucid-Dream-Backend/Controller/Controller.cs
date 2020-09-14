@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GlobalResourses;
 
+
 /* every time the user presses 'Accept', it will be translated to a list of all channels we
  * want to activate.
  * The main program will use direct exchange via RabbitMQ service and will send the checked
