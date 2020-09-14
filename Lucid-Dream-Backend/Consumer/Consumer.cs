@@ -13,10 +13,10 @@ namespace Consumer
         private readonly SaveStreamHelper _streamSaver;
         private readonly UdpListener _udpClient;
 
-        public Consumer(UdpListener uDp, string savePath, string dbConnectionUrl)
+        public Consumer(UdpListener uDp, string dbConnectionUrl)
         {
             _udpClient = uDp;
-            _streamSaver = new SaveStreamHelper(savePath, dbConnectionUrl);
+            _streamSaver = new SaveStreamHelper( dbConnectionUrl);
         }
 
         public void ListenToQueue()

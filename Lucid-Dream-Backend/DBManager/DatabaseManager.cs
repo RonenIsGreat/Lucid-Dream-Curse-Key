@@ -39,7 +39,7 @@ namespace DBManager
                 ExpireAfter = TimeSpan.FromHours(1)
             };
             var indexModel =
-                new CreateIndexModel<MessageModel>(messageIndexBuilder.Ascending(x => x.Date), options);
+                new CreateIndexModel<MessageModel>(messageIndexBuilder.Ascending(x => x._date), options);
             await collection.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
         }
 
@@ -53,14 +53,13 @@ namespace DBManager
             try
             {
                 MessageModel messageModel = new MessageModel
-                    {Data = content, Date = BsonDateTime.Create(DateTime.Now), ChannelName = channelType};
+                    {Data = content, _date = BsonDateTime.Create(DateTime.Now.ToUniversalTime()), ChannelName = channelType};
                 var collectionByType = GetCollectionByStreamType(messageModel);
                 collectionByType.InsertOneAsync(messageModel);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                    \
             }
         }
     }

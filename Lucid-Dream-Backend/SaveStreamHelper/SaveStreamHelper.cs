@@ -17,11 +17,11 @@ namespace SaveStream
         private TransformBlock<byte[], byte[]> _transformDataBlock;
 
 
-        public SaveStreamHelper(string savePathFolder, string dbConnectionUrl)
+        public SaveStreamHelper(string dbConnectionUrl)
         {
-            InitializeDataBlocks();
-
             _scheduler = new ConcurrentExclusiveSchedulerPair();
+
+            InitializeDataBlocks();
 
             if (_dbManager == null)
                 _dbManager = new DatabaseManager(dbConnectionUrl);
@@ -30,12 +30,12 @@ namespace SaveStream
 
         private void InitializeDataBlocks()
         {
-            var execOptions = new ExecutionDataflowBlockOptions
+            ExecutionDataflowBlockOptions execOptions = new ExecutionDataflowBlockOptions
             {
                 MaxDegreeOfParallelism = Environment.ProcessorCount,
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
-            var generalOptions = new DataflowBlockOptions
+            DataflowBlockOptions generalOptions = new DataflowBlockOptions
             {
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };

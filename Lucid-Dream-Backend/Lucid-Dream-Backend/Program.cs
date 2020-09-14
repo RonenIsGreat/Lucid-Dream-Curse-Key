@@ -11,7 +11,6 @@ namespace Lucid_Dream_Backend
         private static void Main(string[] args)
         {
             //Initialize and get the save stream helper instance
-            var savePath = ConfigurationManager.AppSettings["save-path"];
             var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
 
             DatabaseManager database = new DatabaseManager("mongodb://localhost");
@@ -32,7 +31,7 @@ namespace Lucid_Dream_Backend
             for (var i = 0; i < udpListeners.Length; i++)
             {
                 udpListeners[i] = new UdpListener(_Ports[i]);
-                consumers[i] = new Consumer.Consumer(udpListeners[i], savePath, dbConnectionUrl);
+                consumers[i] = new Consumer.Consumer(udpListeners[i], dbConnectionUrl);
                 consumers[i].ListenToQueue();
             } //End For
 
