@@ -1,4 +1,5 @@
-﻿using GlobalResourses;
+﻿using System.Collections.Generic;
+using GlobalResourses;
 using MongoDB.Bson;
 
 namespace DBManager.Models

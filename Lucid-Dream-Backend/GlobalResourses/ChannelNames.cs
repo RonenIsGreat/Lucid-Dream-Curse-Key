@@ -2,8 +2,9 @@
 {
     public enum ChannelNames
     {
-        CasBeam,
+        Null,
         CasStave,
+        CasBeam,
         FasTasBeam,
         FasTasStave,
         PRSStave,

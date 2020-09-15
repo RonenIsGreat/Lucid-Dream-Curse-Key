@@ -36,8 +36,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson, Version=2.11.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Bson.2.11.1\lib\net452\MongoDB.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,8 +51,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChannelNames.cs" />
+    <Compile Include="Models\BatchedMessages.cs" />
+    <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Port.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

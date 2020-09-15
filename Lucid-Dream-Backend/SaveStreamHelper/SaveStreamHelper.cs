@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using DBManager;
+using DBManager.Models;
 using GlobalResourses;
+using SaveStreamHelper.Models;
 
 namespace SaveStream
 {
@@ -12,14 +17,17 @@ namespace SaveStream
         private static DatabaseManager _dbManager;
         private readonly ConcurrentExclusiveSchedulerPair _scheduler;
 
+        private Dictionary<ChannelNames, ulong> NumberOfMessagesByChannelTypeMap;
+
         private BufferBlock<byte[]> _dataBufferBlock;
-        private ActionBlock<byte[]> _saveToFileBlock;
-        private TransformBlock<byte[], byte[]> _transformDataBlock;
+        private TransformBlock<byte[], BatchedMessages> _transformByteArrayToWraped;
+        private ActionBlock<IList<BatchedMessages>> _saveToFileBlock;
 
 
         public SaveStreamHelper(string dbConnectionUrl)
         {
             _scheduler = new ConcurrentExclusiveSchedulerPair();
+            NumberOfMessagesByChannelTypeMap = new Dictionary<ChannelNames, ulong>();
 
             InitializeDataBlocks();
 
@@ -40,22 +48,24 @@ namespace SaveStream
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
 
+            _transformByteArrayToWraped = new TransformBlock<byte[], BatchedMessages>(data => TransformDataCallback(data), execOptions);
             _dataBufferBlock = new BufferBlock<byte[]>(generalOptions);
-            _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data), execOptions);
-            _saveToFileBlock = new ActionBlock<byte[]>(data => { PushToDb(data); }, execOptions);
+            _saveToFileBlock = new ActionBlock<IList<BatchedMessages>>(data => { PushToDb(data); }, execOptions);
 
-            _dataBufferBlock.LinkTo(_transformDataBlock);
-            _transformDataBlock.LinkTo(_saveToFileBlock);
+            _dataBufferBlock.LinkTo(_transformByteArrayToWraped);
+            _transformByteArrayToWraped.LinkTo(_saveToFileBlock);
         }
 
         #region Data Flow Actions
 
-        private static void PushToDb(byte[] byteArray)
+        private static void PushToDb(IList<BatchedMessages> multipleByteArray)
         {
             try
             {
-                ChannelNames channelType = GetBufferType(byteArray);
-                _dbManager.SaveBinaryBased(byteArray, channelType);
+                foreach (BatchedMessages batchedMessages in multipleByteArray)
+                {
+                    _dbManager.SaveBinaryBased(batchedMessages.messages, batchedMessages.channelName);
+                }
             }
             catch (Exception ex)
             {
@@ -88,7 +98,6 @@ namespace SaveStream
 
         private static byte[] TransformDataCallback(byte[] data)
         {
-            //TODO: transform data here if needed
             return data;
         }
 
