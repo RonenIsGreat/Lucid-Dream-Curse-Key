@@ -67,8 +67,8 @@ namespace MongoFetchByTime
                         foreach (var res in results)
                         {
 
-                            //DateTime resDate = DateTimeOffset.FromUnixTimeMilliseconds((long)res["_date"]["$date"]).DateTime;
-                            //Console.WriteLine($"ID: {res["_id"]["$oid"]}, Date: {resDate.ToString()}");
+                            DateTime resDate = DateTimeOffset.FromUnixTimeMilliseconds((long)res["_date"]["$date"]).DateTime;
+                            Console.WriteLine($"ID: {res["_id"]["$oid"]}, Date: {resDate.ToString()}");
                             ++countRes;
                         }
 
