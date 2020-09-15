@@ -16,6 +16,7 @@ namespace Controller.RestAPIController
             string restApiAdress = $"http://localhost:{port}";
 
             var config = new HttpSelfHostConfiguration(restApiAdress);
+            config.EnableCors();
             config.Routes.MapHttpRoute("Default", "api/{controller}/{action}");
             config.Formatters.Add(new BrowserJsonFormatter());
 
@@ -29,7 +30,7 @@ namespace Controller.RestAPIController
                 await _server.OpenAsync();
 
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Console.WriteLine("FAILED");
                 return false;
