@@ -21,7 +21,7 @@ namespace Controller.RestAPIController
 
         [HttpPost]
 
-        public IHttpActionResult sendActiveList(string[] checkedChannels)
+        public IHttpActionResult PostActiveList(string[] checkedChannels)
         {
             activeList.Clear();
             nonActiveList = Enum.GetValues(typeof(ChannelNames)).Cast<ChannelNames>().ToList();
