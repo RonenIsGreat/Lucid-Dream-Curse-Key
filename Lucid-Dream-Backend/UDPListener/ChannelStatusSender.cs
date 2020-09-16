@@ -1,13 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using GlobalResourses;
+using RabbitMQ.Client;
+using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UDPListener
 {
     internal class ChannelStatusSender
     {
-
+        public void SendStatusInactive(string channelName)
+        {
+            var factory = new ConnectionFactory { HostName = "localhost" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare("channelStatus",
+                    "direct", true);
+                var body = Encoding.UTF8.GetBytes(channelName);
+                channel.BasicPublish("channelStatus",
+                    "",
+                    null,
+                    body);
+            }
+        }
     }
 }

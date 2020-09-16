@@ -2,9 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
-using System.Text;
 using GlobalResourses;
-using RabbitMQ.Client;
 
 namespace UDPListener
 {
@@ -47,6 +45,8 @@ namespace UDPListener
 
         private void OnReceiveError(Exception e)
         {
+            var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+            var statusSender = new ChannelStatusSender();
             if (!(e is SocketException socketException)) return;
             switch (socketException.ErrorCode)
             {
@@ -62,19 +62,7 @@ namespace UDPListener
                     Console.WriteLine(e.Message);
                     break;
             }
-            string channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
-            var factory = new ConnectionFactory { HostName = "localhost" };
-            using (var connection = factory.CreateConnection())
-            using (var channel = connection.CreateModel())
-            {
-                channel.ExchangeDeclare("channelStatus",
-                    "direct", true);
-                var body = Encoding.UTF8.GetBytes(channelName);
-                channel.BasicPublish("channelStatus",
-                    "",
-                    null,
-                    body);
-            }
+            statusSender.SendStatusInactive(channelName);
         }
 
         #endregion
@@ -108,7 +96,10 @@ namespace UDPListener
         {
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
+                statusSender.SendStatusInactive(channelName);
             }
             catch (Exception e)
             {
@@ -123,8 +114,11 @@ namespace UDPListener
         {
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
                 _listener.Close();
+                statusSender.SendStatusInactive(channelName);
             }
             catch (Exception e)
             {
