@@ -38,7 +38,7 @@ server.listen(port, hostname, () => {
                 throw error1;
             }
             
-            var exchange = 'ChannelStatus';
+            var exchange = 'channelStatus';
 
             channel.assertExchange(exchange, 'fanout', {
                 durable: false

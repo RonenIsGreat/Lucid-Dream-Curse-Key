@@ -2,7 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using System.Text;
 using GlobalResourses;
+using RabbitMQ.Client;
 
 namespace UDPListener
 {
@@ -59,6 +61,19 @@ namespace UDPListener
                 default:
                     Console.WriteLine(e.Message);
                     break;
+            }
+            string channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+            var factory = new ConnectionFactory { HostName = "localhost" };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare("channelStatus",
+                    "direct", true);
+                var body = Encoding.UTF8.GetBytes(channelName);
+                channel.BasicPublish("channelStatus",
+                    "",
+                    null,
+                    body);
             }
         }
 
