@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using DBManager.Models;
 using GlobalResourses;
@@ -8,14 +9,16 @@ namespace SaveStreamHelper.Models
 {
     public class BatchedMessages
     {
-        public BatchedMessages()
+        public BatchedMessages(ChannelNames channelType)
         {
-            messages = new List<MessageModel>();
+            this.ChannelType = Enum.GetName(typeof(ChannelNames), channelType);
+            Messages = new List<MessageModel>();
         }
-        public BsonDateTime _creationDate { get; set; }
 
-        public ChannelNames channelName { get; set; }
-        public IList<MessageModel> messages { get; set; }
-        public BigInteger messagesNum { get; set; }
+        public BsonDateTime CreationDate { get; set; }
+
+        public string ChannelType { get; set; }
+        public IList<MessageModel> Messages { get; set; }
+        public BigInteger NumOfMessages { get; set; }
     }
 }

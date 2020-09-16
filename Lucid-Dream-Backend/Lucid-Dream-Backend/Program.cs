@@ -13,7 +13,7 @@ namespace Lucid_Dream_Backend
             //Initialize and get the save stream helper instance
             var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
 
-            DatabaseManager database = new DatabaseManager("mongodb://localhost");
+            DatabaseManager database = new DatabaseManager("mongodb://localhost", 30);
 
             //Initializing The Ports
             var _Ports = new ChannelDetails[6];

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using DBManager;
 using DBManager.Models;
 using GlobalResourses;
+using MongoDB.Bson;
 using SaveStreamHelper.Models;
 
 namespace SaveStream
@@ -17,22 +19,19 @@ namespace SaveStream
         private static DatabaseManager _dbManager;
         private readonly ConcurrentExclusiveSchedulerPair _scheduler;
 
-        private Dictionary<ChannelNames, ulong> NumberOfMessagesByChannelTypeMap;
-
         private BufferBlock<byte[]> _dataBufferBlock;
-        private TransformBlock<byte[], BatchedMessages> _transformByteArrayToWraped;
-        private ActionBlock<IList<BatchedMessages>> _saveToFileBlock;
+        private TransformBlock<byte[], MessageModel> _transformByteArrayToWraped;
+        private ActionBlock<MessageModel> _saveToFileBlock;
 
 
-        public SaveStreamHelper(string dbConnectionUrl)
+        public SaveStreamHelper(string dbConnectionUrl, BigInteger maxMessagesPerDoc)
         {
             _scheduler = new ConcurrentExclusiveSchedulerPair();
-            NumberOfMessagesByChannelTypeMap = new Dictionary<ChannelNames, ulong>();
 
             InitializeDataBlocks();
 
             if (_dbManager == null)
-                _dbManager = new DatabaseManager(dbConnectionUrl);
+                _dbManager = new DatabaseManager(dbConnectionUrl, maxMessagesPerDoc);
         }
 
 
@@ -48,24 +47,22 @@ namespace SaveStream
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
 
-            _transformByteArrayToWraped = new TransformBlock<byte[], BatchedMessages>(data => TransformDataCallback(data), execOptions);
+            _transformByteArrayToWraped = new TransformBlock<byte[], MessageModel>(data => TransformDataCallback(data), execOptions);
             _dataBufferBlock = new BufferBlock<byte[]>(generalOptions);
-            _saveToFileBlock = new ActionBlock<IList<BatchedMessages>>(data => { PushToDb(data); }, execOptions);
+            _saveToFileBlock = new ActionBlock<MessageModel>(data => { PushToDb(data); }, execOptions);
 
             _dataBufferBlock.LinkTo(_transformByteArrayToWraped);
             _transformByteArrayToWraped.LinkTo(_saveToFileBlock);
         }
 
-        #region Data Flow Actions
+        #region _data Flow Actions
 
-        private static void PushToDb(IList<BatchedMessages> multipleByteArray)
+        private static void PushToDb(MessageModel message)
         {
             try
             {
-                foreach (BatchedMessages batchedMessages in multipleByteArray)
-                {
-                    _dbManager.SaveBinaryBased(batchedMessages.messages, batchedMessages.channelName);
-                }
+                ChannelNames messageType = GetBufferType(message.Data);
+                _dbManager.SaveBinaryBased(message, messageType);
             }
             catch (Exception ex)
             {
@@ -96,9 +93,11 @@ namespace SaveStream
 
         #region Helper Methods
 
-        private static byte[] TransformDataCallback(byte[] data)
+        private static MessageModel TransformDataCallback(byte[] data)
         {
-            return data;
+            MessageModel message = new MessageModel
+                {Data = data, TimeStamp = new BsonDateTime(DateTime.Now).ToUniversalTime()};
+            return message;
         }
 
         private static ChannelNames GetBufferType(byte[] serverIdentData)

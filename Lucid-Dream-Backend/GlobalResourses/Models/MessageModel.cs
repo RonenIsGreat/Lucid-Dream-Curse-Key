@@ -8,7 +8,6 @@ namespace DBManager.Models
     {
         //Contains message data
         public byte[] Data { get; set; }
-        public BsonDateTime _date { get; set; }
-        public ChannelNames ChannelName { get; set; }
+        public BsonDateTime TimeStamp { get; set; }
     }
 }

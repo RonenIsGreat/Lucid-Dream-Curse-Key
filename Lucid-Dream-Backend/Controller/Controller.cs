@@ -28,10 +28,10 @@ namespace Controller
             Consumer[] consumersArray = new Consumer[6];
             // create distinct routing key for each channel
             int i = 0;
-            foreach (string channelName in Enum.GetNames(typeof(ChannelNames)))
+            foreach (string channelType in Enum.GetNames(typeof(ChannelNames)))
             {
                 consumersArray[i] = new Consumer();
-                consumersArray[i].ListenToQueue(channelName);
+                consumersArray[i].ListenToQueue(channelType);
                 i++;
             }*/
             while (true)
