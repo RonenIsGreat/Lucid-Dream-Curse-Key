@@ -56,9 +56,9 @@ server.listen(port, hostname, () => {
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
                     if (msg.content) {
-                        sonarTimeout = msg.content.toString();
+                        sonarTimeoutChannel = msg.content.toString();
                         console.log(` [x] ${msg.content.toString()}`);
-                        socket.emit("StatusSocketIO", sonarTimeout);
+                        socket.emit("StatusSocketIO", sonarTimeoutChannel);
                     }
                 }, {
                     noAck: true
