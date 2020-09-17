@@ -16,11 +16,11 @@ namespace DBManager
     {
         private readonly IMongoDatabase _dbDatabase;
         private readonly IMongoClient _dbClient;
-        private readonly BigInteger maxMessagesPerDoc;
+        private readonly int maxMessagesPerDoc;
         //Limit number of threads to be used for queueing db requests
-        private readonly Semaphore openConnectionSemaphore;
+        private readonly SemaphoreSlim openConnectionSemaphore;
 
-        public DatabaseManager(string connectionString, BigInteger maxMessagesPerDoc)
+        public DatabaseManager(string connectionString, int maxMessagesPerDoc)
         {
             this.maxMessagesPerDoc = maxMessagesPerDoc;
             // Get Database for all records
@@ -28,7 +28,7 @@ namespace DBManager
 
             _dbDatabase = _dbClient.GetDatabase("records");
 
-            openConnectionSemaphore = new Semaphore(_dbClient.Settings.MaxConnectionPoolSize,
+            openConnectionSemaphore = new SemaphoreSlim(_dbClient.Settings.MaxConnectionPoolSize,
                 _dbClient.Settings.MaxConnectionPoolSize);
 
             //Create collections for each stream type and indexers for dates
@@ -64,11 +64,15 @@ namespace DBManager
 
         private async Task<T> AddDbRequest<T>(Task<T> task)
         {
-            openConnectionSemaphore.WaitOne();
+            await openConnectionSemaphore.WaitAsync();
             try
             {
                 T result = await task;
                 return result;
+            }
+            catch (Exception e)
+            {
+                return await Task.FromException<T>(e);
             }
             finally
             {
@@ -96,7 +100,7 @@ namespace DBManager
                 var task = collectionByType.FindOneAndUpdateAsync(filter, appeandAction,
                     new FindOneAndUpdateOptions<BatchedMessages> { IsUpsert = true });
 
-                var result = await AddDbRequest(task);
+                await AddDbRequest(task);
 
             }
             catch (Exception e)
@@ -107,7 +111,6 @@ namespace DBManager
 
         private static void ContinuationAction(object state)
         {
-            //TODO: remove test
         }
 
         private BatchedMessages getNewBatchedMessages(MessageModel firstMessage, ChannelNames channelType)
@@ -122,14 +125,17 @@ namespace DBManager
             return newBatchedMessage;
         }
 
-        private static FilterDefinition<BatchedMessages> GetFilterDefinition(BatchedMessages messageModel, BigInteger maxMessagesPerDoc)
+        private static FilterDefinition<BatchedMessages> GetFilterDefinition(BatchedMessages messageModel, int maxMessagesPerDoc)
         {
             var builder = Builders<BatchedMessages>.Filter;
 
-            var filter = builder.Eq(messages => messages.ChannelType, messageModel.ChannelType);
-                         //& 
-                         //builder.Lt(messages => messages.NumOfMessages, maxMessagesPerDoc);
-            return filter;
+            var filter = builder.Eq(messages => messages.ChannelType, messageModel.ChannelType)
+                         &
+                         builder.Lt(messages => messages.NumOfMessages, maxMessagesPerDoc);
+
+            var dateFilter = builder.Lte(messages => messages.CreationDate, messageModel.CreationDate);
+
+            return filter & dateFilter;
         }
 
     }

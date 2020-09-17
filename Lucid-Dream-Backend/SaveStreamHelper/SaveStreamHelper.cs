@@ -24,7 +24,7 @@ namespace SaveStream
         private ActionBlock<MessageModel> _saveToFileBlock;
 
 
-        public SaveStreamHelper(string dbConnectionUrl, BigInteger maxMessagesPerDoc)
+        public SaveStreamHelper(string dbConnectionUrl, int maxMessagesPerDoc)
         {
             _scheduler = new ConcurrentExclusiveSchedulerPair();
 

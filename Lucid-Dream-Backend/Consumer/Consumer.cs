@@ -16,7 +16,7 @@ namespace Consumer
         public Consumer(UdpListener uDp, string dbConnectionUrl)
         {
             _udpClient = uDp;
-            _streamSaver = new SaveStream.SaveStreamHelper( dbConnectionUrl, 5);
+            _streamSaver = new SaveStream.SaveStreamHelper( dbConnectionUrl, 30);
         }
 
         public void ListenToQueue()

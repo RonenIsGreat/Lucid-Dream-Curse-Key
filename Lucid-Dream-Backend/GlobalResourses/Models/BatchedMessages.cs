@@ -4,9 +4,11 @@ using System.Numerics;
 using DBManager.Models;
 using GlobalResourses;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace SaveStreamHelper.Models
 {
+    [BsonIgnoreExtraElements]
     public class BatchedMessages
     {
         public BatchedMessages(ChannelNames channelType)
@@ -19,6 +21,6 @@ namespace SaveStreamHelper.Models
 
         public string ChannelType { get; set; }
         public IList<MessageModel> Messages { get; set; }
-        public BigInteger NumOfMessages { get; set; }
+        public int NumOfMessages { get; set; }
     }
 }
