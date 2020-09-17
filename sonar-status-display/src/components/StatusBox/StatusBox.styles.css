@@ -1,0 +1,12 @@
+.channel-live {
+    background-color: rgb(39, 214, 39);
+}
+.channel-dead{
+    background-color: red;
+}
+
+.status-box {
+    size: 50%;
+    color: white;
+    background-color: red;
+}
