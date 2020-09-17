@@ -74,7 +74,12 @@ namespace UDPListener
             if (_listener == null)
                 _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             //If already listening return like nothing happened
-            if (IsListening()) return;
+            if (IsListening())
+            {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
+                statusSender.SendStatus($"{channelName} active");
+            }
             try
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());

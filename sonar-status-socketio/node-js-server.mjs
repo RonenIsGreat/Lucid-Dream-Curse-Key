@@ -28,7 +28,7 @@ const socket = io.on("connection", socketCallback);
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 
-    let sonarTimeout;
+    let sonarTimeoutChannel;
     amqp.connect('amqp://localhost', function (error0, connection) {
         if (error0) {
             throw error0;

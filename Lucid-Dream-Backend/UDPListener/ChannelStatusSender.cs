@@ -15,7 +15,7 @@ namespace UDPListener
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare("channelStatus",
-                    "direct", true);
+                    "fanout", false);
                 var body = Encoding.UTF8.GetBytes(channelStatus);
                 channel.BasicPublish("channelStatus",
                     "",

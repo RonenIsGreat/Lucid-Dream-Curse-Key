@@ -1,7 +1,7 @@
-.channel-live {
+.active {
     background-color: rgb(39, 214, 39);
 }
-.channel-dead{
+.inactive{
     background-color: red;
 }
 
