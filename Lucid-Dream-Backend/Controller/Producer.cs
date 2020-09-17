@@ -8,7 +8,7 @@ namespace Controller
     {
         public void SendMessage(string message, string rKey)
         {
-            var factory = new ConnectionFactory {HostName = "localhost"};
+            var factory = new ConnectionFactory {HostName = "localhost", RequestedHeartbeat = TimeSpan.FromSeconds(60)};
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {

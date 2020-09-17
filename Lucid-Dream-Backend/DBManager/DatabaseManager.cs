@@ -8,7 +8,6 @@ using DBManager.Models;
 using GlobalResourses;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Operations;
 using SaveStreamHelper.Models;
 
 namespace DBManager
@@ -58,14 +57,14 @@ namespace DBManager
             };
             var indexModel =
                 new CreateIndexModel<BatchedMessages>(messageIndexBuilder.Ascending(x => x.CreationDate), options);
-            var dbRequest = collection.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
-            await AddDbRequest<string>(openConnectionSemaphore, dbRequest);
+            var dbRequest = collection.Indexes.CreateOneAsync(indexModel);
+
+            await AddDbRequest(dbRequest);
         }
 
-        private static async Task<T> AddDbRequest<T>(Semaphore semaphore, ConfiguredTaskAwaitable<string> task)
+        private async Task<T> AddDbRequest<T>(Task<T> task)
         {
-            //TODO: fix this
-            semaphore.WaitOne();
+            openConnectionSemaphore.WaitOne();
             try
             {
                 T result = await task;
@@ -73,7 +72,7 @@ namespace DBManager
             }
             finally
             {
-                semaphore.Release();
+                openConnectionSemaphore.Release();
             }
         }
 
@@ -94,8 +93,11 @@ namespace DBManager
                     .Push(messages => messages.Messages, content)
                     .Inc(messages => messages.NumOfMessages, 1);
 
-                await collectionByType.FindOneAndUpdateAsync(filter, appeandAction,
-                    new FindOneAndUpdateOptions<BatchedMessages> {IsUpsert = true});
+                var task = collectionByType.FindOneAndUpdateAsync(filter, appeandAction,
+                    new FindOneAndUpdateOptions<BatchedMessages> { IsUpsert = true });
+
+                var result = await AddDbRequest(task);
+
             }
             catch (Exception e)
             {
@@ -124,9 +126,9 @@ namespace DBManager
         {
             var builder = Builders<BatchedMessages>.Filter;
 
-            var filter = builder.Eq(messages => messages.ChannelType, messageModel.ChannelType) 
-                         & 
-                         builder.Lt(messages => messages.NumOfMessages, maxMessagesPerDoc);
+            var filter = builder.Eq(messages => messages.ChannelType, messageModel.ChannelType);
+                         //& 
+                         //builder.Lt(messages => messages.NumOfMessages, maxMessagesPerDoc);
             return filter;
         }
 
