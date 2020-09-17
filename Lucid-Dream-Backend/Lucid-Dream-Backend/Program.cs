@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading;
 using DBManager;
 using GlobalResourses;
 using UDPListener;
@@ -37,7 +38,12 @@ namespace Lucid_Dream_Backend
 
 
             Console.WriteLine("Live Streams :");
-            Controller.Controller.Run();
+            Controller.Controller.RunAsync();
+
+            while (true)
+            {
+                Thread.Sleep(100);
+            }
         } //End Main
     } //End Program
 } //End Lucid_Dream_Backend
