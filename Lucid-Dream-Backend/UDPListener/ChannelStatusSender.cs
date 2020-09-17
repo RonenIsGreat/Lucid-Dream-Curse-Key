@@ -7,15 +7,16 @@ namespace UDPListener
 {
     internal class ChannelStatusSender
     {
-        public void SendStatusInactive(string channelName)
+        public void SendStatus(string channelStatus)
         {
+            // channelStatus is "[channelName] [active/inactive]"
             var factory = new ConnectionFactory { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare("channelStatus",
                     "direct", true);
-                var body = Encoding.UTF8.GetBytes(channelName);
+                var body = Encoding.UTF8.GetBytes(channelStatus);
                 channel.BasicPublish("channelStatus",
                     "",
                     null,

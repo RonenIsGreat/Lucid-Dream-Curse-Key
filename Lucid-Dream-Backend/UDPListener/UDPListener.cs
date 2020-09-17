@@ -62,7 +62,7 @@ namespace UDPListener
                     Console.WriteLine(e.Message);
                     break;
             }
-            statusSender.SendStatusInactive(channelName);
+            statusSender.SendStatus($"{channelName} inactive");
         }
 
         #endregion
@@ -77,9 +77,12 @@ namespace UDPListener
             if (IsListening()) return;
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.ExclusiveAddressUse = false;
                 _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 _listener.Bind(_groupEp);
+                statusSender.SendStatus($"{channelName} active");
             }
             catch (Exception e)
             {
@@ -99,7 +102,7 @@ namespace UDPListener
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
-                statusSender.SendStatusInactive(channelName);
+                statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
             {
@@ -118,7 +121,7 @@ namespace UDPListener
                 var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
                 _listener.Close();
-                statusSender.SendStatusInactive(channelName);
+                statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
             {
