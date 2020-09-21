@@ -79,6 +79,7 @@ namespace UDPListener
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
                 statusSender.SendStatus($"{channelName} active");
+                return;
             }
             try
             {
