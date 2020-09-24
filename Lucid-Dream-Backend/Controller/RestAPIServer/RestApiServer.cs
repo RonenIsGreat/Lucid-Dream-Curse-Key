@@ -30,15 +30,14 @@ namespace Controller.RestAPIController
                 await _server.OpenAsync();
 
             }
-            catch(Exception)
+            catch(Exception e)
             {
                 Console.WriteLine("FAILED");
                 return false;
             }
 
 
-
-          return true;
+            return true;
         }
     }
 }

@@ -40,7 +40,14 @@ namespace DBManager
             };
             var indexModel =
                 new CreateIndexModel<MessageModel>(messageIndexBuilder.Ascending(x => x._date), options);
-            await collection.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
+            try
+            {
+                await collection.Indexes.CreateOneAsync(indexModel).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private IMongoCollection<MessageModel> GetCollectionByStreamType(MessageModel message)
