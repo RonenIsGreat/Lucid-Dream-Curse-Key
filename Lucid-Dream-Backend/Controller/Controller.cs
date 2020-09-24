@@ -15,11 +15,6 @@ namespace Controller
 {
     public class Controller
     {
-        private const string Activate = "ON", Deactivate = "OFF";
-
-        private static readonly List<ChannelNames> activeList = new List<ChannelNames>();
-
-        private static List<ChannelNames> nonActiveList = new List<ChannelNames>();
 
 
         public static async void RunAsync()
