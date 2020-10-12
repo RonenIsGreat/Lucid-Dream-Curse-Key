@@ -105,7 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GlobalResourses\GlobalResourses.csproj">
-      <Project>{fa571ae4-c20c-4932-a168-ea30c2da2b8b}</Project>
+      <Project>{FA571AE4-C20C-4932-A168-EA30C2DA2B8B}</Project>
       <Name>GlobalResourses</Name>
     </ProjectReference>
     <ProjectReference Include="..\SaveStreamHelper\SaveStreamHelper.csproj">

@@ -20,14 +20,13 @@ namespace Controller
         public static async void RunAsync()
         {
 
-            foreach (string channelName in Enum.GetNames(typeof(ChannelNames)))
             //var input = new UserInput();
-                consumersArray[i].ListenToQueue(channelName);
+            //var controller = new Producer();
             var server = new RestApiServer(3391);
 
             await server.StartAsync();
 
-            
+
 
         }
     }
