@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using DBManager.Models;
@@ -62,17 +60,16 @@ namespace DBManager
             await AddDbRequest(dbRequest);
         }
 
-        private async Task<T> AddDbRequest<T>(Task<T> task)
+        private async Task AddDbRequest<T>(Task<T> task)
         {
             await openConnectionSemaphore.WaitAsync();
             try
             {
-                T result = await task;
-                return result;
+                await task;
             }
             catch (Exception e)
             {
-                return await Task.FromException<T>(e);
+                await Task.FromException<T>(e);
             }
             finally
             {
@@ -107,10 +104,6 @@ namespace DBManager
             {
                 Console.WriteLine(e);
             }
-        }
-
-        private static void ContinuationAction(object state)
-        {
         }
 
         private BatchedMessages getNewBatchedMessages(MessageModel firstMessage, ChannelNames channelType)
