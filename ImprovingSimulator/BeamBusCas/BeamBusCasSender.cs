@@ -34,7 +34,7 @@ namespace BeamBusCas
             subSegmentNum = subSements.Length;
             stopwatch.Start();
             aTimer.Start();
-            while (count * 10 < subSegmentNum)
+            while (count * 10 < subSegmentNum - 10)
             {
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
                 {
@@ -67,7 +67,7 @@ namespace BeamBusCas
             stopwatch.Start();
             int limit;
             //  aTimer.Start();
-            while (count * 10 < number)
+            while (count * 10 < number - 10)
             {
 
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)

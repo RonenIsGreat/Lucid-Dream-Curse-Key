@@ -32,7 +32,7 @@ namespace IDRS
             subSegmentNum = subSements.Length;
             stopwatch.Start();
             aTimer.Start();
-            while (count * 12 < subSegmentNum)
+            while (count * 12 < subSegmentNum - 12)
             {
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
                 {
@@ -65,7 +65,7 @@ namespace IDRS
             stopwatch.Start();
             int limit;
             //  aTimer.Start();
-            while (count * 12 < number)
+            while (count * 12 < number - 12)
             {
 
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)

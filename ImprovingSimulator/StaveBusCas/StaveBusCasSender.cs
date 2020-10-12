@@ -33,7 +33,7 @@ namespace StaveBusCas
             subSegmentNum = subSements.Length;
             stopwatch.Start();
             aTimer.Start();
-            while (count * 6 < subSegmentNum)
+            while (count * 6 < subSegmentNum - 6)
             {
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
                 {
@@ -65,7 +65,7 @@ namespace StaveBusCas
             stopwatch.Start();
             int limit;
             //  aTimer.Start();
-            while (count * 6 < number)
+            while (count * 6 < number - 6)
             {
 
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)

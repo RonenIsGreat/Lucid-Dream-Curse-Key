@@ -33,7 +33,7 @@ namespace StaveBusFasTas
             subSegmentNum = subSements.Length;
             stopwatch.Start();
             aTimer.Start();
-            while (count * 7 < subSegmentNum)
+            while (count * 7 < subSegmentNum - 7)
             {
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
                 {
@@ -65,7 +65,7 @@ namespace StaveBusFasTas
             stopwatch.Start();
             int limit;
             aTimer.Start();
-            while (count * 7 < number)
+            while (count * 7 < number - 7)
             {
 
                 if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
