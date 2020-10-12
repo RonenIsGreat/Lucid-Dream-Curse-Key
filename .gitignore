@@ -360,3 +360,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/reordings fo simulator 30 seconds/CAS_HAKATON.rec
+/reordings fo simulator 30 seconds/CAS_STAVE.rec
+/reordings fo simulator 30 seconds/FAS_HAKATON.rec
+/reordings fo simulator 30 seconds/FAS_STAVE.rec
+/reordings fo simulator 30 seconds/IDRS.rec
+/reordings fo simulator 30 seconds/PRS_STAVE.rec
