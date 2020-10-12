@@ -96,8 +96,6 @@
     <Compile Include="RestAPIServer\BrowserJsonFormatter.cs" />
     <Compile Include="RestAPIServer\RestApiController.cs" />
     <Compile Include="RestAPIServer\RestApiServer.cs" />
-    <Compile Include="UserInput.cs" />
-    <Compile Include="WelcomeMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
