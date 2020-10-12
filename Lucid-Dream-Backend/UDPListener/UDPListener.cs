@@ -45,6 +45,8 @@ namespace UDPListener
 
         private void OnReceiveError(Exception e)
         {
+            var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+            var statusSender = new ChannelStatusSender();
             if (!(e is SocketException socketException)) return;
             switch (socketException.ErrorCode)
             {
@@ -60,6 +62,7 @@ namespace UDPListener
                     Console.WriteLine(e.Message);
                     break;
             }
+            statusSender.SendStatus($"{channelName} inactive");
         }
 
         #endregion
@@ -71,12 +74,21 @@ namespace UDPListener
             if (_listener == null)
                 _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             //If already listening return like nothing happened
-            if (IsListening()) return;
+            if (IsListening())
+            {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
+                statusSender.SendStatus($"{channelName} active");
+                return;
+            }
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.ExclusiveAddressUse = false;
                 _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 _listener.Bind(_groupEp);
+                statusSender.SendStatus($"{channelName} active");
             }
             catch (Exception e)
             {
@@ -93,7 +105,10 @@ namespace UDPListener
         {
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
+                statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
             {
@@ -108,8 +123,11 @@ namespace UDPListener
         {
             try
             {
+                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
+                var statusSender = new ChannelStatusSender();
                 _listener.Shutdown(SocketShutdown.Both);
                 _listener.Close();
+                statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
             {
