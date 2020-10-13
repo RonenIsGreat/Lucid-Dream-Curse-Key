@@ -28,7 +28,7 @@ namespace Tests
                 }
         }
 
-        private static SaveStreamHelper _saveStreamHelper;
+        private static SaveStream.SaveStreamHelper _saveStreamHelper;
         private static byte[] testData;
         private string fileName = "TestFileName";
         private const string savePath = "C:\\Recordings\\";

@@ -30,7 +30,7 @@ namespace UDPListener
         } //End UDPListener Constructor
 
         public ChannelDetails Param { get; }
-        public BigInteger MessageCount { get; private set; }
+        public int MessageCount { get; private set; }
 
         // Declare the event.
         public event OnDataReceivedDelegate DataReceivedDelegate;

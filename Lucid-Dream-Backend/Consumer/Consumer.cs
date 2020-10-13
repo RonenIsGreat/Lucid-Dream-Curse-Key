@@ -10,13 +10,13 @@ namespace Consumer
 {
     public class Consumer
     {
-        private readonly SaveStreamHelper _streamSaver;
+        private readonly SaveStream.SaveStreamHelper _streamSaver;
         private readonly UdpListener _udpClient;
 
         public Consumer(UdpListener uDp, string dbConnectionUrl)
         {
             _udpClient = uDp;
-            _streamSaver = new SaveStreamHelper( dbConnectionUrl);
+            _streamSaver = new SaveStream.SaveStreamHelper( dbConnectionUrl, 30);
         }
 
         public void ListenToQueue()
@@ -65,9 +65,7 @@ namespace Consumer
         {
             UdpListener currentListener = (UdpListener) sender;
 
-            //This date format can be saved as file name
-            var dateAsString = DateTime.Now.ToString("yyyy-dd-M--HH-mm");
-            var succeeded = _streamSaver.SaveData(data.buffer, dateAsString);
+            var succeeded = _streamSaver.SaveData(data.buffer);
             if (!succeeded) Console.WriteLine("Failed to save message");
         }
     }

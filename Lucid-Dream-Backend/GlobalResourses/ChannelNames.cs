@@ -2,6 +2,7 @@
 {
     public enum ChannelNames
     {
+        NULL,
         CasStave,
         FasTasStave,
         PRSStave,

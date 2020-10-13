@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using DBManager;
+using DBManager.Models;
 using GlobalResourses;
+using MongoDB.Bson;
 
 namespace SaveStream
 {
@@ -13,18 +15,18 @@ namespace SaveStream
         private readonly ConcurrentExclusiveSchedulerPair _scheduler;
 
         private BufferBlock<byte[]> _dataBufferBlock;
-        private ActionBlock<byte[]> _saveToFileBlock;
-        private TransformBlock<byte[], byte[]> _transformDataBlock;
+        private TransformBlock<byte[], MessageModel> _transformByteArrayToWraped;
+        private ActionBlock<MessageModel> _saveToFileBlock;
 
 
-        public SaveStreamHelper(string dbConnectionUrl)
+        public SaveStreamHelper(string dbConnectionUrl, int maxMessagesPerDoc)
         {
             _scheduler = new ConcurrentExclusiveSchedulerPair();
 
             InitializeDataBlocks();
 
             if (_dbManager == null)
-                _dbManager = new DatabaseManager(dbConnectionUrl);
+                _dbManager = new DatabaseManager(dbConnectionUrl, maxMessagesPerDoc);
         }
 
 
@@ -40,22 +42,22 @@ namespace SaveStream
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
 
+            _transformByteArrayToWraped = new TransformBlock<byte[], MessageModel>(data => TransformDataCallback(data), execOptions);
             _dataBufferBlock = new BufferBlock<byte[]>(generalOptions);
-            _transformDataBlock = new TransformBlock<byte[], byte[]>(data => TransformDataCallback(data), execOptions);
-            _saveToFileBlock = new ActionBlock<byte[]>(data => { PushToDb(data); }, execOptions);
+            _saveToFileBlock = new ActionBlock<MessageModel>(data => { PushToDb(data); }, execOptions);
 
-            _dataBufferBlock.LinkTo(_transformDataBlock);
-            _transformDataBlock.LinkTo(_saveToFileBlock);
+            _dataBufferBlock.LinkTo(_transformByteArrayToWraped);
+            _transformByteArrayToWraped.LinkTo(_saveToFileBlock);
         }
 
-        #region Data Flow Actions
+        #region _data Flow Actions
 
-        private static void PushToDb(byte[] byteArray)
+        private static void PushToDb(MessageModel message)
         {
             try
             {
-                ChannelNames channelType = GetBufferType(byteArray);
-                _dbManager.SaveBinaryBased(byteArray, channelType);
+                ChannelNames messageType = GetBufferType(message.Data);
+                _dbManager.SaveBinaryBased(message, messageType);
             }
             catch (Exception ex)
             {
@@ -67,7 +69,7 @@ namespace SaveStream
 
         #region Public Methods
 
-        public bool SaveData(byte[] data, string newFileName)
+        public bool SaveData(byte[] data)
         {
             try
             {
@@ -86,10 +88,11 @@ namespace SaveStream
 
         #region Helper Methods
 
-        private static byte[] TransformDataCallback(byte[] data)
+        private static MessageModel TransformDataCallback(byte[] data)
         {
-            //TODO: transform data here if needed
-            return data;
+            MessageModel message = new MessageModel
+                {Data = data, TimeStamp = new BsonDateTime(DateTime.Now).ToUniversalTime()};
+            return message;
         }
 
         private static ChannelNames GetBufferType(byte[] serverIdentData)

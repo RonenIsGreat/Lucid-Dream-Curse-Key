@@ -30,9 +30,9 @@ namespace Controller.RestAPIController
                 await _server.OpenAsync();
 
             }
-            catch(Exception)
+            catch(Exception e)
             {
-                Console.WriteLine("FAILED");
+                Console.WriteLine("FAILED to start server with error: "+e.Message);
                 return false;
             }
 

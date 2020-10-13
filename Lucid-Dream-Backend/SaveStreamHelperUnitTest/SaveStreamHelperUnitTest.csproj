@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <NoWin32Manifest>true</NoWin32Manifest>
+
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
