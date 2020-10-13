@@ -37,7 +37,7 @@ namespace Tests
         public void SaveFile_FileExists_True()
         {
             fileName = getStreamType(testData, fileName);
-            _saveStreamHelper.SaveData(testData, fileName);
+            _saveStreamHelper.SaveData(testData);
             Assert.True(File.Exists(savePath + fileName), "File does not exist");
         }
 

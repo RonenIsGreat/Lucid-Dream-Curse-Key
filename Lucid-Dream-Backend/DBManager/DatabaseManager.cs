@@ -27,7 +27,7 @@ namespace DBManager
 
             _dbDatabase = dbClient.GetDatabase("records");
 
-            _openConnectionSemaphore = new SemaphoreSlim(dbClient.Settings.MaxConnectionPoolSize, dbClient.Settings.MaxConnectionPoolSize);
+            _openConnectionSemaphore = new SemaphoreSlim(dbClient.Settings.MaxConnectionPoolSize);
 
             //Create collections for each stream type and indexers for dates
             CreateAllCollections();

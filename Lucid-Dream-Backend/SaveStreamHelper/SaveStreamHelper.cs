@@ -98,7 +98,7 @@ namespace SaveStream
         private static ChannelNames GetBufferType(byte[] serverIdentData)
         {
             var serverIdent = BitConverter.ToUInt16(serverIdentData, 0);
-            ChannelNames channel = (ChannelNames)(serverIdent - 1);
+            ChannelNames channel = (ChannelNames) serverIdent;
             return channel;
         }
 
