@@ -1,47 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
+import React from 'react';
 import StatusBox from '../StatusBox/StatusBox.component';
 
 import './SonarStatus.styles.scss'
 
-function SonarStatus() {
-  const ENDPOINT = "http://127.0.0.1:4000";
-  const [CasBeam, setCasBeam] = useState("inactive");
-  const [CasStave, setCasStave] = useState("inactive");
-  const [FasTasBeam, setFasTasBeam] = useState("inactive");
-  const [FasTasStave, setFasTasStave] = useState("inactive");
-  const [PRSStave, setPRSStave] = useState("inactive");
-  const [IDRSBus, setIDRSBus] = useState("inactive");
-
-  useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
-    socket.on("StatusSocketIO", data => {
-      let dataSplit = data.split(" ");
-      switch(dataSplit[0]) {
-        case "CasBeam":
-          setCasBeam(dataSplit[1]);
-          break;
-        case "CasStave":
-          setCasStave(dataSplit[1]);
-          break;
-        case "FasTasBeam":
-          setFasTasBeam(dataSplit[1]);
-          break;
-        case "FasTasStave":
-          setFasTasStave(dataSplit[1]);
-          break;
-        case "PRSStave":
-          setPRSStave(dataSplit[1]);
-          break;
-        case "IDRSBus":
-          setIDRSBus(dataSplit[1]);
-          break;
-        default:
-          break;
-      }
-    });
-  }, [])
-
+function SonarStatus(props) {
+  let {CasBeam, CasStave, FasTasBeam, FasTasStave, PRSStave, IDRSBus} = props;
+  
   return (
     <div className="sonar-status">
       <h1>Stream Array Status</h1>

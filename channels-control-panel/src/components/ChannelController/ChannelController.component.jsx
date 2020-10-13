@@ -25,7 +25,7 @@ class ChannelController extends Component {
     checkboxes: CHANNELS.reduce(
       (channels, channel) => ({
         ...channels,
-        [channel]: false
+        [channel]: this.props[channel]
       }),
       {}
     ),
