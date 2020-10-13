@@ -69,7 +69,7 @@ namespace SaveStream
 
         #region Public Methods
 
-        public bool SaveData(byte[] data, string newFileName)
+        public bool SaveData(byte[] data)
         {
             try
             {

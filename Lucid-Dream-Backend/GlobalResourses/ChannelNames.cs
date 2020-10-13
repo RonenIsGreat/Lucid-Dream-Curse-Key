@@ -2,12 +2,12 @@
 {
     public enum ChannelNames
     {
-        Null,
-        CasBeam,
+        NULL,
         CasStave,
-        FasTasBeam,
         FasTasStave,
         PRSStave,
+        CasBeam,
+        FasTasBeam,
         IDRSBus
     }
 }

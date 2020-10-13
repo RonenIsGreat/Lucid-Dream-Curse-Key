@@ -65,9 +65,7 @@ namespace Consumer
         {
             UdpListener currentListener = (UdpListener) sender;
 
-            //This date format can be saved as file name
-            var dateAsString = DateTime.Now.ToString("yyyy-dd-M--HH-mm");
-            var succeeded = _streamSaver.SaveData(data.buffer, dateAsString);
+            var succeeded = _streamSaver.SaveData(data.buffer);
             if (!succeeded) Console.WriteLine("Failed to save message");
         }
     }
