@@ -21,21 +21,19 @@ namespace Consumer
 
         public void ListenToQueue()
         {
-            ChannelDetails port = _udpClient.Param;
-            ConnectionFactory factory = new ConnectionFactory {HostName = "localhost"};
-            IConnection connection = factory.CreateConnection();
-            IModel channel = connection.CreateModel();
-            channel.ExchangeDeclare("channelControl",
-                "direct", true);
-            var queueName = channel.QueueDeclare().QueueName;
+            IModel channel;
+            string queueName;
+            ConnectToRabbitMQ(out channel, out queueName);
 
-            channel.QueueBind(queueName,
-                "channelControl",
-                port.GetName().ToString());
+            EventingBasicConsumer consumer = SetupRabbitMQConsumer(channel);
 
+            // Start the consumer
+            channel.BasicConsume(queueName, true, consumer);
+        }
 
-            Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
-
+        private EventingBasicConsumer SetupRabbitMQConsumer(IModel channel)
+        {
+            // Define what happens when data is received from the RabbitMQ exchange
             EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
@@ -56,9 +54,24 @@ namespace Consumer
                 Console.WriteLine(" [x] Received '{0}':'{1}'",
                     routingKey, message);
             };
-            channel.BasicConsume(queueName,
-                true,
-                consumer);
+            return consumer;
+        }
+
+        private void ConnectToRabbitMQ(out IModel channel, out string queueName)
+        {
+            // Set up a RabbitMQ Connection for a specific port
+            // and bind to a RabbitMQ exchange
+            ChannelDetails port = _udpClient.Param;
+            ConnectionFactory factory = new ConnectionFactory { HostName = "localhost" };
+            IConnection connection = factory.CreateConnection();
+            channel = connection.CreateModel();
+            channel.ExchangeDeclare("channelControl", "direct", true);
+            queueName = channel.QueueDeclare().QueueName;
+            channel.QueueBind(queueName,
+                "channelControl",
+                port.GetName().ToString());
+
+            Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
         }
 
         private void UdpClientDataReceivedDelegate(object sender, StateObject data)
