@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using GlobalResourses;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace DBManager.Models

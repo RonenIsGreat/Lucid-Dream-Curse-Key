@@ -3,7 +3,6 @@ using System.Text;
 using GlobalResourses;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using SaveStream;
 using UDPListener;
 
 namespace Consumer

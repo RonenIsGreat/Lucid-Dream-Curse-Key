@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using DBManager;
 using GlobalResourses;
 using UDPListener;
 

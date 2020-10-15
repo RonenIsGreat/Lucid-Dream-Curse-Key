@@ -1,6 +1,4 @@
-﻿using GlobalResourses;
-using RabbitMQ.Client;
-using System;
+﻿using RabbitMQ.Client;
 using System.Text;
 
 namespace UDPListener

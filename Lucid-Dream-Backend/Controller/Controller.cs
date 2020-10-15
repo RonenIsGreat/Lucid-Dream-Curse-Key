@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Controller.RestAPIController;
-using GlobalResourses;
+﻿using Controller.RestAPIController;
 
 
 /* every time the user presses 'Accept', it will be translated to a list of all channels we
@@ -25,8 +20,6 @@ namespace Controller
             var server = new RestApiServer(3391);
 
             await server.StartAsync();
-
-
 
         }
     }
