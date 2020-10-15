@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
+using System.Runtime.Remoting.Messaging;
+using System.Threading.Tasks;
 using GlobalResourses;
 
 namespace UDPListener
@@ -10,8 +12,9 @@ namespace UDPListener
     {
         public delegate void OnDataReceivedDelegate(object sender, StateObject data);
 
-        private readonly IPEndPoint _groupEp;
-        private Socket _listener;
+        private readonly IPEndPoint _localEndPoint;
+        private IPEndPoint _remoteEndPoint;
+        private Socket _socket;
 
         public UdpListener(ChannelDetails port)
         {
@@ -20,10 +23,11 @@ namespace UDPListener
             //Initialize client port
             var clientPort = Param.GetPortNumber();
 
-            //Initialize udp endpoint(server)
-            _groupEp = new IPEndPoint(IPAddress.Parse("127.0.0.1"), clientPort);
-            _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
-            //specefies the number of 1400 bytes messages that have been received
+            //TODO: add this to config instead of constructor
+            _localEndPoint = new IPEndPoint(IPAddress.Loopback, clientPort+1);
+
+            _remoteEndPoint = new IPEndPoint(IPAddress.Loopback, clientPort);
+
             MessageCount = 0;
 
             InitSocket();
@@ -37,8 +41,13 @@ namespace UDPListener
 
         private void InitSocket()
         {
-            _listener.ReceiveTimeout = 1000;
-            _listener.ReceiveBufferSize = 1400;
+            _socket = new Socket(AddressFamily.InterNetwork,
+                SocketType.Dgram,
+                ProtocolType.Udp);
+
+            _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1400);
+
+            _socket.Bind(_localEndPoint);
         }
 
         #region Helper Methods
@@ -71,8 +80,6 @@ namespace UDPListener
 
         public void StartListener()
         {
-            if (_listener == null)
-                _listener = new Socket(SocketType.Dgram, ProtocolType.Udp);
             //If already listening return like nothing happened
             if (IsListening())
             {
@@ -85,9 +92,9 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-                _listener.ExclusiveAddressUse = false;
-                _listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                _listener.Bind(_groupEp);
+
+                _socket.Connect(_remoteEndPoint);
+
                 statusSender.SendStatus($"{channelName} active");
             }
             catch (Exception e)
@@ -107,7 +114,7 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-                _listener.Shutdown(SocketShutdown.Both);
+                _socket.Disconnect(true);
                 statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
@@ -125,8 +132,8 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-                _listener.Shutdown(SocketShutdown.Both);
-                _listener.Close();
+                _socket.Shutdown(SocketShutdown.Both);
+                _socket.Close();
                 statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
@@ -137,7 +144,7 @@ namespace UDPListener
 
         public bool IsListening()
         {
-            return _listener.IsBound;
+            return _socket.Connected;
         }
 
         #endregion
@@ -149,7 +156,7 @@ namespace UDPListener
             var state = (StateObject) result.AsyncState;
 
             //get current message
-            state.bytesCount = _listener.EndReceive(result);
+            state.bytesCount = _socket.EndReceive(result);
             BeginReceivingNewData();
 
             if (state.buffer == null) return;
@@ -162,7 +169,7 @@ namespace UDPListener
             var state = new StateObject();
             try
             {
-                _listener.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
+                _socket.BeginReceive(state.buffer, 0, StateObject.BufferSize, SocketFlags.None,
                     OnDataReceived, state);
             }
             catch (Exception e)
