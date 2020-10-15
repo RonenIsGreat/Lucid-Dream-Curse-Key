@@ -22,6 +22,11 @@ namespace StaveBusFasTas
 
         }//End State
 
+        public void Disconnect()
+        {
+            _socket.Disconnect(true);
+        }
+
         public void Server(string address, int port)
         {
             _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);

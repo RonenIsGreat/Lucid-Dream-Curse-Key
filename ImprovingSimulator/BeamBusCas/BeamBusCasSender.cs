@@ -12,11 +12,18 @@ using System.Timers;
 
 namespace BeamBusCas
 {
-    public static class BeamBusCasSender
+    public class BeamBusCasSender
     {
         static int subSegmentNum;
         static byte[][] subSements;
         static UDPSocket client;
+
+        public BeamBusCasSender()
+        {
+            client = new UDPSocket();
+            client.Client(Properties.Settings.Default.IP,
+                Properties.Settings.Default.Port);
+        }
 
 
         public static void SendMessage()
@@ -28,9 +35,6 @@ namespace BeamBusCas
 
             Stopwatch stopwatch = new Stopwatch();
             subSements = FileEdit.GetRecording(Path.Combine(Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, Properties.Settings.Default.Recording_path));
-            client = new UDPSocket();
-            client.Client(Properties.Settings.Default.IP,
-                Properties.Settings.Default.Port);
             subSegmentNum = subSements.Length;
             stopwatch.Start();
             aTimer.Start();

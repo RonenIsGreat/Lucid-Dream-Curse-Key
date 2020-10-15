@@ -37,6 +37,11 @@ namespace PrsStaveBus
 
         }//End Client
 
+        public void Disconnect()
+        {
+            _socket.Disconnect(true);
+        }
+
         public void Send(byte[] text)
         {
             byte[] data = text;

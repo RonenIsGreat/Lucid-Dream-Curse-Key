@@ -49,6 +49,11 @@ namespace BeamBusCas
 
         }//End Send
 
+        public void Disconnect()
+        {
+            _socket.Disconnect(true);
+        }
+
         private void Receive()
         {
             _socket.BeginReceiveFrom(state.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv = (ar) =>

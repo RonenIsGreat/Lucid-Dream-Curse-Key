@@ -50,6 +50,11 @@ namespace BeamBusFasTas
 
         }//End Send
 
+        public void Disconnect()
+        {
+            _socket.Disconnect(true);
+        }
+
         //Receive Data
         private void Receive()
         {

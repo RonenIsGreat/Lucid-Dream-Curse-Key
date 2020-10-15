@@ -30,6 +30,11 @@ namespace IDRS
 
         }//End Server
 
+        public void Disconnect()
+        {
+            _socket.Disconnect(true);
+        }
+
         public void Client(string address, int port)
         {
             _socket.Connect(IPAddress.Parse(address), port);
