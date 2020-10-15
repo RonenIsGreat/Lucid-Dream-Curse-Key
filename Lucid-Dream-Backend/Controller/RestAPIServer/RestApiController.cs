@@ -15,8 +15,7 @@ namespace Controller.RestAPIController
         private static readonly List<ChannelNames> activeList = new List<ChannelNames>();
 
         private static List<ChannelNames> nonActiveList = new List<ChannelNames>();
-
-        Producer controller = new Producer();
+        private readonly Producer controller = new Producer();
 
         [HttpPost]
 

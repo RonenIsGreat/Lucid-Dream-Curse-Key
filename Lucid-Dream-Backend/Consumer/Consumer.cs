@@ -20,9 +20,7 @@ namespace Consumer
 
         public void ListenToQueue()
         {
-            IModel channel;
-            string queueName;
-            ConnectToRabbitMQ(out channel, out queueName);
+            ConnectToRabbitMQ(out IModel channel, out string queueName);
 
             EventingBasicConsumer consumer = SetupRabbitMQConsumer(channel);
 

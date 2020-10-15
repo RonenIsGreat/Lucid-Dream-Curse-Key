@@ -7,7 +7,7 @@ namespace Controller.RestAPIController
 {
     public class RestApiServer
     {
-        private HttpSelfHostServer _server;
+        private readonly HttpSelfHostServer _server;
         public RestApiServer(int port)
         {
             string restApiAdress = $"http://localhost:{port}";

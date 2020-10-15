@@ -8,7 +8,7 @@ namespace Lucid_Dream_Backend
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             //Initialize and get the save stream helper instance
             var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];

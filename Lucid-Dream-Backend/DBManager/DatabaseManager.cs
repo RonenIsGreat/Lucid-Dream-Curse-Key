@@ -39,7 +39,7 @@ namespace DBManager
             try
             {
                 var collectionByType = GetCollectionByStreamType(channelType);
-                var newBatchedMessage = getNewBatchedMessages(content, channelType);
+                var newBatchedMessage = GetNewBatchedMessages(content, channelType);
                 var filter = GetFilterDefinition(newBatchedMessage, _maxMessagesPerDoc);
 
                 var bsonDoc = newBatchedMessage.ToBsonDocument();
@@ -115,7 +115,7 @@ namespace DBManager
         {
             return _dbDatabase.GetCollection<BatchedMessages>(Enum.GetName(typeof(ChannelNames), message));
         }
-        private BatchedMessages getNewBatchedMessages(MessageModel firstMessage, ChannelNames channelType)
+        private BatchedMessages GetNewBatchedMessages(MessageModel firstMessage, ChannelNames channelType)
         {
             BatchedMessages newBatchedMessage = new BatchedMessages(channelType)
             {
