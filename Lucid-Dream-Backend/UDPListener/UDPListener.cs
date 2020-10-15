@@ -12,8 +12,7 @@ namespace UDPListener
     {
         public delegate void OnDataReceivedDelegate(object sender, StateObject data);
 
-        private readonly IPEndPoint _localEndPoint;
-        private IPEndPoint _remoteEndPoint;
+        private readonly IPEndPoint _remoteEndPoint;
         private Socket _socket;
 
         public UdpListener(ChannelDetails port)
@@ -24,8 +23,6 @@ namespace UDPListener
             var clientPort = Param.GetPortNumber();
 
             //TODO: add this to config instead of constructor
-            _localEndPoint = new IPEndPoint(IPAddress.Loopback, clientPort+1);
-
             _remoteEndPoint = new IPEndPoint(IPAddress.Loopback, clientPort);
 
             MessageCount = 0;
@@ -46,8 +43,6 @@ namespace UDPListener
                 ProtocolType.Udp);
 
             _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1400);
-
-            _socket.Bind(_localEndPoint);
         }
 
         #region Helper Methods
@@ -92,9 +87,7 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-
-                _socket.Connect(_remoteEndPoint);
-
+                _socket.Bind(_remoteEndPoint);
                 statusSender.SendStatus($"{channelName} active");
             }
             catch (Exception e)
