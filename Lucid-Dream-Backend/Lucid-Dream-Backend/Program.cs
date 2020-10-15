@@ -10,9 +10,40 @@ namespace Lucid_Dream_Backend
     {
         private static void Main()
         {
-            //Initialize and get the save stream helper instance
-            var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
+            InitializeVariables(out string dbConnectionUrl,
+                                out UdpListener[] udpListeners,
+                                out Consumer.Consumer[] consumers);
 
+            ChannelDetails[] _Ports = SetupChannels();
+
+            SetupConsumers(dbConnectionUrl, udpListeners, consumers, _Ports);
+
+            StartControllerAndWait();
+        } //End Main
+
+        private static void StartControllerAndWait()
+        {
+            Console.WriteLine("Live Streams :");
+            Controller.Controller.RunAsync();
+
+            while (true)
+            {
+                Thread.Sleep(100);
+            }
+        }
+
+        private static void SetupConsumers(string dbConnectionUrl, UdpListener[] udpListeners, Consumer.Consumer[] consumers, ChannelDetails[] _Ports)
+        {
+            for (var i = 0; i < udpListeners.Length; i++)
+            {
+                udpListeners[i] = new UdpListener(_Ports[i]);
+                consumers[i] = new Consumer.Consumer(udpListeners[i], dbConnectionUrl);
+                consumers[i].ListenToQueue();
+            } //End For
+        }
+
+        private static ChannelDetails[] SetupChannels()
+        {
             //Initializing The Ports
             var _Ports = new ChannelDetails[6];
 
@@ -22,25 +53,15 @@ namespace Lucid_Dream_Backend
             _Ports[3] = new ChannelDetails(ChannelNames.CasBeam, 25104);
             _Ports[4] = new ChannelDetails(ChannelNames.FasTasBeam, 25105);
             _Ports[5] = new ChannelDetails(ChannelNames.IDRSBus, 25106);
+            return _Ports;
+        }
 
-            var udpListeners = new UdpListener[6];
-            var consumers = new Consumer.Consumer[6];
-
-            for (var i = 0; i < udpListeners.Length; i++)
-            {
-                udpListeners[i] = new UdpListener(_Ports[i]);
-                consumers[i] = new Consumer.Consumer(udpListeners[i], dbConnectionUrl);
-                consumers[i].ListenToQueue();
-            } //End For
-
-
-            Console.WriteLine("Live Streams :");
-            Controller.Controller.RunAsync();
-
-            while (true)
-            {
-                Thread.Sleep(100);
-            }
-        } //End Main
+        private static void InitializeVariables(out string dbConnectionUrl, out UdpListener[] udpListeners, out Consumer.Consumer[] consumers)
+        {
+            //Initialize and get the save stream helper instance
+            dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
+            udpListeners = new UdpListener[6];
+            consumers = new Consumer.Consumer[6];
+        }
     } //End Program
 } //End Lucid_Dream_Backend
