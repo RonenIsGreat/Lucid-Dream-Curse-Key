@@ -57,43 +57,45 @@ namespace StreamWrapper
          {
              // Check requirements before sending messages
              if (!CheckRequirements(numberOfMessagesToSend)) return Task.CompletedTask;
-
-             // Sending limit, can be either numberOfMessagesToSend or recording file size ( will be looped around forever if so)
-            var limit = numberOfMessagesToSend > 0 ? numberOfMessagesToSend : subSegmentLength;
-
              // Encapsulate with using so resources will be flushed after execution
              using (var f = File.OpenRead(subSementPath))
             {
                 subSegmentLength = f.Length;
+
+                // Sending limit, can be either numberOfMessagesToSend or recording file size ( will be looped around forever if so)
+                var limitInBytes = numberOfMessagesToSend > 0 ? numberOfMessagesToSend * 1400 : subSegmentLength;
+
                 stopwatch.Start();
 
                 //NOTE: In original implantation, we send x amount of messages every 1.024 ms.
                 // I changed it to send Each message after 1.024 ms. (until decided otherwise)
                 // Because of that, the delimiter ( 6, 10, 7 etc) has been deleted.
+                var numberOfMessagesInRecording = (limitInBytes  - limitInBytes % 1400) / 1400;
 
-                for (var messageIndex = 0; messageIndex < limit; messageIndex++)
+                for (var messageIndex = 0; messageIndex < numberOfMessagesInRecording; messageIndex++)
                 {
+                    var index = messageIndex;
+                    // Waits for elapsed milliseconds condition safely
+                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1.024 * index);
+
                     if (ct.IsCancellationRequested)
                     {
-                        return Task.FromCanceled(ct);
+                        return Task.CompletedTask;
                     }
-                    var index = messageIndex;
-                    // Waits for elapsed milliseconds condition safely or when cancellation has been requested
-                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1.024 * index || ct.IsCancellationRequested);
 
                     var buffer = new byte[1400];
-                    f.Read(buffer, messageIndex * 1400, 1400);
+                    f.Read(buffer, 0, 1400);
                     client.Send(buffer);
 
                     //Sets the index according to numberOfMessagesToSend (forever or limited)
-                    messageIndex = CheckSendLimit(messageIndex, limit, f);
+                    messageIndex = CheckSendLimit(messageIndex, limitInBytes, f);
                 }
             }
             return Task.CompletedTask;
 
          }
 
-         private int CheckSendLimit(int messageIndex, long limit, Stream f)
+         private int CheckSendLimit(int messageIndex, long limit, FileStream f)
          {
              if (messageIndex == limit)
              {
