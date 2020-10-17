@@ -5,122 +5,113 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms;
 using UdpSocket;
+using Task = System.Threading.Tasks.Task;
 
 namespace StreamWrapper
 {
-    public class StreamWrapper
+    public sealed class StreamWrapper
     {
-         private int subSegmentLength;
-         private byte[][] subSements;
-         private UDPSocket client;
-         private Stopwatch stopwatch;
-         private uint numOfMessages;
+        private long subSegmentLength;
+        private string subSementPath;
+        private UDPSocket client;
+        private Stopwatch stopwatch;
 
-        public StreamWrapper(string path, string ipAddress, int port)
-        {
-            subSements = GetRecording(path);
+         public StreamWrapper(string path, string ipAddress, int port)
+         {
+             subSementPath = path;
             stopwatch = new Stopwatch();
             client = new UDPSocket(ipAddress, port);
         }
 
-        public void SendMessages(ushort delimiter, int numberOfMessagesToSend = -1)
-        {
-            subSegmentLength = subSements.Length;
-            stopwatch.Start();
+         private bool CheckRequirements(long numberOfMessagesToSend)
+         {
+             if (!File.Exists(subSementPath))
+             {
+                 MessageBox.Show("Wrong path entered");
+                 return false;
+             }
 
-            while ((numOfMessages * delimiter) < (numberOfMessagesToSend == -1 ? subSegmentLength - delimiter : numberOfMessagesToSend - delimiter))
+             if (numberOfMessagesToSend > subSegmentLength)
+             {
+                 MessageBox.Show("Number of messages to send is greater than total messages in recording file",
+                     "Exceeds total count");
+                 return false;
+             }
+
+             return true;
+         }
+
+         /// <summary>
+         /// Send Messages with given reregistration token and number of messages to send. <br></br>
+         /// If Number of messages is -1 then it will send forever until canceled with <see cref="CancellationToken"/>
+         /// </summary>
+         /// <param name="ct"></param>
+         /// <param name="numberOfMessagesToSend"></param>
+         /// <returns></returns>
+         public Task SendMessages(CancellationToken ct, long numberOfMessagesToSend = -1)
+         {
+             // Check requirements before sending messages
+             if (!CheckRequirements(numberOfMessagesToSend)) return Task.CompletedTask;
+
+             // Sending limit, can be either numberOfMessagesToSend or recording file size ( will be looped around forever if so)
+            var limit = numberOfMessagesToSend > 0 ? numberOfMessagesToSend : subSegmentLength;
+
+             // Encapsulate with using so resources will be flushed after execution
+             using (var f = File.OpenRead(subSementPath))
             {
-                if (stopwatch.ElapsedMilliseconds >= 1.024 * numOfMessages)
+                subSegmentLength = f.Length;
+                stopwatch.Start();
+
+                //NOTE: In original implantation, we send x amount of messages every 1.024 ms.
+                // I changed it to send Each message after 1.024 ms. (until decided otherwise)
+                // Because of that, the delimiter ( 6, 10, 7 etc) has been deleted.
+
+                for (var messageIndex = 0; messageIndex < limit; messageIndex++)
                 {
-
-                    for (var j = numOfMessages * delimiter; j < numOfMessages * delimiter + delimiter; j++)
+                    if (ct.IsCancellationRequested)
                     {
-                        client.Send(subSements[j]);
-                        numOfMessages++;
+                        return Task.FromCanceled(ct);
                     }
-                    numOfMessages++;
+                    var index = messageIndex;
+                    // Waits for elapsed milliseconds condition safely or when cancellation has been requested
+                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1.024 * index || ct.IsCancellationRequested);
 
+                    var buffer = new byte[1400];
+                    f.Read(buffer, messageIndex * 1400, 1400);
+                    client.Send(buffer);
+
+                    //Sets the index according to numberOfMessagesToSend (forever or limited)
+                    messageIndex = CheckSendLimit(messageIndex, limit, f);
                 }
-
             }
-        }
-        public void SendNumberOfMessages(int number)
-        {
-            int messageCount = 0;
-            System.Timers.Timer aTimer = new System.Timers.Timer(1000);
-            aTimer.Elapsed += (sender, e) => MyElapsedMethod(sender, e, messageCount);
-            int count = 0;
+            return Task.CompletedTask;
 
-            Stopwatch stopwatch = new Stopwatch();
-            subSements = GetRecording(Path.Combine(Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName, Properties.Settings.Default.Recording_path));
-            client = new UDPSocket();
-            client.Client(Properties.Settings.Default.IP,
-                Properties.Settings.Default.Port);
-            subSegmentLength = subSements.Length;
-            stopwatch.Start();
-            int limit;
-            aTimer.Start();
-            while (count * 7 < number - 7)
-            {
+         }
 
-                if (stopwatch.ElapsedMilliseconds >= 1.024 * count)
-                {
-                    if (count * 7 + 7 > number)
-                        limit = number;
-                    else
-                        limit = count * 7 + 7;
-                    for (int j = count * 7; j < limit; j++)
-                    {
-                        client.Send(subSements[j]);
-                        messageCount++;
-                    }
-                    count++;
+         private int CheckSendLimit(int messageIndex, long limit, Stream f)
+         {
+             if (messageIndex == limit)
+             {
+                 try
+                 {
+                     f.Flush();
+                 }
+                 catch (Exception)
+                 {
+                     // ignored
+                 }
 
-                }
+                 // If limit is equal to length of recording file (send forever) then reset messageIndex to continue sending.
+                 // Else do nothing and exit the loop respectively 
+                 messageIndex = limit == subSegmentLength ? 0 : messageIndex;
+             }
 
-            }
-        }
-
-        private static void MyElapsedMethod(Object source, ElapsedEventArgs e, int messageCount)
-        {
-            Console.WriteLine(messageCount);
-
-        }
-
-        private static void delayInMs(double ms)
-        {
-            for (int i = 0; i < ms * 480000; i++)
-            {
-                //Delay
-
-            }//For
-
-        }//End delayInMs
-
-        public static byte[][] GetRecording(string path)
-        {
-            int subSegmentsNum;
-            byte[] casBeamBusRecording;
-            byte[][] SubSegments;
-
-            casBeamBusRecording = File.ReadAllBytes(path);
-            subSegmentsNum = casBeamBusRecording.Length / 1400;
-            SubSegments = new byte[subSegmentsNum][];
-
-            for (int i = 0; i < subSegmentsNum; i++)
-            {
-                SubSegments[i] = new byte[1400];
-                Array.Copy(casBeamBusRecording, i * 1400, SubSegments[i], 0, 1400);
-
-            }//End For
-
-            return (SubSegments);
-
-        }//End GetRecording
-
-
+             return messageIndex;
+         }
     }//End BeamBusCasSender
 }

@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using StreamWrapper = StreamWrapper.StreamWrapper;
 
 namespace ImprovingSimulator
 {
@@ -71,10 +73,13 @@ namespace ImprovingSimulator
         #endregion
 
         //Methods For Activating The Threads
-        private void BeamBusFasTasSendMessage()
+        private async Task BeamBusFasTasSendMessage()
         {
-            BeamBusFasTasSenderThread.SetApartmentState(ApartmentState.STA);
-            BeamBusFasTasSenderThread.Start();
+            global::StreamWrapper.StreamWrapper a = new global::StreamWrapper.StreamWrapper("", IPAddress.Loopback.ToString(), 0);
+            CancellationToken da = new CancellationToken();
+
+
+            await Task.Run(() => a.SendMessages(da));
 
         }//End BeamBusFasTasSendMessage
 
