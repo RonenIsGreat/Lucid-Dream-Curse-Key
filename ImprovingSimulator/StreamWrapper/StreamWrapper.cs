@@ -11,6 +11,7 @@ using System.Timers;
 using System.Windows.Forms;
 using UdpSocket;
 using Task = System.Threading.Tasks.Task;
+using Timer = System.Timers.Timer;
 
 namespace StreamWrapper
 {
@@ -20,15 +21,25 @@ namespace StreamWrapper
         private string subSementPath;
         private UDPSocket client;
         private Stopwatch stopwatch;
+        private Timer testTimer;
+        private int count;
 
          public StreamWrapper(string path, string ipAddress, int port)
          {
+             count = 0;
              subSementPath = path;
             stopwatch = new Stopwatch();
             client = new UDPSocket(ipAddress, port);
-        }
+            testTimer = new Timer(1000);
+            testTimer.Elapsed += TestTimerOnElapsed;
+         }
 
-         private bool CheckRequirements(long numberOfMessagesToSend)
+         private void TestTimerOnElapsed(object sender, ElapsedEventArgs e)
+         {
+             Console.WriteLine("Times: " + count);
+         }
+
+        private bool CheckRequirements(long numberOfMessagesToSend)
          {
              if (!File.Exists(subSementPath))
              {
@@ -51,10 +62,13 @@ namespace StreamWrapper
          /// If Number of messages is -1 then it will send forever until canceled with <see cref="CancellationToken"/>
          /// </summary>
          /// <param name="ct"></param>
+         /// <param name="delimiter"></param>
          /// <param name="numberOfMessagesToSend"></param>
          /// <returns></returns>
-         public Task SendMessages(CancellationToken ct, long numberOfMessagesToSend = -1)
+         public Task SendMessages(CancellationToken ct, double delimiter = 1, long numberOfMessagesToSend = -1)
          {
+             testTimer.Start();
+
              // Check requirements before sending messages
              if (!CheckRequirements(numberOfMessagesToSend)) return Task.CompletedTask;
              // Encapsulate with using so resources will be flushed after execution
@@ -67,50 +81,54 @@ namespace StreamWrapper
 
                 stopwatch.Start();
 
-                //NOTE: In original implantation, we send x amount of messages every 1.024 ms.
-                // I changed it to send Each message after 1.024 ms. (until decided otherwise)
-                // Because of that, the delimiter ( 6, 10, 7 etc) has been deleted.
                 var numberOfMessagesInRecording = (limitInBytes  - limitInBytes % 1400) / 1400;
 
                 for (var messageIndex = 0; messageIndex < numberOfMessagesInRecording; messageIndex++)
                 {
                     var index = messageIndex;
                     // Waits for elapsed milliseconds condition safely
-                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1.024 * index);
+                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= (1.024 / delimiter) * index);
 
                     if (ct.IsCancellationRequested)
                     {
+                        count = 0;
                         return Task.CompletedTask;
                     }
 
                     var buffer = new byte[1400];
                     f.Read(buffer, 0, 1400);
                     client.Send(buffer);
+                    count++;
 
                     //Sets the index according to numberOfMessagesToSend (forever or limited)
-                    messageIndex = CheckSendLimit(messageIndex, limitInBytes, f);
+                    messageIndex = CheckSendLimit(messageIndex + 1, numberOfMessagesInRecording, f, numberOfMessagesToSend);
                 }
             }
             return Task.CompletedTask;
 
          }
 
-         private int CheckSendLimit(int messageIndex, long limit, FileStream f)
+
+         private int CheckSendLimit(int messageIndex, long limit, Stream f, long numberOfMessagesToSend)
          {
-             if (messageIndex == limit)
+             if (messageIndex  == limit && numberOfMessagesToSend == -1)
              {
                  try
                  {
                      f.Flush();
+                     // Will be equal to 0 once incremented in the for loop
+                     messageIndex = -1;
+                     f.Seek(0, SeekOrigin.Begin);
                  }
-                 catch (Exception)
-                 {
+                catch (Exception)
+                {
                      // ignored
-                 }
+                }
 
-                 // If limit is equal to length of recording file (send forever) then reset messageIndex to continue sending.
-                 // Else do nothing and exit the loop respectively 
-                 messageIndex = limit == subSegmentLength ? 0 : messageIndex;
+             }
+             else if (messageIndex == limit && numberOfMessagesToSend != -1)
+             {
+                f.Flush();
              }
 
              return messageIndex;
