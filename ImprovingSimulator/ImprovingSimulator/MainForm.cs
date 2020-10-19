@@ -26,10 +26,13 @@ namespace ImprovingSimulator
 
                 var fullPath = Path.Combine(path, config["Recording_Name"]);
 
-                var stream = new global::StreamWrapper.StreamWrapper(fullPath, IPAddress.Loopback.ToString(), int.Parse(config["Port"]));
+                var stream = new StreamWrapper.StreamWrapper(fullPath,
+                    IPAddress.Loopback.ToString(),
+                    int.Parse(config["Port"]),
+                    double.Parse(config["Delimiter"]));
 
                 // We don't care if we go back to original context so configure await is false
-                await Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend)).ConfigureAwait(false);
+                await Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct).ConfigureAwait(false);
             }
         }
 

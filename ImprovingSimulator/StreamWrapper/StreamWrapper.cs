@@ -23,11 +23,13 @@ namespace StreamWrapper
         private Stopwatch stopwatch;
         private Timer testTimer;
         private int count;
+        private double delimiter;
 
-         public StreamWrapper(string path, string ipAddress, int port)
+         public StreamWrapper(string path, string ipAddress, int port, double delimiter)
          {
-             count = 0;
-             subSementPath = path;
+            this.delimiter = delimiter;
+            count = 0; 
+            subSementPath = path;
             stopwatch = new Stopwatch();
             client = new UDPSocket(ipAddress, port);
             testTimer = new Timer(1000);
@@ -65,7 +67,7 @@ namespace StreamWrapper
          /// <param name="delimiter"></param>
          /// <param name="numberOfMessagesToSend"></param>
          /// <returns></returns>
-         public Task SendMessages(CancellationToken ct, double delimiter = 1, long numberOfMessagesToSend = -1)
+         public Task SendMessages(CancellationToken ct, long numberOfMessagesToSend = -1)
          {
              testTimer.Start();
 
@@ -87,7 +89,7 @@ namespace StreamWrapper
                 {
                     var index = messageIndex;
                     // Waits for elapsed milliseconds condition safely
-                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= (1.024 / delimiter) * index);
+                    SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= ((1.024 / delimiter) * index));
 
                     if (ct.IsCancellationRequested)
                     {
@@ -101,7 +103,7 @@ namespace StreamWrapper
                     count++;
 
                     //Sets the index according to numberOfMessagesToSend (forever or limited)
-                    messageIndex = CheckSendLimit(messageIndex + 1, numberOfMessagesInRecording, f, numberOfMessagesToSend);
+                    messageIndex = CheckSendLimit(messageIndex++, numberOfMessagesInRecording, f, numberOfMessagesToSend);
                 }
             }
             return Task.CompletedTask;

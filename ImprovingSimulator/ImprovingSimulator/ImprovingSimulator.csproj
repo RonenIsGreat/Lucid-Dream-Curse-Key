@@ -175,10 +175,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BeamBusCas\BeamBusCas.csproj">
-      <Project>{d7dcdadc-4957-4c7e-a319-07c17e9a6799}</Project>
-      <Name>BeamBusCas</Name>
-    </ProjectReference>
     <ProjectReference Include="..\StreamWrapper\StreamWrapper.csproj">
       <Project>{470E7273-BFD9-4B06-B539-D520150D5560}</Project>
       <Name>StreamWrapper</Name>
