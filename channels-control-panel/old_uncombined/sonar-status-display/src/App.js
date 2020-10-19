@@ -44,17 +44,17 @@ function App() {
   return (
     <div className="App">
       <h1>Stream Array Status</h1>
-      <StatusBox name = {"Cas Beam Bas"} status = {CasBeam}/>  
+      <StatusBox name = {"Cas Beam Bus"} status = {CasBeam}/>  
       <br/>
-      <StatusBox name = {"Cas Stave Bas"} status = {CasStave}/>  
+      <StatusBox name = {"Cas Stave Bus"} status = {CasStave}/>  
       <br/>
-      <StatusBox name = {"Fas/Tas Beam Bas"} status = {FasTasBeam}/>  
+      <StatusBox name = {"Fas/Tas Beam Bus"} status = {FasTasBeam}/>  
       <br/>
-      <StatusBox name = {"Fas/Tas Stave Bas"} status = {FasTasStave}/>  
+      <StatusBox name = {"Fas/Tas Stave Bus"} status = {FasTasStave}/>  
       <br/>
-      <StatusBox name = {"PRS Beam Bas"} status = {PRSStave}/>  
+      <StatusBox name = {"PRS Stave Bus"} status = {PRSStave}/>  
       <br/>
-      <StatusBox name = {"ATM IDRS Bas"} status = {IDRSBus}/> 
+      <StatusBox name = {"ATM IDRS Bus"} status = {IDRSBus}/> 
     </div>
   );
 }
