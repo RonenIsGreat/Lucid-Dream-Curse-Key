@@ -5,20 +5,26 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
-using Utilities.BunifuButton.Transitions;
-using Utilities.BunifuRadioButton.Transitions;
 
 namespace ImprovingSimulator
 {
     public partial class MainForm : Form
     {
+        private readonly List<CancellationTokenSource> cancellationTokens;
         private int NumberOfMessages;
-        private List<CancellationTokenSource> cancellationTokens;
 
-        private async void StartSendingMessages(string streamType, CancellationToken ct, long numberOfMessagesToSend = -1)
+        public MainForm()
+        {
+            InitializeComponent();
+            NumberOfMessages = 0;
+            cancellationTokens = new List<CancellationTokenSource>();
+        } //End MainForm Constructor
+
+        private async void StartSendingMessages(string streamType, CancellationToken ct,
+            long numberOfMessagesToSend = -1)
         {
             if (ConfigurationManager.GetSection("StreamSettings/" + streamType) is NameValueCollection config)
             {
@@ -38,30 +44,15 @@ namespace ImprovingSimulator
 
         private void StopAllSending()
         {
-            foreach (var ct in cancellationTokens)
-            {
-                ct.Cancel();
-            }
+            foreach (var ct in cancellationTokens) ct.Cancel();
 
             cancellationTokens.Clear();
-
-        }//End If
-
-        public MainForm()
-        {
-            InitializeComponent();
-            this.NumberOfMessages = 0;
-            cancellationTokens = new List<CancellationTokenSource>();
-
-
-        }//End MainForm Constructor
+        } //End If
 
         private void ExitButton_Click(object sender, EventArgs e)
         {
-            this.DestroyHandle();
-            
-
-        }//End ExitButton_Click
+            DestroyHandle();
+        } //End ExitButton_Click
 
         private void SequenceSendingBtn_Click(object sender, EventArgs e)
         {
@@ -74,7 +65,7 @@ namespace ImprovingSimulator
 
                 DisableCheckboxes();
 
-                bool success = SendMessagesToCheckedStreams();
+                var success = SendMessagesToCheckedStreams();
 
                 if (!success)
                 {
@@ -82,13 +73,13 @@ namespace ImprovingSimulator
                     SequenceSendingBtn.Text = "Start Sending";
                     EnableCheckboxes();
                     //groupBox1.Enabled = true;
-                }//End If
+                } //End If
 
                 else
+                {
                     SequenceSendingBtn.Text = "Stop Sending";
-
-
-            }//End If
+                }
+            } //End If
 
             else
             {
@@ -96,18 +87,16 @@ namespace ImprovingSimulator
                 StopAllSending();
                 EnableCheckboxes();
                 //groupBox1.Enabled = true;
-
-            }//End Else
-
+            } //End Else
         }
 
         private bool SendMessagesToCheckedStreams(long numberOfMessagesToSend = -1)
         {
-            bool flag = false;
+            var flag = false;
             var checkedBoxes = Controls.OfType<CheckBox>().Where(box => box.Checked);
             foreach (var box in checkedBoxes)
             {
-                CancellationTokenSource ctSource = new CancellationTokenSource();
+                var ctSource = new CancellationTokenSource();
                 var streamType = box.Name.Replace("CheckBox", "");
 
                 cancellationTokens.Add(ctSource);
@@ -127,8 +116,7 @@ namespace ImprovingSimulator
             StaveBusFasTasCheckBox.Enabled = false;
             IdrsCheckBox.Enabled = false;
             PrsStaveBusCheckBox.Enabled = false;
-
-        }//End DisableCheckBoxes
+        } //End DisableCheckBoxes
 
         private void EnableCheckboxes()
         {
@@ -138,8 +126,7 @@ namespace ImprovingSimulator
             StaveBusFasTasCheckBox.Enabled = true;
             IdrsCheckBox.Enabled = true;
             PrsStaveBusCheckBox.Enabled = true;
-
-        }//End EnableCheckboxes
+        } //End EnableCheckboxes
 
         private void QuantitySendingBtn_Click(object sender, EventArgs e)
         {
@@ -147,39 +134,31 @@ namespace ImprovingSimulator
             {
                 var checkedBoxes = Controls.OfType<CheckBox>().Where(box => box.Checked);
 
-                bool success = false;
-                this.NumberOfMessages = (int)this.numericUpDown1.Value;
+                var success = false;
+                NumberOfMessages = (int) numericUpDown1.Value;
 
                 DisableCheckboxes();
                 QuantitySendingBtn.Text = "Stop Sending";
 
 
-                success = SendMessagesToCheckedStreams(this.NumberOfMessages);
+                success = SendMessagesToCheckedStreams(NumberOfMessages);
 
                 if (!success)
                 {
-                    System.Windows.Forms.MessageBox.Show("No Channels Were Selected!");
+                    MessageBox.Show("No Channels Were Selected!");
                     QuantitySendingBtn.Text = "Send By Number";
                     EnableCheckboxes();
-
-                }//End If
+                } //End If
 
                 //BeamBusCasNumberSenderThread.Join();
-
-            }//End If
+            } //End If
 
             else
             {
                 QuantitySendingBtn.Text = "Send By Number";
                 StopAllSending();
                 EnableCheckboxes();
-
-            }//End Else
-
-
-
-        }//End QuantitySendingBtn
-
-    }//End MainForm
-
-}//End Improving Simulator
+            } //End Else
+        } //End QuantitySendingBtn
+    } //End MainForm
+} //End Improving Simulator
