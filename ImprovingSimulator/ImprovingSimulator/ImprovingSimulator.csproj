@@ -140,12 +140,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -154,9 +148,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -184,29 +175,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BeamBusCas\BeamBusCas.csproj">
-      <Project>{d7dcdadc-4957-4c7e-a319-07c17e9a6799}</Project>
-      <Name>BeamBusCas</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BeamBusFasTas\BeamBusFasTas.csproj">
-      <Project>{a27ee48c-70d5-4ea4-a733-780681c46217}</Project>
-      <Name>BeamBusFasTas</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\IDRS\IDRS.csproj">
-      <Project>{45f03050-ffea-4b0f-ab6d-861138a74d1d}</Project>
-      <Name>IDRS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PrsStaveBus\PrsStaveBus.csproj">
-      <Project>{98f66bdb-a6e8-4b34-8199-d1baf7bfa5df}</Project>
-      <Name>PrsStaveBus</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StaveBusCas\StaveBusCas.csproj">
-      <Project>{8ced0619-0158-48e9-b3e3-baa90886a736}</Project>
-      <Name>StaveBusCas</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StaveBusFasTas\StaveBusFasTas.csproj">
-      <Project>{91fd5adb-9db4-4fb7-8306-95bfcf08fea3}</Project>
-      <Name>StaveBusFasTas</Name>
+    <ProjectReference Include="..\StreamWrapper\StreamWrapper.csproj">
+      <Project>{470E7273-BFD9-4B06-B539-D520150D5560}</Project>
+      <Name>StreamWrapper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

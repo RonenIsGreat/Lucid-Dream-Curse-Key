@@ -1,15 +1,14 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("StaveBusFasTas")]
+[assembly: AssemblyTitle("StreamWrapper")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StaveBusFasTas")]
+[assembly: AssemblyProduct("StreamWrapper")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("91fd5adb-9db4-4fb7-8306-95bfcf08fea3")]
+[assembly: Guid("470e7273-bfd9-4b06-b539-d520150d5560")]
 
 // Version information for an assembly consists of the following four values:
 //
