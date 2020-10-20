@@ -19,14 +19,14 @@ namespace SaveStream
         private ActionBlock<MessageModel> _saveToFileBlock;
 
 
-        public SaveStreamHelper(string dbConnectionUrl, int maxMessagesPerDoc)
+        public SaveStreamHelper()
         {
             _scheduler = new ConcurrentExclusiveSchedulerPair();
 
             InitializeDataBlocks();
 
             if (_dbManager == null)
-                _dbManager = new DatabaseManager(dbConnectionUrl, maxMessagesPerDoc);
+                _dbManager = DatabaseManager.Instance;
         }
 
 
@@ -42,9 +42,9 @@ namespace SaveStream
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
 
-            _transformByteArrayToWraped = new TransformBlock<byte[], MessageModel>(data => TransformDataCallback(data), execOptions);
             _dataBufferBlock = new BufferBlock<byte[]>(generalOptions);
-            _saveToFileBlock = new ActionBlock<MessageModel>(data => { PushToDb(data); }, execOptions);
+            _transformByteArrayToWraped = new TransformBlock<byte[], MessageModel>(TransformDataCallback, execOptions);
+            _saveToFileBlock = new ActionBlock<MessageModel>(PushToDb , execOptions);
 
             _dataBufferBlock.LinkTo(_transformByteArrayToWraped);
             _transformByteArrayToWraped.LinkTo(_saveToFileBlock);
@@ -52,7 +52,7 @@ namespace SaveStream
 
         #region _data Flow Actions
 
-        private static void PushToDb(MessageModel message)
+        private void PushToDb(MessageModel message)
         {
             try
             {

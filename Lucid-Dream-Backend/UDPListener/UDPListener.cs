@@ -75,6 +75,7 @@ namespace UDPListener
 
         public void StartListener()
         {
+            if(_socket == null) InitSocket();
             //If already listening return like nothing happened
             if (IsListening())
             {
@@ -99,27 +100,9 @@ namespace UDPListener
         } //End StartListener
 
         /// <summary>
-        ///     Stops the listener temporally
+        ///     Stops the listener
         /// </summary>
         public void StopListener()
-        {
-            try
-            {
-                var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
-                var statusSender = new ChannelStatusSender();
-                _socket.Disconnect(true);
-                statusSender.SendStatus($"{channelName} inactive");
-            }
-            catch (Exception e)
-            {
-                OnReceiveError(e);
-            }
-        }
-
-        /// <summary>
-        ///     Hard stops the listener and frees resources
-        /// </summary>
-        public void HardStop()
         {
             try
             {
@@ -137,7 +120,7 @@ namespace UDPListener
 
         public bool IsListening()
         {
-            return _socket.Connected;
+            return _socket.IsBound;
         }
 
         #endregion
@@ -149,8 +132,15 @@ namespace UDPListener
             var state = (StateObject) result.AsyncState;
 
             //get current message
-            state.bytesCount = _socket.EndReceive(result);
-            BeginReceivingNewData();
+            try
+            {
+                state.bytesCount = _socket.EndReceive(result);
+                BeginReceivingNewData();
+            }
+            catch (Exception e)
+            {
+                OnReceiveError(e);
+            }
 
             if (state.buffer == null) return;
             DataReceivedDelegate?.Invoke(this, state);

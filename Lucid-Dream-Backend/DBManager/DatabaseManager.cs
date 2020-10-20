@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using DBManager.Models;
 using GlobalResourses;
 using MongoDB.Bson;
@@ -16,32 +18,42 @@ namespace DBManager
     {
         private readonly IMongoDatabase _dbDatabase;
         private readonly int _maxMessagesPerDoc;
-        //Limit number of threads to be used for queueing db requests
-        private readonly SemaphoreSlim _openConnectionSemaphore;
 
-        public DatabaseManager(string connectionString, int maxMessagesPerDoc)
+        private static DatabaseManager _instance;
+        public static DatabaseManager Instance
         {
-            this._maxMessagesPerDoc = maxMessagesPerDoc - 1;
+            get
+            {
+                var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
+                var maxMessagesPerDoc = ConfigurationManager.AppSettings["maxMessagesPerDoc"];
+
+                if (_instance == null)
+                    _instance = new DatabaseManager(dbConnectionUrl, int.Parse(maxMessagesPerDoc));
+                return _instance;
+            }
+        }
+
+        private DatabaseManager(string connectionString, int maxMessagesPerDoc)
+        {
+            _maxMessagesPerDoc = maxMessagesPerDoc - 1;
             // Get Database for all records
             IMongoClient dbClient = new MongoClient(connectionString);
 
             _dbDatabase = dbClient.GetDatabase("records");
 
-            _openConnectionSemaphore = new SemaphoreSlim(dbClient.Settings.MaxConnectionPoolSize);
-
             //Create collections for each stream type and indexers for dates
             CreateAllCollections();
         }
 
+
         #region Public Methods
-        public async void SaveBinaryBased(MessageModel content, ChannelNames channelType)
+        public void SaveBinaryBased(MessageModel content, ChannelNames channelType)
         {
             try
             {
                 var collectionByType = GetCollectionByStreamType(channelType);
                 var newBatchedMessage = getNewBatchedMessages(content, channelType);
                 var filter = GetFilterDefinition(newBatchedMessage, _maxMessagesPerDoc);
-
                 var bsonDoc = newBatchedMessage.ToBsonDocument();
 
                 UpdateDefinition<BatchedMessages> updateDefinition = new UpdateDefinitionBuilder<BatchedMessages>().Push(messages => messages.Messages, content);
@@ -54,10 +66,8 @@ namespace DBManager
                 }
 
                 updateDefinition = updateDefinition.Inc(messages => messages.NumOfMessages, 1);
-                var task = collectionByType.UpdateOneAsync(filter, updateDefinition, new UpdateOptions { IsUpsert = true });
-
-                await AddDbRequest(task);
-
+                collectionByType.UpdateOne(filter, updateDefinition,
+                    new UpdateOptions {IsUpsert = true});
             }
             catch (Exception e)
             {
@@ -78,7 +88,7 @@ namespace DBManager
             }
         }
 
-        private async void CreateIndexers(IMongoCollection<BatchedMessages> collection)
+        private void CreateIndexers(IMongoCollection<BatchedMessages> collection)
         {
             if (collection == null) return;
             var messageIndexBuilder = Builders<BatchedMessages>.IndexKeys;
@@ -89,26 +99,8 @@ namespace DBManager
             };
             var indexModel =
                 new CreateIndexModel<BatchedMessages>(messageIndexBuilder.Descending(x => x.CreationDate), options);
-            var dbRequest = collection.Indexes.CreateOneAsync(indexModel);
+            collection.Indexes.CreateOne(indexModel);
 
-            await AddDbRequest(dbRequest);
-        }
-
-        private async Task AddDbRequest<T>(Task<T> task)
-        {
-            await _openConnectionSemaphore.WaitAsync();
-            try
-            {
-                await task;
-            }
-            catch (Exception e)
-            {
-                await Task.FromException<T>(e);
-            }
-            finally
-            {
-                _openConnectionSemaphore.Release();
-            }
         }
 
         private IMongoCollection<BatchedMessages> GetCollectionByStreamType(ChannelNames message)
