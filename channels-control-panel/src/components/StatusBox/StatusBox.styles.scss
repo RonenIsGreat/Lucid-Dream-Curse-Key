@@ -1,0 +1,12 @@
+.status-box {
+    size: 50%;
+    color: white;
+    background-color: red;
+
+    .active {
+        background-color: rgb(39, 214, 39);
+    }
+    .inactive{
+        background-color: red;
+    }
+}
