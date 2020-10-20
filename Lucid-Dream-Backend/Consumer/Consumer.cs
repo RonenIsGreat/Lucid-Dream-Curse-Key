@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using GlobalResourses;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -13,10 +14,10 @@ namespace Consumer
         private readonly SaveStream.SaveStreamHelper _streamSaver;
         private readonly UdpListener _udpClient;
 
-        public Consumer(UdpListener uDp, string dbConnectionUrl)
+        public Consumer(UdpListener uDp)
         {
             _udpClient = uDp;
-            _streamSaver = new SaveStream.SaveStreamHelper( dbConnectionUrl, 30);
+            _streamSaver = new SaveStream.SaveStreamHelper();
         }
 
         public void ListenToQueue()
@@ -61,11 +62,11 @@ namespace Consumer
                 consumer);
         }
 
-        private void UdpClientDataReceivedDelegate(object sender, StateObject data)
+        private  void UdpClientDataReceivedDelegate(object sender, StateObject data)
         {
-            UdpListener currentListener = (UdpListener) sender;
+            //UdpListener currentListener = (UdpListener) sender;
 
-            var succeeded = _streamSaver.SaveData(data.buffer);
+            var succeeded =  _streamSaver.SaveData(data.buffer);
             if (!succeeded) Console.WriteLine("Failed to save message");
         }
     }

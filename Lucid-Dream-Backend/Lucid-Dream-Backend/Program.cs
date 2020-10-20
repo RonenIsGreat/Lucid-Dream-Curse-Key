@@ -11,9 +11,6 @@ namespace Lucid_Dream_Backend
     {
         private static void Main(string[] args)
         {
-            //Initialize and get the save stream helper instance
-            var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
-
             //Initializing The Ports
             var _Ports = new ChannelDetails[6];
 
@@ -30,7 +27,7 @@ namespace Lucid_Dream_Backend
             for (var i = 0; i < udpListeners.Length; i++)
             {
                 udpListeners[i] = new UdpListener(_Ports[i]);
-                consumers[i] = new Consumer.Consumer(udpListeners[i], dbConnectionUrl);
+                consumers[i] = new Consumer.Consumer(udpListeners[i]);
                 consumers[i].ListenToQueue();
             } //End For
 
