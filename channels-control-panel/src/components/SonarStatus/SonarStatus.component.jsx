@@ -7,7 +7,7 @@ function SonarStatus(props) {
   let {CasBeam, CasStave, FasTasBeam, FasTasStave, PRSStave, IDRSBus} = props;
   
   return (
-    <div className="sonar-status">
+    <div className="sonar-status container">
       <h1>Stream Array Status</h1>
       <StatusBox name = {"Cas Beam Bus"} status = {CasBeam}/>  
       <br/>
@@ -19,7 +19,7 @@ function SonarStatus(props) {
       <br/>
       <StatusBox name = {"PRS Stave Bus"} status = {PRSStave}/>  
       <br/>
-      <StatusBox name = {"ATM IDRS Bus"} status = {IDRSBus}/> 
+      <StatusBox name = {"ATM IDRS Bus"} status = {IDRSBus}/>
     </div>
   );
 }
