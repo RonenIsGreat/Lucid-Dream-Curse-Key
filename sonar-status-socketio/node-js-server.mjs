@@ -38,11 +38,21 @@ server.listen(port, hostname, () => {
                 throw error1;
             }
             
-            var exchange = 'channelStatus';
+            var channelStatusExchange = 'channelStatus';
+            var distributionDataExchange = 'distributionData';
 
-            channel.assertExchange(exchange, 'fanout', {
+            channel.assertExchange(channelStatusExchange, 'fanout', {
                 durable: false
             });
+            channel.assertExchange(distributionDataExchange, 'fanout', {
+                durable: false
+            });
+
+            channel.publish(distributionDataExchange, '', Buffer.from(JSON.stringify({
+                date1UnixTime: '1603288680000',
+                date2UnixTime: '1603288714000',
+                channel: 'CasStave'
+            })));
 
             channel.assertQueue('', {
                 exclusive: true
@@ -51,7 +61,7 @@ server.listen(port, hostname, () => {
                     throw error2;
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                channel.bindQueue(q.queue, exchange, '');
+                channel.bindQueue(q.queue, channelStatusExchange, '');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
