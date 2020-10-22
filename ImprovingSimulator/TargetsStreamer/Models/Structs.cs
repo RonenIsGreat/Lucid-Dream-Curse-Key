@@ -25,7 +25,7 @@ namespace TargetsStreamerMain.Models
         public byte[] ToByteArray()
         {
             byte[] arr;
-            IntPtr ptr = IntPtr.Zero;
+            var ptr = IntPtr.Zero;
             try
             {
                 var size = Marshal.SizeOf(this);
@@ -50,7 +50,7 @@ namespace TargetsStreamerMain.Models
         public float relativeBearing;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct TimeType
     {
         public long hours;

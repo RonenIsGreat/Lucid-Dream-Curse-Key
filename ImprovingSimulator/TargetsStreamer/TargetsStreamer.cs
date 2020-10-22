@@ -20,18 +20,17 @@ namespace TargetsStreamerMain
         {
             get
             {
-                var dbConnectionUrl = ConfigurationManager.AppSettings["db-url"];
-                var maxMessagesPerDoc = ConfigurationManager.AppSettings["maxMessagesPerDoc"];
+                var targetsDataFilePath = ConfigurationManager.AppSettings["TargetsDataPath"];
 
                 if (_instance == null)
-                    _instance = new TargetsStreamer(dbConnectionUrl);
+                    _instance = new TargetsStreamer(targetsDataFilePath);
                 return _instance;
             }
         }
 
         private TargetsStreamer(string targetsRecordingPath)
         {
-            this._targetsRecordingPath = targetsRecordingPath;
+            _targetsRecordingPath = targetsRecordingPath;
         }
 
         private bool CheckRequirements()
@@ -50,48 +49,46 @@ namespace TargetsStreamerMain
             if (!CheckRequirements()) return Task.CompletedTask;
             using (var f = new StreamReader(File.OpenRead(_targetsRecordingPath), Encoding.UTF8))
             {
-                short count = 0;
+                short index = 0;
                 var systemTracks = new SystemTracks
                 {
                     sentTimeStamp = TimeType.ParseFromDateTime(DateTime.UtcNow)
                 };
                 //Take the array created in system tracks constructor
-                var trackDataList = systemTracks.systemTracks;
+                var targetsDataList = systemTracks.systemTracks;
 
                 while (!f.EndOfStream)
                 {
                     //Check cancellation
-                    if(ct.IsCancellationRequested) return Task.CompletedTask;
+                    if(ct.IsCancellationRequested)
+                    {
+                        return Task.CompletedTask;
+                    }
+
                     var line = f.ReadLine();
                     if (!string.IsNullOrWhiteSpace(line) && !string.IsNullOrEmpty(line))
                     {
-                        var param = line.Split(',');
-                        var trackIdString = param[0];
-                        var bearingString = param[1];
+                        var trackData = ParseTrackDataWithDelimiter(line);
 
-                        var trackId = long.Parse(trackIdString.Split(':')[1]);
-                        var relativeBearing = float.Parse(bearingString.Split(':')[1]);
-
-                        var trackData = new TrackData
+                        // If array is full, send the messages
+                        if (index + 1 == SystemTracks.ARRAY_SIZE)
                         {
-                            relativeBearing = relativeBearing,
-                            trackID = trackId
-                        };
+                            targetsDataList[index] = trackData;
 
-                        trackDataList[count] = trackData;
+                            SendMessage(systemTracks.ToByteArray(), "SystemTracks");
 
-                        // Max 3 track per message
-                        if (count == SystemTracks.ARRAY_SIZE || f.EndOfStream)
-                        {
-
-                            //TODO: add routing key
-                            SendMessage(systemTracks.ToByteArray(), "");
-                            trackDataList.Initialize();
-                            count = 0;
+                            index = 0;
                         }
                         else
                         {
-                            count++;
+                            targetsDataList[index] = trackData;
+                            index++;
+                        }
+
+                        // Send forever until canceled
+                        if (f.EndOfStream && !ct.IsCancellationRequested)
+                        {
+                            f.BaseStream.Seek(0, SeekOrigin.Begin);
                         }
 
                     }
@@ -101,9 +98,25 @@ namespace TargetsStreamerMain
             return Task.CompletedTask;
         }
 
+        private static TrackData ParseTrackDataWithDelimiter(string line)
+        {
+            var param = line.Split(',');
+            var trackIdString = param[0];
+            var bearingString = param[1];
+
+            var trackId = long.Parse(trackIdString.Split(':')[1]);
+            var relativeBearing = float.Parse(bearingString.Split(':')[1]);
+
+            var trackData = new TrackData
+            {
+                relativeBearing = relativeBearing,
+                trackID = trackId
+            };
+            return trackData;
+        }
 
 
-        public void SendMessage(byte[] message, string rKey)
+        private void SendMessage(byte[] message, string rKey)
         {
             var factory = new ConnectionFactory { HostName = "localhost", RequestedHeartbeat = TimeSpan.FromSeconds(60) };
             using (var connection = factory.CreateConnection())

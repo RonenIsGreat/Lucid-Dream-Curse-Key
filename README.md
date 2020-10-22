@@ -14,8 +14,6 @@ RabbitMQ - https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/
 
 `restheart` - Add a new enviormental veriable and set it's value to restheart folder in the project (..\Lucid-Dream-Curse-Key\DBService\RESTheart)
 
-`RecordingsPath` - Add a new enviormental veriable and set it's value to the recording files folder path.
-
 # Run
 
 ### Lucid Dream Backend
@@ -25,4 +23,4 @@ RabbitMQ - https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.9/
 - Install dependencies with `npm install`.
 
 ### Simulator
-- Remember to set envioremntal veriable `RecordingsPath` or else the simulator will not work.
+- Remember change app.config of project ImprovingSimulator according to your system

@@ -26,12 +26,12 @@ namespace ImprovingSimulator
             streamsCancellationTokens = new List<CancellationTokenSource>();
         } //End MainForm Constructor
 
-        private async void StartSendingStreamMessages(string streamType, CancellationToken ct,
+        private void StartSendingStreamMessages(string streamType, CancellationToken ct,
             long numberOfMessagesToSend = -1)
         {
             if (ConfigurationManager.GetSection("StreamSettings/" + streamType) is NameValueCollection config)
             {
-                var path = Environment.GetEnvironmentVariable("RecordingsPath");
+                var path = ConfigurationManager.AppSettings["RecordingsPath"];
 
                 var fullPath = Path.Combine(path, config["Recording_Name"]);
 
@@ -41,7 +41,7 @@ namespace ImprovingSimulator
                     double.Parse(config["Delimiter"]));
 
                 // We don't care if we go back to original context so configure await is false
-                await Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct).ConfigureAwait(false);
+                Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct);
             }
         }
 
@@ -167,19 +167,15 @@ namespace ImprovingSimulator
             {
                 targetsCancellationTokenSource = new CancellationTokenSource();
                 TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
-                SystemTracks test = new SystemTracks
-                {
-                    systemTracks = new TrackData[3]
-                    {
-                        new TrackData {relativeBearing = 1, trackID = 1}, new TrackData(), new TrackData()
-                    },
-                    sentTimeStamp = TimeType.ParseFromDateTime(DateTime.Now)
-                };
-                var array = test.ToByteArray();
+                targetsCancellationTokenSource = new CancellationTokenSource();
                 SendTargetsBtn.Text = "Stop Sending Targets";
+
+                // Do it in background
+                Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
             }
             else
             {
+                targetsCancellationTokenSource.Cancel();
                 SendTargetsBtn.Text = "Start Sending Targets";
             }
         }
