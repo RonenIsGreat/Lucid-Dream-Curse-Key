@@ -33,10 +33,12 @@ namespace ImprovingSimulator
             {
                 var path = ConfigurationManager.AppSettings["RecordingsPath"];
 
+                IPAddress udpIp = IPAddress.Parse( ConfigurationManager.AppSettings["UdpRemoteIp"]);
+
                 var fullPath = Path.Combine(path, config["Recording_Name"]);
 
                 var stream = new StreamWrapper.Main.StreamWrapper(fullPath,
-                    IPAddress.Loopback.ToString(),
+                    udpIp.ToString(),
                     int.Parse(config["Port"]),
                     double.Parse(config["Delimiter"]));
 

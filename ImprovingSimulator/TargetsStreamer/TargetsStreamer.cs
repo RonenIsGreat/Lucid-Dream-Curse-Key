@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using RabbitMQ.Client;
 using System.Linq;
+using System.Net;
 using TargetsStreamerMain.Models;
 
 namespace TargetsStreamerMain
@@ -16,6 +18,11 @@ namespace TargetsStreamerMain
     {
         private readonly string _targetsRecordingPath;
         private static TargetsStreamer _instance;
+        public static int MessagesSent { get; private set; }
+        private readonly Stopwatch stopwatch;
+
+        private static string RabbitMqHost;
+        private static int RabbitMqPort;
         public static TargetsStreamer Instance
         {
             get
@@ -30,6 +37,15 @@ namespace TargetsStreamerMain
 
         private TargetsStreamer(string targetsRecordingPath)
         {
+            //Validity check
+            IPAddress ip = IPAddress.Parse(ConfigurationManager.AppSettings["RabbitMqHost"]);
+            int port = int.Parse(ConfigurationManager.AppSettings["RabbitMqPort"]);
+
+            RabbitMqHost = ip.ToString();
+            RabbitMqPort = port;
+
+            MessagesSent = 0;
+            stopwatch = new Stopwatch();
             _targetsRecordingPath = targetsRecordingPath;
         }
 
@@ -46,6 +62,8 @@ namespace TargetsStreamerMain
 
         public Task StartSending(CancellationToken ct)
         {
+            stopwatch.Start();
+
             if (!CheckRequirements()) return Task.CompletedTask;
             using (var f = new StreamReader(File.OpenRead(_targetsRecordingPath), Encoding.UTF8))
             {
@@ -75,7 +93,12 @@ namespace TargetsStreamerMain
                         {
                             targetsDataList[index] = trackData;
 
-                            SendMessage(systemTracks.ToByteArray(), "SystemTracks");
+                            // Send each message after 1.3 secs
+                            SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1300 * MessagesSent);
+
+                            SendMessage(systemTracks.ToByteArray());
+
+                            MessagesSent++;
 
                             index = 0;
                         }
@@ -116,16 +139,16 @@ namespace TargetsStreamerMain
         }
 
 
-        private void SendMessage(byte[] message, string rKey)
+        private void SendMessage(byte[] message)
         {
-            var factory = new ConnectionFactory { HostName = "localhost", RequestedHeartbeat = TimeSpan.FromSeconds(60) };
+            var factory = new ConnectionFactory { HostName = RabbitMqHost, RequestedHeartbeat = TimeSpan.FromSeconds(60), Port = RabbitMqPort };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
                 channel.ExchangeDeclare("SystemTracks",
                     "direct", true);
                 channel.BasicPublish("channelControl",
-                    rKey,
+                    "SystemTracks",
                     null,
                     message);
             }
