@@ -8,45 +8,48 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TargetsStreamerMain.Models;
+using TargetsStreamerMain;
 
 namespace ImprovingSimulator
 {
     public partial class MainForm : Form
     {
-        private readonly List<CancellationTokenSource> cancellationTokens;
+        private readonly List<CancellationTokenSource> streamsCancellationTokens;
+        private CancellationTokenSource targetsCancellationTokenSource;
         private int NumberOfMessages;
 
         public MainForm()
         {
             InitializeComponent();
             NumberOfMessages = 0;
-            cancellationTokens = new List<CancellationTokenSource>();
+            streamsCancellationTokens = new List<CancellationTokenSource>();
         } //End MainForm Constructor
 
-        private async void StartSendingMessages(string streamType, CancellationToken ct,
+        private void StartSendingStreamMessages(string streamType, CancellationToken ct,
             long numberOfMessagesToSend = -1)
         {
             if (ConfigurationManager.GetSection("StreamSettings/" + streamType) is NameValueCollection config)
             {
-                var path = Environment.GetEnvironmentVariable("RecordingsPath");
+                var path = ConfigurationManager.AppSettings["RecordingsPath"];
 
                 var fullPath = Path.Combine(path, config["Recording_Name"]);
 
-                var stream = new StreamWrapper.StreamWrapper(fullPath,
+                var stream = new StreamWrapper.Main.StreamWrapper(fullPath,
                     IPAddress.Loopback.ToString(),
                     int.Parse(config["Port"]),
                     double.Parse(config["Delimiter"]));
 
                 // We don't care if we go back to original context so configure await is false
-                await Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct).ConfigureAwait(false);
+                Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct);
             }
         }
 
         private void StopAllSending()
         {
-            foreach (var ct in cancellationTokens) ct.Cancel();
+            foreach (var ct in streamsCancellationTokens) ct.Cancel();
 
-            cancellationTokens.Clear();
+            streamsCancellationTokens.Clear();
         } //End If
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -59,7 +62,7 @@ namespace ImprovingSimulator
             if (SequenceSendingBtn.Text == "Start Sending")
             {
                 //Ensure cancellation tokens list is cleared
-                cancellationTokens.Clear();
+                streamsCancellationTokens.Clear();
 
                 //groupBox1.Enabled = false;
 
@@ -99,9 +102,9 @@ namespace ImprovingSimulator
                 var ctSource = new CancellationTokenSource();
                 var streamType = box.Name.Replace("CheckBox", "");
 
-                cancellationTokens.Add(ctSource);
+                streamsCancellationTokens.Add(ctSource);
 
-                StartSendingMessages(streamType, ctSource.Token, numberOfMessagesToSend);
+                StartSendingStreamMessages(streamType, ctSource.Token, numberOfMessagesToSend);
                 flag = true;
             }
 
@@ -132,16 +135,13 @@ namespace ImprovingSimulator
         {
             if (QuantitySendingBtn.Text == "Send By Number")
             {
-                var checkedBoxes = Controls.OfType<CheckBox>().Where(box => box.Checked);
-
-                var success = false;
                 NumberOfMessages = (int) numericUpDown1.Value;
 
                 DisableCheckboxes();
                 QuantitySendingBtn.Text = "Stop Sending";
 
 
-                success = SendMessagesToCheckedStreams(NumberOfMessages);
+                var success = SendMessagesToCheckedStreams(NumberOfMessages);
 
                 if (!success)
                 {
@@ -160,5 +160,24 @@ namespace ImprovingSimulator
                 EnableCheckboxes();
             } //End Else
         } //End QuantitySendingBtn
+
+        private void SendTargetsBtn_Click(object sender, EventArgs e)
+        {
+            if (SendTargetsBtn.Text == "Start Sending Targets")
+            {
+                targetsCancellationTokenSource = new CancellationTokenSource();
+                TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
+                targetsCancellationTokenSource = new CancellationTokenSource();
+                SendTargetsBtn.Text = "Stop Sending Targets";
+
+                // Do it in background
+                Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
+            }
+            else
+            {
+                targetsCancellationTokenSource.Cancel();
+                SendTargetsBtn.Text = "Start Sending Targets";
+            }
+        }
     } //End MainForm
 } //End Improving Simulator

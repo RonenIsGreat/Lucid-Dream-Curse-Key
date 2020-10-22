@@ -179,6 +179,10 @@
       <Project>{470E7273-BFD9-4B06-B539-D520150D5560}</Project>
       <Name>StreamWrapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TargetsStreamer\TargetsStreamer.csproj">
+      <Project>{883D69F4-B4D2-4F79-BB0B-684ADAD5786E}</Project>
+      <Name>TargetsStreamer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace UdpSocket
+namespace UdpSocket.Main
 {
     public class UDPSocket
     {
