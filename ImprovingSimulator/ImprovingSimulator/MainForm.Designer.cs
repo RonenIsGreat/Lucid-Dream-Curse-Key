@@ -54,6 +54,7 @@
             this.NumberOfMessagesLabel = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.QuantitySendingBtn = new System.Windows.Forms.Button();
+            this.SendTargetsBtn = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -131,7 +132,7 @@
             this.SequenceSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SequenceSendingBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SequenceSendingBtn.ForeColor = System.Drawing.Color.White;
-            this.SequenceSendingBtn.Location = new System.Drawing.Point(805, 432);
+            this.SequenceSendingBtn.Location = new System.Drawing.Point(639, 432);
             this.SequenceSendingBtn.Name = "SequenceSendingBtn";
             this.SequenceSendingBtn.Size = new System.Drawing.Size(190, 39);
             this.SequenceSendingBtn.TabIndex = 2;
@@ -333,7 +334,7 @@
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(156, 47);
+            this.numericUpDown1.Size = new System.Drawing.Size(156, 34);
             this.numericUpDown1.TabIndex = 25;
             this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.numericUpDown1.Value = new decimal(new int[] {
@@ -360,11 +361,30 @@
             this.QuantitySendingBtn.UseVisualStyleBackColor = false;
             this.QuantitySendingBtn.Click += new System.EventHandler(this.QuantitySendingBtn_Click);
             // 
+            // SendTargetsBtn
+            // 
+            this.SendTargetsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.SendTargetsBtn.Cursor = System.Windows.Forms.Cursors.Default;
+            this.SendTargetsBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.SendTargetsBtn.FlatAppearance.BorderSize = 0;
+            this.SendTargetsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SendTargetsBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SendTargetsBtn.ForeColor = System.Drawing.Color.White;
+            this.SendTargetsBtn.Location = new System.Drawing.Point(835, 432);
+            this.SendTargetsBtn.Name = "SendTargetsBtn";
+            this.SendTargetsBtn.Size = new System.Drawing.Size(190, 39);
+            this.SendTargetsBtn.TabIndex = 27;
+            this.SendTargetsBtn.Text = "Start Sending Targets";
+            this.SendTargetsBtn.UseMnemonic = false;
+            this.SendTargetsBtn.UseVisualStyleBackColor = false;
+            this.SendTargetsBtn.Click += new System.EventHandler(this.SendTargetsBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1032, 516);
+            this.Controls.Add(this.SendTargetsBtn);
             this.Controls.Add(this.QuantitySendingBtn);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.NumberOfMessagesLabel);
@@ -422,5 +442,6 @@
         private System.Windows.Forms.Label NumberOfMessagesLabel;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button QuantitySendingBtn;
+        private System.Windows.Forms.Button SendTargetsBtn;
     }
 }
