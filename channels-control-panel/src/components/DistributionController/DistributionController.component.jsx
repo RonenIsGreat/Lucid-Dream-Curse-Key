@@ -27,11 +27,12 @@ export default class DistributionController extends Component {
             isSending: !this.state.isSending
         }, () => {
             if (this.state.isSending) {
-                const {casStave, fasTasStave, startDate, endDate} = this.state;
-                const startTimeArray = this.state.startTime.split(":");
-                const endTimeArray = this.state.endTime.split(":");
-                const startDateUnix = startDate.setHours(startTimeArray[0], startTimeArray[1], startTimeArray[2]);
-                const endDateUnix = endDate.setHours(endTimeArray[0], endTimeArray[1], endTimeArray[2]);
+                const {casStave, fasTasStave, startDate, endDate,
+                        startTime, endTime} = this.state;
+                const startTimeArray = startTime.split(":");
+                const endTimeArray = endTime.split(":");
+                const startDateUnix = startTime === "" ? startDate.getTime() : startDate.setHours(startTimeArray[0], startTimeArray[1], startTimeArray[2]);
+                const endDateUnix = endTime === "" ? endDate.getTime() : endDate.setHours(endTimeArray[0], endTimeArray[1], endTimeArray[2]);
                 console.log(startDateUnix, endDateUnix);
                 this.state.socket.emit("DistributionSocketIO", {
                     date1UnixTime: startDateUnix,
@@ -104,6 +105,17 @@ export default class DistributionController extends Component {
                                             <Form.Control id="startTime" type="time" step="1" onChange={this.handleChange}></Form.Control>
                                         </Form.Group>
                                     </Col>
+                                    <Col xs={5}>
+                                        <Form.Group>
+                                            <Form.Label>Speed</Form.Label>
+                                            <Form.Control as="select">
+                                                <option>X1</option>
+                                                <option>X2</option>
+                                                <option>X4</option>
+                                                <option>X8</option>
+                                            </Form.Control>
+                                        </Form.Group>
+                                    </Col>
                                 </Row>
                                 <Row>
                                     <Col xs={3}>
@@ -124,15 +136,12 @@ export default class DistributionController extends Component {
                                 </Row>
                             </Col>
                         </Row>
-                        <div className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit">
-                                {this.state.isSending ? "End" : "Start"}
-                            </Button>
-                        </div>
+                        <Button variant="primary" type="submit">
+                            {this.state.isSending ? "End" : "Start"}
+                        </Button>
                     </Form>
                     
                 </div>
-                {/* <Button variant="warning" onClick={() => this.handleSubmit(this.props.ENDPOINT)}>Warning</Button> */}
             </div>
         )
     }
