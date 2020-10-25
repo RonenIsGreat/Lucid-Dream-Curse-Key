@@ -8,6 +8,7 @@ import socketIOClient from 'socket.io-client';
 
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import StorageStatus from './components/StorageStatus/StorageStatus.component';
 
 function App() {
   const ENDPOINT = "http://127.0.0.1:4000";
@@ -55,6 +56,7 @@ function App() {
         <Nav className="mr-auto">
           <Nav.Link as={NavLink} to='/' exact>Status</Nav.Link>
           <Nav.Link as={NavLink} to='/controller'>Controller</Nav.Link>
+          <Nav.Link as={NavLink} to='/storageStatus'>StorageStatus</Nav.Link>
         </Nav>
       </Navbar>
       
@@ -70,6 +72,7 @@ function App() {
                       FasTasBeam={FasTasBeam === "active"} FasTasStave={FasTasStave === "active"}
                       PRSStave={PRSStave === "active"} IDRSBus={IDRSBus === "active"}/>}
         />
+        <Route path ="/storageStatus" component={StorageStatus}/>
         <Route component={NotFoundPage}/>
       </Switch>
     </div>
