@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import './StorageStatus.styles.scss';
 import CanvasJSReact from '../../canvasjs.react';
+import socketIOClient from 'socket.io-client';
 
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -9,7 +10,21 @@ class StorageStatus extends Component {
     state = {
         used: 85,
         available: 15
-    }
+	}
+	
+	componentDidMount() {
+		const ENDPOINT = "http://127.0.0.1:4000";
+		const socket = socketIOClient(ENDPOINT);
+		socket.on("StorageStatus", data => {
+			let dataObject = JSON.parse(data);
+			this.setState({
+				used : dataObject.used,
+				available : dataObject.available
+			})
+			}
+		)
+	};
+
 	render() {
 		const options = {
 			title: {
@@ -33,7 +48,7 @@ class StorageStatus extends Component {
 				indexLabelFontColor: "white",
 				yValueFormatString: "#,###'%'",
 				dataPoints: [
-					{ label: "Drive 1",   y: 85 }
+					{ label: "Drive 1",   y: this.state.used }
 				]
 			},{
 				type: "stackedBar100",
@@ -44,7 +59,7 @@ class StorageStatus extends Component {
 				indexLabelFontColor: "white",
 				yValueFormatString: "#,###'%'",
 				dataPoints: [
-					{ label: "Drive 1",   y: 15 },
+					{ label: "Drive 1",   y: this.state.available },
 				]
 			}]
 		}
