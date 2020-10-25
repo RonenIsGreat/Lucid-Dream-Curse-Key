@@ -1,48 +1,136 @@
 import React, { Component } from 'react'
-import { Button, Form } from 'react-bootstrap'
-import socketIOClient from 'socket.io-client'
+import { Button, Form, Row, Col } from 'react-bootstrap'
+// import socketIOClient from 'socket.io-client'
+import DatePicker from "react-datepicker"
+
+import "react-datepicker/dist/react-datepicker.css"
 import './DistributionController.styles.scss'
 
 export default class DistributionController extends Component {
     state = {
-        
+        casStave: false,
+        fasTasStave: false,
+        startDate: new Date(),
+        endDate: new Date(),
+        startTime: '',
+        endTime: '',
+        isSending: false,
+        socket: this.props.socket
     }
 
-    handleSubmit = (ENDPOINT) => {
+    handleSubmit = (e) => {
         // let {ENDPOINT} = this.props;
-        const socket = socketIOClient(ENDPOINT);
-        socket.emit("DistributionSocketIO", {
-            date1UnixTime: '1603288680000',
-            date2UnixTime: '1603288714000',
-            channel: 'CasStave'
+        // const socket = socketIOClient(ENDPOINT);
+        
+        e.preventDefault();
+        this.setState({
+            isSending: !this.state.isSending
+        }, () => {
+            if (this.state.isSending) {
+                const {casStave, fasTasStave, startDate, endDate} = this.state;
+                const startTimeArray = this.state.startTime.split(":");
+                const endTimeArray = this.state.endTime.split(":");
+                const startDateUnix = startDate.setHours(startTimeArray[0], startTimeArray[1], startTimeArray[2]);
+                const endDateUnix = endDate.setHours(endTimeArray[0], endTimeArray[1], endTimeArray[2]);
+                console.log(startDateUnix, endDateUnix);
+                this.state.socket.emit("DistributionSocketIO", {
+                    date1UnixTime: startDateUnix,
+                    date2UnixTime: endDateUnix,
+                    channels: {
+                        casStave,
+                        fasTasStave
+                    }
+                })
+            }
+            else {
+
+            }
         })
     }
 
+    handleChange = (e) => {
+        this.setState({
+            [e.target.id]: e.target.value
+        });
+    }
+
+    handleToggle = (e) => {
+        this.setState({
+            [e.target.id]: e.target.checked
+        });
+    }
+
+    handleDate = (date, type, e) => {
+        // console.log(e.target);
+        this.setState({
+            [type]: date
+        });
+    }
+
     render() {
+        const CustomDateInput = ({value, onClick}) => (
+            <Button className="bg-light text-primary" onClick={onClick}>{value}</Button>
+        );
+
         return (
             <div className="distribution-controller container">
                 <div className="form-wrapper bg-light">
                     <h5 className="text-center">Data Distribution</h5>
-                    <Form>
-                        <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" />
-                            <Form.Text className="text-muted">
-                                We'll never share your email with anyone else.
-                        </Form.Text>
-                        </Form.Group>
-
-                        <Form.Group controlId="formBasicPassword">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password" />
-                        </Form.Group>
-                        <Form.Group controlId="formBasicCheckbox">
-                            <Form.Check type="checkbox" label="Check me out" />
-                        </Form.Group>
-                        <Button variant="primary" type="submit">
-                            Submit
-                    </Button>
+                    <Form onSubmit={this.handleSubmit}>
+                        <Row>
+                            <Col xs={3}>
+                                <Form.Label>Channels</Form.Label>
+                                <Form.Group controlId="casStave">
+                                    <Form.Check type="checkbox" label="Cas Stave Bus" onChange={this.handleToggle} />
+                                </Form.Group>
+                                <Form.Group controlId="fasTasStave">
+                                    <Form.Check type="checkbox" label="Fas/Tas Stave Bus" onChange={this.handleToggle} />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Row>
+                                    <Col xs={3}>
+                                        <Form.Group>
+                                            <Form.Label>Start Date</Form.Label>
+                                            <DatePicker
+                                                selected={this.state.startDate} onChange={(date, e) => this.handleDate(date, "startDate", e)}
+                                                dateFormat="dd/MM/yyyy"
+                                                customInput={<CustomDateInput />} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4}>
+                                        <Form.Group>
+                                            <Form.Label>Start Time</Form.Label>
+                                            <Form.Control id="startTime" type="time" step="1" onChange={this.handleChange}></Form.Control>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col xs={3}>
+                                        <Form.Group>
+                                            <Form.Label>End Date</Form.Label>
+                                            <DatePicker minDate={this.state.startDate} selected={this.state.endDate >= this.state.startDate ? this.state.endDate : this.state.startDate}
+                                                onChange={(date, e) => this.handleDate(date, "endDate", e)}
+                                                dateFormat="dd/MM/yyyy"
+                                                customInput={<CustomDateInput />} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs={4}>
+                                        <Form.Group>
+                                            <Form.Label>End Time</Form.Label>
+                                            <Form.Control id="endTime" type="time" step="1" onChange={this.handleChange}></Form.Control>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <div className="d-flex justify-content-center">
+                            <Button variant="primary" type="submit">
+                                {this.state.isSending ? "End" : "Start"}
+                            </Button>
+                        </div>
                     </Form>
+                    
                 </div>
                 {/* <Button variant="warning" onClick={() => this.handleSubmit(this.props.ENDPOINT)}>Warning</Button> */}
             </div>

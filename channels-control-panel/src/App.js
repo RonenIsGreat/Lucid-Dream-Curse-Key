@@ -1,8 +1,8 @@
 import React from 'react';
-import { Switch, Route, Link, NavLink} from "react-router-dom";
+import { Switch, Route, Link} from "react-router-dom";
 import NotFoundPage from './components/NotFoundPage/NotFoundPage.component';
 import Home from './components/Home/Home.component';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar } from 'react-bootstrap';
 
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';

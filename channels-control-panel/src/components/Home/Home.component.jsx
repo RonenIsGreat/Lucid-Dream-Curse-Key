@@ -14,36 +14,40 @@ export default function Home() {
     const [FasTasStave, setFasTasStave] = useState("inactive");
     const [PRSStave, setPRSStave] = useState("inactive");
     const [IDRSBus, setIDRSBus] = useState("inactive");
-
+    const socket = socketIOClient(ENDPOINT);
 
     useEffect(() => {
-        const socket = socketIOClient(ENDPOINT);
-        socket.on("StatusSocketIO", data => {
-            let dataSplit = data.split(" ");
-            switch (dataSplit[0]) {
-                case "CasBeam":
-                    setCasBeam(dataSplit[1]);
-                    break;
-                case "CasStave":
-                    setCasStave(dataSplit[1]);
-                    break;
-                case "FasTasBeam":
-                    setFasTasBeam(dataSplit[1]);
-                    break;
-                case "FasTasStave":
-                    setFasTasStave(dataSplit[1]);
-                    break;
-                case "PRSStave":
-                    setPRSStave(dataSplit[1]);
-                    break;
-                case "IDRSBus":
-                    setIDRSBus(dataSplit[1]);
-                    break;
-                default:
-                    break;
-            }
-        });
-    }, [])
+        // socket.on('connect_error', (timeout) => {
+        //     socket.close()
+        // });
+        // if(socket.connected) {
+            socket.on("StatusSocketIO", data => {
+                let dataSplit = data.split(" ");
+                switch (dataSplit[0]) {
+                    case "CasBeam":
+                        setCasBeam(dataSplit[1]);
+                        break;
+                    case "CasStave":
+                        setCasStave(dataSplit[1]);
+                        break;
+                    case "FasTasBeam":
+                        setFasTasBeam(dataSplit[1]);
+                        break;
+                    case "FasTasStave":
+                        setFasTasStave(dataSplit[1]);
+                        break;
+                    case "PRSStave":
+                        setPRSStave(dataSplit[1]);
+                        break;
+                    case "IDRSBus":
+                        setIDRSBus(dataSplit[1]);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        // }
+    }, [socket])
 
     return (
         <div>
@@ -60,7 +64,7 @@ export default function Home() {
             </Row>
             <Row>
                 <Col xs={6}>
-                    <DistributionController ENDPOINT={ENDPOINT} />
+                    <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
                 </Col>
             </Row>
         </div>
