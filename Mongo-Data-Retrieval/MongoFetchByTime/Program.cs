@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Server;
+using System.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Collections.Specialized;
 
 namespace MongoFetchByTime
 {
@@ -20,16 +25,24 @@ namespace MongoFetchByTime
         public const string FilterEnd = "} } } } }&pagesize=1000&page=";
     }
 
+    public class channelsData
+    {
+        public bool casStave { get; set; }
+        public bool fasTasStave { get; set; }
+    }
+
     public class DistributionData
     {
         public string date1UnixTime { get; set; }
         public string date2UnixTime { get; set; }
-        public string channel { get; set; }
+        public string mode { get; set; }
+        public channelsData channels { get; set; }
     }
 
     class Program
     {
         static HttpClient client = new HttpClient();
+        static List<CancellationTokenSource> cancellationTokens = new List<CancellationTokenSource>();
 
         static void Main(string[] args)
         {
@@ -60,13 +73,17 @@ namespace MongoFetchByTime
             //new DateTime(DateTime.Parse(Console.ReadLine()).Ticks, DateTimeKind.Utc)
             #endregion
 
-            string resultsAsString = "";
+            string casResultsAsString = "";
 
             // RabbitMQ init
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
             using (var rabbitChannel = connection.CreateModel())
             {
+                //Ensure cancellation tokens list is cleared
+                cancellationTokens.Clear();
+
+
                 rabbitChannel.ExchangeDeclare(exchange: "distributionData", type: ExchangeType.Fanout);
                 var queueName = rabbitChannel.QueueDeclare().QueueName;
                 rabbitChannel.QueueBind(queue: queueName,
@@ -80,44 +97,75 @@ namespace MongoFetchByTime
                     var body = ea.Body.ToArray();
                     DistributionData distributionData = JsonConvert.DeserializeObject<DistributionData>(Encoding.UTF8.GetString(body));
                     //Console.WriteLine(" [x] {0}", channel);
-                    Console.WriteLine(distributionData.date1UnixTime + distributionData.date2UnixTime + distributionData.channel);
+                    Console.WriteLine(distributionData.date1UnixTime + distributionData.date2UnixTime + distributionData.channels);
 
-                    long date1 = Convert.ToInt64(distributionData.date1UnixTime);
-                    long date2 = Convert.ToInt64(distributionData.date2UnixTime);
-                    string channel = distributionData.channel;
-                    string query = channel + Constants.FilterStart + date1 + Constants.FilterMiddle
-                                    + date2 + Constants.FilterEnd;
-
-
-                    using (var watch = new SuperWatch())
+                    if(distributionData.mode == "start")
                     {
-                        for (; page <= 2; page++)
+                        long date1 = Convert.ToInt64(distributionData.date1UnixTime);
+                        long date2 = Convert.ToInt64(distributionData.date2UnixTime);
+                        bool casStave = distributionData.channels.casStave;
+                        bool fasTasStave = distributionData.channels.fasTasStave;
+                        string casQuery = casStave ? "CasStave" + Constants.FilterStart + date1 + Constants.FilterMiddle
+                                        + date2 + Constants.FilterEnd : "";
+                        string fasTasQuery = fasTasStave ? "FasTasStave" + Constants.FilterStart + date1 + Constants.FilterMiddle
+                                        + date2 + Constants.FilterEnd : "";
+
+
+                        using (var watch = new SuperWatch())
                         {
-                            try
+                            for (; page <= 2; page++)
                             {
-                                HttpResponseMessage response = await client.GetAsync($"{query}{page.ToString()}");
-                                if (response.IsSuccessStatusCode)
+                                try
                                 {
-                                    resultsAsString = await response.Content.ReadAsStringAsync();
+                                    HttpResponseMessage casResponse = new HttpResponseMessage();
+                                    HttpResponseMessage fasTasResponse = new HttpResponseMessage();
+                                    if (casStave)
+                                    {
+                                        casResponse = await client.GetAsync($"{casQuery}{page.ToString()}");
+                                    }
+                                    if (fasTasStave)
+                                    {
+                                        fasTasResponse = await client.GetAsync($"{fasTasQuery}{page.ToString()}");
+                                    }
+                                    if (casResponse.IsSuccessStatusCode)
+                                    {
+                                        casResultsAsString = await casResponse.Content.ReadAsStringAsync();
+                                    }
+
+                                    JArray casResults = JArray.Parse(casResultsAsString);
+
+                                    //foreach (var res in casResults)
+                                    //{
+
+                                    //    DateTime resDate = DateTimeOffset.FromUnixTimeMilliseconds((long)res["CreationDate"]["$date"]).DateTime;
+                                    //    Console.WriteLine($"ID: {res["_id"]["$oid"]}, Date: {resDate.ToString()}");
+                                    //    ++countRes;
+                                    //}
+
+
+                                    var flag = false;
+                                    var ctSource = new CancellationTokenSource();
+
+                                    cancellationTokens.Add(ctSource);
+
+                                    StartSendingMessages("CasStave", ctSource.Token, casResults);
+                                    flag = true;
+
+
+                                    Console.WriteLine($"Number of results: {countRes}");
                                 }
-
-                                JArray results = JArray.Parse(resultsAsString);
-
-                                foreach (var res in results)
+                                catch (Exception e)
                                 {
-
-                                    DateTime resDate = DateTimeOffset.FromUnixTimeMilliseconds((long)res["CreationDate"]["$date"]).DateTime;
-                                    Console.WriteLine($"ID: {res["_id"]["$oid"]}, Date: {resDate.ToString()}");
-                                    ++countRes;
+                                    Console.WriteLine(e.Message);
                                 }
-
-                                Console.WriteLine($"Number of results: {countRes}");
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
                             }
                         }
+                    }
+                    else
+                    {
+                        foreach (var ct in cancellationTokens) ct.Cancel();
+
+                        cancellationTokens.Clear();
                     }
                 };
                 rabbitChannel.BasicConsume(queue: queueName,
@@ -126,6 +174,20 @@ namespace MongoFetchByTime
 
                 Console.ReadLine();
 
+            }
+        }
+
+        static async void StartSendingMessages(string streamType, CancellationToken ct, JArray casResults)
+        {
+            if (ConfigurationManager.GetSection("StreamSettings/" + streamType) is NameValueCollection config)
+            {
+                var stream = new StreamWrapper.StreamWrapper(IPAddress.Loopback.ToString(),
+                    int.Parse(config["Port"]),
+                    double.Parse(config["Delimiter"]),
+                    casResults);
+
+                // We don't care if we go back to original context so configure await is false
+                await Task.Run(() => stream.SendMessages(ct), ct).ConfigureAwait(false);
             }
         }
     }
