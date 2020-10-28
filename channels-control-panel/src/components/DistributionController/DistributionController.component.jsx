@@ -37,6 +37,7 @@ export default class DistributionController extends Component {
                 this.state.socket.emit("DistributionSocketIO", {
                     date1UnixTime: startDateUnix,
                     date2UnixTime: endDateUnix,
+                    mode: 'start',
                     channels: {
                         casStave,
                         fasTasStave
@@ -44,7 +45,15 @@ export default class DistributionController extends Component {
                 })
             }
             else {
-
+                this.state.socket.emit("DistributionSocketIO", {
+                    date1UnixTime: "",
+                    date2UnixTime: "",
+                    mode: 'end',
+                    channels: {
+                        casStave: false,
+                        fasTasStave: false
+                    }
+                })
             }
         })
     }

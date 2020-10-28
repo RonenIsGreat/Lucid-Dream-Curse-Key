@@ -37,17 +37,6 @@ server.listen(port, hostname, () => {
                 durable: false
             });
 
-            // TESTING
-            channel.publish(distributionDataExchange, '', Buffer.from(JSON.stringify({
-                date1UnixTime: '1603819800000',
-                date2UnixTime: '1603820400000',
-                mode: 'start',
-                channels: {
-                    casStave: true,
-                    fasTasStave: false
-                }
-            })));
-
             // ------------------- SocketIO ------------------- //
             const io = socketIo(server);
             const socketCallback = (socket) => {

@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
 
 namespace MongoFetchByTime
 {
@@ -74,6 +75,7 @@ namespace MongoFetchByTime
             #endregion
 
             string casResultsAsString = "";
+            string fasTasResultsAsString = "";
 
             // RabbitMQ init
             var factory = new ConnectionFactory() { HostName = "localhost" };
@@ -131,6 +133,10 @@ namespace MongoFetchByTime
                                     {
                                         casResultsAsString = await casResponse.Content.ReadAsStringAsync();
                                     }
+                                    if (fasTasResponse.IsSuccessStatusCode)
+                                    {
+                                        fasTasResultsAsString = await casResponse.Content.ReadAsStringAsync();
+                                    }
 
                                     JArray casResults = JArray.Parse(casResultsAsString);
 
@@ -144,12 +150,24 @@ namespace MongoFetchByTime
 
 
                                     var flag = false;
-                                    var ctSource = new CancellationTokenSource();
+                                    var i = 0;
+                                    for(; i<5; i++)
+                                    {
+                                        var ctSource = new CancellationTokenSource();
 
-                                    cancellationTokens.Add(ctSource);
+                                        cancellationTokens.Add(ctSource);
 
-                                    StartSendingMessages("CasStave", ctSource.Token, casResults);
-                                    flag = true;
+                                        if (i == 0 && casStave)
+                                        {
+                                            StartSendingMessages("CasStave", ctSource.Token, casResults);
+                                            flag = true;
+                                        }
+                                        else if( i==1 && fasTasStave)
+                                        {
+                                            StartSendingMessages("FasTasStave", ctSource.Token, casResults);
+                                            flag = true;
+                                        }
+                                    }
 
 
                                     Console.WriteLine($"Number of results: {countRes}");

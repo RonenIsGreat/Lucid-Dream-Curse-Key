@@ -60,7 +60,8 @@ namespace StreamWrapper
 
                     //var buffer = new byte[1400];
                     //client.Send(message);
-                    Console.WriteLine(message["Data"]);
+                    Console.WriteLine(message["TimeStamp"]);
+                    client.Send(message["Data"]["$binary"]["base64"].ToObject<byte[]>());
 
                     index++;
                 }
