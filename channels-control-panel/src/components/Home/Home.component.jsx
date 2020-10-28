@@ -3,6 +3,7 @@ import socketIOClient from 'socket.io-client'
 import SonarStatus from '../SonarStatus/SonarStatus.component'
 import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
+import PlayAudio from "../PlayAudio/PlayAudio.component";
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
@@ -65,6 +66,9 @@ export default function Home() {
             <Row>
                 <Col xs={6}>
                     <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
+                </Col>
+                <Col>
+                    <PlayAudio />
                 </Col>
             </Row>
         </div>

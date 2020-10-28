@@ -38,10 +38,10 @@ namespace Controller.RestAPIController
                *send "ON"  to all channels in activeList Enum.ToString(channel)*/
 
             foreach (var channelToActivate in activeList)
-                controller.SendMessage(Activate, channelToActivate.ToString());
+                Producer.SendMessage(Activate, channelToActivate.ToString());
 
             foreach (var channelToDeactivate in nonActiveList)
-                controller.SendMessage(Deactivate, channelToDeactivate.ToString());
+                Producer.SendMessage(Deactivate, channelToDeactivate.ToString());
 
             return Ok();
         }
