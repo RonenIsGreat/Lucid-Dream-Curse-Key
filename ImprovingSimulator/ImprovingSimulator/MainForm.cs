@@ -24,6 +24,7 @@ namespace ImprovingSimulator
             InitializeComponent();
             NumberOfMessages = 0;
             streamsCancellationTokens = new List<CancellationTokenSource>();
+
         } //End MainForm Constructor
 
         private void StartSendingStreamMessages(string streamType, CancellationToken ct,
@@ -33,7 +34,7 @@ namespace ImprovingSimulator
             {
                 var path = ConfigurationManager.AppSettings["RecordingsPath"];
 
-                IPAddress udpIp = IPAddress.Parse( ConfigurationManager.AppSettings["UdpRemoteIp"]);
+                IPAddress udpIp = IPAddress.Parse(ConfigurationManager.AppSettings["UdpRemoteIp"]);
 
                 var fullPath = Path.Combine(path, config["Recording_Name"]);
 
@@ -57,6 +58,7 @@ namespace ImprovingSimulator
         private void ExitButton_Click(object sender, EventArgs e)
         {
             DestroyHandle();
+
         } //End ExitButton_Click
 
         private void SequenceSendingBtn_Click(object sender, EventArgs e)
@@ -65,21 +67,32 @@ namespace ImprovingSimulator
             {
                 //Ensure cancellation tokens list is cleared
                 streamsCancellationTokens.Clear();
-
-                //groupBox1.Enabled = false;
-
                 DisableCheckboxes();
+                TargetSendingBtn.Enabled = false;
+                NumberSendingBtn.Enabled = false;
 
                 var success = SendMessagesToCheckedStreams();
 
+                if(TargetsCheckbox.IsDisposed == true)
+                {
+                    targetsCancellationTokenSource = new CancellationTokenSource();
+                    TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
+                    targetsCancellationTokenSource = new CancellationTokenSource();
+
+                    // Do it in background
+                    Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
+
+                }//End If
+                
                 if (!success)
                 {
                     MessageBox.Show("No Channels Were Selected!");
                     SequenceSendingBtn.Text = "Start Sending";
                     EnableCheckboxes();
-                    //groupBox1.Enabled = true;
-                } //End If
+                    TargetSendingBtn.Enabled = true;
+                    NumberSendingBtn.Enabled = true;
 
+                } //End If
                 else
                 {
                     SequenceSendingBtn.Text = "Stop Sending";
@@ -88,10 +101,15 @@ namespace ImprovingSimulator
 
             else
             {
+                if (TargetsCheckbox.IsDisposed == true)
+                    targetsCancellationTokenSource.Cancel();
+
                 SequenceSendingBtn.Text = "Start Sending";
                 StopAllSending();
                 EnableCheckboxes();
-                //groupBox1.Enabled = true;
+                TargetSendingBtn.Enabled = true;
+                NumberSendingBtn.Enabled = true;
+
             } //End Else
         }
 
@@ -121,6 +139,8 @@ namespace ImprovingSimulator
             StaveBusFasTasCheckBox.Enabled = false;
             IdrsCheckBox.Enabled = false;
             PrsStaveBusCheckBox.Enabled = false;
+            TargetsCheckbox.Enabled = false;
+
         } //End DisableCheckBoxes
 
         private void EnableCheckboxes()
@@ -131,17 +151,20 @@ namespace ImprovingSimulator
             StaveBusFasTasCheckBox.Enabled = true;
             IdrsCheckBox.Enabled = true;
             PrsStaveBusCheckBox.Enabled = true;
+            TargetsCheckbox.Enabled = true;
+
         } //End EnableCheckboxes
 
         private void QuantitySendingBtn_Click(object sender, EventArgs e)
         {
             if (QuantitySendingBtn.Text == "Send By Number")
             {
-                NumberOfMessages = (int) numericUpDown1.Value;
+                NumberOfMessages = (int)numericUpDown1.Value;
 
                 DisableCheckboxes();
                 QuantitySendingBtn.Text = "Stop Sending";
-
+                TimeSendingBtn.Enabled = false;
+                TargetSendingBtn.Enabled = false;
 
                 var success = SendMessagesToCheckedStreams(NumberOfMessages);
 
@@ -150,6 +173,9 @@ namespace ImprovingSimulator
                     MessageBox.Show("No Channels Were Selected!");
                     QuantitySendingBtn.Text = "Send By Number";
                     EnableCheckboxes();
+                    TimeSendingBtn.Enabled = true;
+                    TargetSendingBtn.Enabled = true;
+
                 } //End If
 
                 //BeamBusCasNumberSenderThread.Join();
@@ -160,6 +186,9 @@ namespace ImprovingSimulator
                 QuantitySendingBtn.Text = "Send By Number";
                 StopAllSending();
                 EnableCheckboxes();
+                TimeSendingBtn.Enabled = true;
+                TargetSendingBtn.Enabled = true;
+
             } //End Else
         } //End QuantitySendingBtn
 
@@ -167,6 +196,8 @@ namespace ImprovingSimulator
         {
             if (SendTargetsBtn.Text == "Start Sending Targets")
             {
+                NumberSendingBtn.Enabled = false;
+                TimeSendingBtn.Enabled = false;
                 targetsCancellationTokenSource = new CancellationTokenSource();
                 TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
                 targetsCancellationTokenSource = new CancellationTokenSource();
@@ -179,7 +210,110 @@ namespace ImprovingSimulator
             {
                 targetsCancellationTokenSource.Cancel();
                 SendTargetsBtn.Text = "Start Sending Targets";
+                NumberSendingBtn.Enabled = true;
+                TimeSendingBtn.Enabled = true;
             }
         }
-    } //End MainForm
+
+        private void DisplayingNumberSendingComponents()
+        {
+            HeadlineLabel.Visible = false;
+            SubHeadlineLabel.Visible = false;
+            numericUpDown1.Visible = true;
+            NumberOfMessagesLabel.Visible = true;
+            QuantitySendingBtn.Visible = true;
+            SendTargetsBtn.Visible = false;
+            label3.Visible = true;
+            BeamBusCas.Visible = true;
+            BeamBusFasTasLabel.Visible = true;
+            StaveBusCasLabel.Visible = true;
+            StaveBusFasTasLabel.Visible = true;
+            PrsStaveBusLabel.Visible = true;
+            IdrsLabel.Visible = true;
+            TargetsLabel.Visible = true;
+            BeamBusCasCheckBox.Visible = true;
+            BeamBusFasTasCheckBox.Visible = true;
+            StaveBusCasCheckBox.Visible = true;
+            StaveBusFasTasCheckBox.Visible = true;
+            PrsStaveBusCheckBox.Visible = true;
+            IdrsCheckBox.Visible = true;
+            TargetsCheckbox.Visible = true;
+            SequenceSendingBtn.Visible = false;
+
+
+        }//End DisableNumberSendingComponents
+
+        private void DisplayingTimeSendingComponent()
+        {
+            HeadlineLabel.Visible = false;
+            SubHeadlineLabel.Visible = false;
+            numericUpDown1.Visible = false;
+            NumberOfMessagesLabel.Visible = false;
+            QuantitySendingBtn.Visible = false;
+            SendTargetsBtn.Visible = false;
+            label3.Visible = true;
+            BeamBusCas.Visible = true;
+            BeamBusFasTasLabel.Visible = true;
+            StaveBusCasLabel.Visible = true;
+            StaveBusFasTasLabel.Visible = true;
+            PrsStaveBusLabel.Visible = true;
+            IdrsLabel.Visible = true;
+            TargetsLabel.Visible = true;
+            BeamBusCasCheckBox.Visible = true;
+            BeamBusFasTasCheckBox.Visible = true;
+            StaveBusCasCheckBox.Visible = true;
+            StaveBusFasTasCheckBox.Visible = true;
+            PrsStaveBusCheckBox.Visible = true;
+            IdrsCheckBox.Visible = true;
+            TargetsCheckbox.Visible = true;
+            SequenceSendingBtn.Visible = true;
+
+        }//End DisableTimeSendingComponent
+
+        private void DisplayingTargetSendingComponent()
+        {
+            HeadlineLabel.Visible = false;
+            SubHeadlineLabel.Visible = false;
+            numericUpDown1.Visible = false;
+            NumberOfMessagesLabel.Visible = false;
+            QuantitySendingBtn.Visible = false;
+            SendTargetsBtn.Visible = true;
+            label3.Visible = false;
+            BeamBusCas.Visible = false;
+            BeamBusFasTasLabel.Visible = false;
+            StaveBusCasLabel.Visible = false;
+            StaveBusFasTasLabel.Visible = false;
+            PrsStaveBusLabel.Visible = false;
+            IdrsLabel.Visible = false;
+            TargetsLabel.Visible = false;
+            BeamBusCasCheckBox.Visible = false;
+            BeamBusFasTasCheckBox.Visible = false;
+            StaveBusCasCheckBox.Visible = false;
+            StaveBusFasTasCheckBox.Visible = false;
+            PrsStaveBusCheckBox.Visible = false;
+            IdrsCheckBox.Visible = false;
+            TargetsCheckbox.Visible = false;
+            SequenceSendingBtn.Visible = false;
+
+        }//End DisplayingTargetSendingComponent
+
+        private void NumberSendingBtn_Click(object sender, EventArgs e)
+        {
+            DisplayingNumberSendingComponents();
+
+        }//End NumberSendingBtn_Click
+
+        private void TimeSendingBtn_Click(object sender, EventArgs e)
+        {
+            DisplayingTimeSendingComponent();
+
+        }//End TimeSendingBtn_Click
+
+        private void TargetSendingBtn_Click(object sender, EventArgs e)
+        {
+            DisplayingTargetSendingComponent();
+
+        }//End TargetSendingBtn_Click
+    }
+
 } //End Improving Simulator
