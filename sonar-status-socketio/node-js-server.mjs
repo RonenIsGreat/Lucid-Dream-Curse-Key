@@ -41,6 +41,8 @@ server.listen(port, hostname, () => {
             var channelStatusExchange = 'channelStatus';
             var distributionDataExchange = 'distributionData';
             var storageStatusExchange = "storageStatus";
+            var targetDataExchange = 'SystemTracks';
+
             channel.assertExchange(channelStatusExchange, 'fanout', {
                 durable: false
             });
@@ -48,6 +50,10 @@ server.listen(port, hostname, () => {
                 durable: false
             });
             channel.assertExchange(storageStatusExchange, 'fanout', {
+                durable: false
+            });
+
+            channel.assertExchange(targetDataExchange, 'fanout', {
                 durable: false
             });
 
@@ -80,6 +86,7 @@ server.listen(port, hostname, () => {
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
                 channel.bindQueue(q.queue, storageStatusExchange, '');
+                channel.bindQueue(q.queue, exchange, 'SystemTracks');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
@@ -97,9 +104,33 @@ server.listen(port, hostname, () => {
                         });
                         console.log(storageStatusObjects);
                         socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
+                        sonarTimeoutChannel = msg.content.toString();
+                        console.log(` [x] ${msg.content.toString()}`);
+                       // socket.emit("StatusSocketIO", sonarTimeoutChannel);
                     }
                 }, {
                     noAck: true
+                });
+
+                channel.assertQueue('', {
+                    exclusive: true
+                }, function (error2, q) {
+                    if (error2) {
+                        throw error2;
+                    }
+                    console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                    channel.bindQueue(q.queue, exchange, 'SystemTracks');
+
+                    channel.consume(q.queue, function (msg) {
+                        // ---------- If received message from rabbitMQ: ---------- //
+                        if (msg.content) {
+                            sonarTimeoutChannel = msg.content.toString();
+                            console.log(` [x] ${msg.content.toString()}`);
+                            // socket.emit("StatusSocketIO", sonarTimeoutChannel);
+                        }
+                    }, {
+                        noAck: true
+                    });
                 });
             });
         });
