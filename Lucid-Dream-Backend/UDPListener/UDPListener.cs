@@ -14,6 +14,7 @@ namespace UDPListener
 
         private readonly IPEndPoint _remoteEndPoint;
         private Socket _socket;
+        private bool firstTimeStarted;
 
         public UdpListener(ChannelDetails port)
         {
@@ -28,6 +29,9 @@ namespace UDPListener
             MessageCount = 0;
 
             InitSocket();
+
+            firstTimeStarted = true;
+            _socket.Bind(_remoteEndPoint);
         } //End UDPListener Constructor
 
         public ChannelDetails Param { get; }
@@ -51,7 +55,11 @@ namespace UDPListener
         {
             var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
             var statusSender = new ChannelStatusSender();
-            if (!(e is SocketException socketException)) return;
+            if (!(e is SocketException socketException))
+            {
+                statusSender.SendStatus($"{channelName} inactive");
+                return;
+            }
             switch (socketException.ErrorCode)
             {
                 case (int) SocketError.TimedOut:
@@ -77,7 +85,7 @@ namespace UDPListener
         {
             if(_socket == null) InitSocket();
             //If already listening return like nothing happened
-            if (IsListening())
+            if (IsListening() && !firstTimeStarted)
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
@@ -88,7 +96,8 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-                _socket.Bind(_remoteEndPoint);
+                //_socket.Bind(_remoteEndPoint);
+                firstTimeStarted = false;
                 statusSender.SendStatus($"{channelName} active");
             }
             catch (Exception e)

@@ -50,6 +50,7 @@ namespace Consumer
                 }
                 else if (message.Equals("OFF"))
                 {
+                    
                     _udpClient.StopListener();
                     _udpClient.DataReceivedDelegate -= UdpClientDataReceivedDelegate;
                 }
