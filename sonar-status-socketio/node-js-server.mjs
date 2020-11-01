@@ -71,6 +71,37 @@ server.listen(port, hostname, () => {
                     noAck: true
                 });
             });
+
+            channel.assertQueue('', {
+                exclusive: true
+            }, function (error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                channel.bindQueue(q.queue, storageStatusExchange, '');
+
+                channel.consume(q.queue, function (msg) {
+                    // ---------- If received message from rabbitMQ: ---------- //
+                    if (msg.content) {
+                        const storageStatusJSON = msg.content.toString();
+                        const storageStatusArray = JSON.parse(storageStatusJSON);
+                        let storageStatusObjects = [];
+                        storageStatusArray.forEach(element => {
+                            const driveSplitArray = element.split(' ');
+                            storageStatusObjects.push({
+                                available: Number(driveSplitArray[0]),
+                                used: Number(driveSplitArray[1]),
+                                name: driveSplitArray[2]
+                            });
+                        });
+                        console.log(storageStatusObjects);
+                        socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
+                    }
+                }, {
+                    noAck: true
+                });
+            });
         });
     });
 });
