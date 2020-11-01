@@ -119,9 +119,6 @@ export default class DistributionController extends Component {
                                             <Form.Label>Speed</Form.Label>
                                             <Form.Control as="select">
                                                 <option>X1</option>
-                                                <option>X2</option>
-                                                <option>X4</option>
-                                                <option>X8</option>
                                             </Form.Control>
                                         </Form.Group>
                                     </Col>
