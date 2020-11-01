@@ -38,9 +38,16 @@ server.listen(port, hostname, () => {
                 throw error1;
             }
             
-            var exchange = 'channelStatus';
-
-            channel.assertExchange(exchange, 'fanout', {
+            var channelStatusExchange = 'channelStatus';
+            var distributionDataExchange = 'distributionData';
+            var storageStatusExchange = "storageStatus";
+            channel.assertExchange(channelStatusExchange, 'fanout', {
+                durable: false
+            });
+            channel.assertExchange(distributionDataExchange, 'fanout', {
+                durable: false
+            });
+            channel.assertExchange(storageStatusExchange, 'fanout', {
                 durable: false
             });
 
@@ -51,7 +58,7 @@ server.listen(port, hostname, () => {
                     throw error2;
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                channel.bindQueue(q.queue, exchange, '');
+                channel.bindQueue(q.queue, channelStatusExchange, '');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
@@ -59,6 +66,37 @@ server.listen(port, hostname, () => {
                         sonarTimeoutChannel = msg.content.toString();
                         console.log(` [x] ${msg.content.toString()}`);
                         socket.emit("StatusSocketIO", sonarTimeoutChannel);
+                    }
+                }, {
+                    noAck: true
+                });
+            });
+
+            channel.assertQueue('', {
+                exclusive: true
+            }, function (error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                channel.bindQueue(q.queue, storageStatusExchange, '');
+
+                channel.consume(q.queue, function (msg) {
+                    // ---------- If received message from rabbitMQ: ---------- //
+                    if (msg.content) {
+                        const storageStatusJSON = msg.content.toString();
+                        const storageStatusArray = JSON.parse(storageStatusJSON);
+                        let storageStatusObjects = [];
+                        storageStatusArray.forEach(element => {
+                            const driveSplitArray = element.split(' ');
+                            storageStatusObjects.push({
+                                available: Number(driveSplitArray[0]),
+                                used: Number(driveSplitArray[1]),
+                                name: driveSplitArray[2]
+                            });
+                        });
+                        console.log(storageStatusObjects);
+                        socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
                     }
                 }, {
                     noAck: true
