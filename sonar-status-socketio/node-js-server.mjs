@@ -37,7 +37,7 @@ server.listen(port, hostname, () => {
             if (error1) {
                 throw error1;
             }
-            
+
             var channelStatusExchange = 'channelStatus';
             var distributionDataExchange = 'distributionData';
             var storageStatusExchange = "storageStatus";
@@ -52,9 +52,8 @@ server.listen(port, hostname, () => {
             channel.assertExchange(storageStatusExchange, 'fanout', {
                 durable: false
             });
-
-            channel.assertExchange(targetDataExchange, 'fanout', {
-                durable: false
+            channel.assertExchange(targetDataExchange, 'direct', {
+                durable: true
             });
 
             channel.assertQueue('', {
@@ -85,8 +84,7 @@ server.listen(port, hostname, () => {
                     throw error2;
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                channel.bindQueue(q.queue, storageStatusExchange, '');
-                channel.bindQueue(q.queue, exchange, 'SystemTracks');
+                channel.bindQueue(q.queue, storageStatusExchange, 'SystemTracks');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
@@ -104,33 +102,34 @@ server.listen(port, hostname, () => {
                         });
                         console.log(storageStatusObjects);
                         socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
-                        sonarTimeoutChannel = msg.content.toString();
-                        console.log(` [x] ${msg.content.toString()}`);
-                       // socket.emit("StatusSocketIO", sonarTimeoutChannel);
                     }
                 }, {
                     noAck: true
                 });
+            });
 
-                channel.assertQueue('', {
-                    exclusive: true
-                }, function (error2, q) {
-                    if (error2) {
-                        throw error2;
+            channel.assertQueue('', {
+                exclusive: true
+            }, function (error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                channel.bindQueue(q.queue, storageStatusExchange, '');
+                channel.bindQueue(q.queue, exchange, 'SystemTracks');
+
+                channel.consume(q.queue, function (msg) {
+                    // ---------- If received message from rabbitMQ: ---------- //
+                    console.log(msg)
+                    if (msg.content) {
+                        const targetsString = msg.content.toString();
+                        let targets = JSON.parse(targetsString);
+                        console.log(` [x] targets: ${targets}`);
+                        // socket.emit("StatusSocketIO", sonarTimeoutChannel);
+                        socket.emit("TargetStatus", targetsString);
                     }
-                    console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                    channel.bindQueue(q.queue, exchange, 'SystemTracks');
-
-                    channel.consume(q.queue, function (msg) {
-                        // ---------- If received message from rabbitMQ: ---------- //
-                        if (msg.content) {
-                            sonarTimeoutChannel = msg.content.toString();
-                            console.log(` [x] ${msg.content.toString()}`);
-                            // socket.emit("StatusSocketIO", sonarTimeoutChannel);
-                        }
-                    }, {
-                        noAck: true
-                    });
+                }, {
+                    noAck: true
                 });
             });
         });
