@@ -29,7 +29,7 @@ server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 
     let sonarTimeoutChannel;
-    amqp.connect('amqp://localhost', function (error0, connection) {
+    amqp.connect('amqp://admin:admin@localhost', function (error0, connection) {
         if (error0) {
             throw error0;
         }
