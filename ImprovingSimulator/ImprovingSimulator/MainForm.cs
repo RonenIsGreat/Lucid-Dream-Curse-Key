@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TargetsStreamerMain.Models;
 using TargetsStreamerMain;
+using System.Runtime.InteropServices;
 
 namespace ImprovingSimulator
 {

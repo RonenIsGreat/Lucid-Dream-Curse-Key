@@ -234,7 +234,8 @@
             this.StaveBusCasCheckBox.TabIndex = 8;
             this.StaveBusCasCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.StaveBusCasCheckBox.UseVisualStyleBackColor = true;
-            this.StaveBusCasCheckBox.Visible = false;            // 
+            this.StaveBusCasCheckBox.Visible = false;
+            // 
             // StaveBusFasTasCheckBox
             // 
             this.StaveBusFasTasCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
