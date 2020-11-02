@@ -21,7 +21,14 @@ namespace Controller
         {
             try
             {
-                IConnection connection = this.factory.CreateConnection();
+                var connection = this.factory.CreateConnection();
+                var channel = connection.CreateModel();
+                channel.ExchangeDeclare("channelControl", "direct", true);
+                var body = Encoding.UTF8.GetBytes(message);
+                channel.BasicPublish("channelControl",
+                    rKey,
+                    null,
+                    body);
             }
             catch (Exception e)
             {
@@ -29,15 +36,15 @@ namespace Controller
                 {
                     Thread.Sleep(1000);
                     connection = this.factory.CreateConnection();
+                    var channel = connection.CreateModel();
+                    channel.ExchangeDeclare("channelControl", "direct", true);
+                    var body = Encoding.UTF8.GetBytes(message);
+                    channel.BasicPublish("channelControl",
+                        rKey,
+                        null,
+                        body);
                 }
             }
-            var channel = connection.CreateModel();
-            channel.ExchangeDeclare("channelControl", "direct", true);
-            var body = Encoding.UTF8.GetBytes(message);
-            channel.BasicPublish("channelControl",
-                rKey,
-                null,
-                body);
             //Console.WriteLine(" [x] Sent '{0}':'{1}'", rKey, message);
         }
     }
