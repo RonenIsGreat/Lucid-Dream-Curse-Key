@@ -37,10 +37,12 @@ server.listen(port, hostname, () => {
             if (error1) {
                 throw error1;
             }
-            
+
             var channelStatusExchange = 'channelStatus';
             var distributionDataExchange = 'distributionData';
             var storageStatusExchange = "storageStatus";
+            var targetDataExchange = 'SystemTracksJSON';
+
             channel.assertExchange(channelStatusExchange, 'fanout', {
                 durable: false
             });
@@ -49,6 +51,9 @@ server.listen(port, hostname, () => {
             });
             channel.assertExchange(storageStatusExchange, 'fanout', {
                 durable: false
+            });
+            channel.assertExchange(targetDataExchange, 'direct', {
+                durable: true
             });
 
             channel.assertQueue('', {
@@ -97,6 +102,29 @@ server.listen(port, hostname, () => {
                         });
                         console.log(storageStatusObjects);
                         socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
+                    }
+                }, {
+                    noAck: true
+                });
+            });
+
+            channel.assertQueue('', {
+                exclusive: true
+            }, function (error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                channel.bindQueue(q.queue, targetDataExchange, 'SystemTracks');
+
+                channel.consume(q.queue, function (msg) {
+                    // ---------- If received message from rabbitMQ: ---------- //
+                    console.log(msg)
+                    if (msg.content) {
+                        const targetsString = msg.content.toString();
+                        let targets = JSON.parse(targetsString);
+                        console.log(targets);
+                        socket.emit("TargetStatus", targetsString);
                     }
                 }, {
                     noAck: true
