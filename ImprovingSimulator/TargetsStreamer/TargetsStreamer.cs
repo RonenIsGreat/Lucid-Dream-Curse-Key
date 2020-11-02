@@ -11,6 +11,7 @@ using RabbitMQ.Client;
 using System.Linq;
 using System.Net;
 using TargetsStreamerMain.Models;
+using Newtonsoft.Json;
 
 namespace TargetsStreamerMain
 {
@@ -97,6 +98,7 @@ namespace TargetsStreamerMain
                             SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1300 * MessagesSent);
 
                             SendMessage(systemTracks.ToByteArray());
+                            SendMessageJSON(systemTracks);
 
                             MessagesSent++;
 
@@ -161,5 +163,19 @@ namespace TargetsStreamerMain
         }
 
 
+        private void SendMessageJSON(SystemTarget targets)
+        {
+            var factory = new ConnectionFactory { HostName = RabbitMqHost, RequestedHeartbeat = TimeSpan.FromSeconds(60), Port = RabbitMqPort };
+            using (var connection = factory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDeclare("SystemTracksJSON",
+                    "direct", true);
+                channel.BasicPublish("SystemTracksJSON",
+                    "SystemTracks",
+                    null,
+                    Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(targets)));
+            }
+        }
     }
 }
