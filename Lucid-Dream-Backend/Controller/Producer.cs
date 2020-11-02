@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 
 namespace Controller
 {
@@ -17,7 +19,16 @@ namespace Controller
 
         public void SendMessage(string message, string rKey)
         {
-            var connection = this.factory.CreateConnection();
+            IConnection connection;
+            try
+            {
+                connection = this.factory.CreateConnection();
+            }
+            catch (BrokerUnreachableException e)
+            {
+                Thread.Sleep(1000);
+                connection = this.factory.CreateConnection();
+            }
             var channel = connection.CreateModel();
             channel.ExchangeDeclare("channelControl", "direct", true);
             var body = Encoding.UTF8.GetBytes(message);
