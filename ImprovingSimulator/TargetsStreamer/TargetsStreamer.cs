@@ -68,17 +68,17 @@ namespace TargetsStreamerMain
             using (var f = new StreamReader(File.OpenRead(_targetsRecordingPath), Encoding.UTF8))
             {
                 short index = 0;
-                var systemTracks = new SystemTracks
+                var systemTracks = new SystemTarget
                 {
                     sentTimeStamp = TimeType.ParseFromDateTime(DateTime.UtcNow)
                 };
                 //Take the array created in system tracks constructor
-                var targetsDataList = systemTracks.systemTracks;
+                var targetsDataList = systemTracks.systemTargets;
 
                 while (!f.EndOfStream)
                 {
                     //Check cancellation
-                    if(ct.IsCancellationRequested)
+                    if (ct.IsCancellationRequested)
                     {
                         return Task.CompletedTask;
                     }
@@ -88,10 +88,10 @@ namespace TargetsStreamerMain
                     {
                         var trackData = ParseTrackDataWithDelimiter(line);
 
-                        // If array is full, send the messages
-                        if (index + 1 == SystemTracks.ARRAY_SIZE)
+                        // If array has 3 elemts, send the messages
+                        if (index + 1 == 3)
                         {
-                            targetsDataList[index] = trackData;
+                            targetsDataList.Add(trackData);
 
                             // Send each message after 1.3 secs
                             SpinWait.SpinUntil(() => stopwatch.ElapsedMilliseconds >= 1300 * MessagesSent);
@@ -100,11 +100,17 @@ namespace TargetsStreamerMain
 
                             MessagesSent++;
 
+                            systemTracks = new SystemTarget
+                            {
+                                sentTimeStamp = TimeType.ParseFromDateTime(DateTime.UtcNow)
+                            };
+                            targetsDataList = systemTracks.systemTargets;
+
                             index = 0;
                         }
                         else
                         {
-                            targetsDataList[index] = trackData;
+                            targetsDataList.Add(trackData);
                             index++;
                         }
 
@@ -121,7 +127,7 @@ namespace TargetsStreamerMain
             return Task.CompletedTask;
         }
 
-        private static TrackData ParseTrackDataWithDelimiter(string line)
+        private static TargetData ParseTrackDataWithDelimiter(string line)
         {
             var param = line.Split(',');
             var trackIdString = param[0];
@@ -130,7 +136,7 @@ namespace TargetsStreamerMain
             var trackId = long.Parse(trackIdString.Split(':')[1]);
             var relativeBearing = float.Parse(bearingString.Split(':')[1]);
 
-            var trackData = new TrackData
+            var trackData = new TargetData
             {
                 relativeBearing = relativeBearing,
                 trackID = trackId
@@ -147,7 +153,7 @@ namespace TargetsStreamerMain
             {
                 channel.ExchangeDeclare("SystemTracks",
                     "direct", true);
-                channel.BasicPublish("channelControl",
+                channel.BasicPublish("SystemTracks",
                     "SystemTracks",
                     null,
                     message);
