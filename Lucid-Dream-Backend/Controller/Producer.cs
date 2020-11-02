@@ -19,15 +19,17 @@ namespace Controller
 
         public void SendMessage(string message, string rKey)
         {
-            IConnection connection;
             try
             {
-                connection = this.factory.CreateConnection();
+                IConnection connection = this.factory.CreateConnection();
             }
-            catch (BrokerUnreachableException e)
+            catch (Exception e)
             {
-                Thread.Sleep(1000);
-                connection = this.factory.CreateConnection();
+                if(e is BrokerUnreachableException)
+                {
+                    Thread.Sleep(1000);
+                    connection = this.factory.CreateConnection();
+                }
             }
             var channel = connection.CreateModel();
             channel.ExchangeDeclare("channelControl", "direct", true);
