@@ -41,7 +41,7 @@ server.listen(port, hostname, () => {
             var channelStatusExchange = 'channelStatus';
             var distributionDataExchange = 'distributionData';
             var storageStatusExchange = "storageStatus";
-            var targetDataExchange = 'SystemTracks';
+            var targetDataExchange = 'SystemTracksJSON';
 
             channel.assertExchange(channelStatusExchange, 'fanout', {
                 durable: false
@@ -84,7 +84,7 @@ server.listen(port, hostname, () => {
                     throw error2;
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                channel.bindQueue(q.queue, storageStatusExchange, 'SystemTracks');
+                channel.bindQueue(q.queue, storageStatusExchange, '');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
@@ -115,8 +115,7 @@ server.listen(port, hostname, () => {
                     throw error2;
                 }
                 console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-                channel.bindQueue(q.queue, storageStatusExchange, '');
-                channel.bindQueue(q.queue, exchange, 'SystemTracks');
+                channel.bindQueue(q.queue, targetDataExchange, 'SystemTracks');
 
                 channel.consume(q.queue, function (msg) {
                     // ---------- If received message from rabbitMQ: ---------- //
@@ -124,8 +123,7 @@ server.listen(port, hostname, () => {
                     if (msg.content) {
                         const targetsString = msg.content.toString();
                         let targets = JSON.parse(targetsString);
-                        console.log(` [x] targets: ${targets}`);
-                        // socket.emit("StatusSocketIO", sonarTimeoutChannel);
+                        console.log(targets);
                         socket.emit("TargetStatus", targetsString);
                     }
                 }, {

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import './TargetIdentifying.styles.scss';
 import socketIOClient from 'socket.io-client';
+import { Card, ListGroup } from 'react-bootstrap';
 
 class TargetIdentifying extends Component {
     state = {
-        targets: []
+        targets: {}
     }
 
     componentDidMount() {
@@ -20,13 +21,20 @@ class TargetIdentifying extends Component {
     render() {
 
         return (
-            <div className="targetIdentifying">
-                {this.state.targets.map(target => (
-                    <div key={target.trackID}>
-                        <h1>{target.trackID}</h1>
-                        <h4>{target.relativeBearing}</h4>
-                    </div>
-                ))}
+            <div className="target-identifying">
+                <Card>
+                    <Card.Header><h2>Target List</h2></Card.Header>
+                    <ListGroup variant="flush">
+                        {
+                            this.state.targets.systemTargets && this.state.targets.systemTargets.map(target => (
+                                <ListGroup.Item className="text-center" key={target.trackID}>
+                                    <h4>Target ID: <b>{target.trackID}</b></h4>
+                                    <h4>Bearing: <b>{target.relativeBearing}°</b></h4>
+                                </ListGroup.Item>
+                            ))
+                        }
+                    </ListGroup>
+                </Card>
             </div>
         );
 

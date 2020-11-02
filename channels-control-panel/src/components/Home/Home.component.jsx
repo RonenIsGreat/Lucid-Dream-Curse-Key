@@ -4,6 +4,7 @@ import SonarStatus from '../SonarStatus/SonarStatus.component'
 import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
 import StorageStatus from '../StorageStatus/StorageStatus.component'
+import TargetIdentifying from '../TargetIdentifying/TargetIdentifying.component'
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
@@ -66,6 +67,7 @@ export default function Home() {
             <Row>
                 <Col xs={6}>
                     <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
+                    <TargetIdentifying />
                 </Col>
                 <Col>
                     <StorageStatus />
