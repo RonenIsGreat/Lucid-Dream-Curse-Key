@@ -15,6 +15,7 @@ namespace UDPListener
         private readonly IPEndPoint _remoteEndPoint;
         private Socket _socket;
         private bool firstTimeStarted;
+        private bool disposed;
 
         public UdpListener(ChannelDetails port)
         {
@@ -29,9 +30,8 @@ namespace UDPListener
             MessageCount = 0;
 
             InitSocket();
+            disposed = false;
 
-            firstTimeStarted = true;
-            _socket.Bind(_remoteEndPoint);
         } //End UDPListener Constructor
 
         public ChannelDetails Param { get; }
@@ -47,6 +47,9 @@ namespace UDPListener
                 ProtocolType.Udp);
 
             _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 1400);
+
+            firstTimeStarted = true;
+            
         }
 
         #region Helper Methods
@@ -83,7 +86,17 @@ namespace UDPListener
 
         public void StartListener()
         {
-            if(_socket == null) InitSocket();
+            if (!_socket.IsBound) 
+            {
+                InitSocket();
+                disposed = false;
+            }
+            if(disposed)
+            {
+                InitSocket();
+                disposed = false;
+            }
+
             //If already listening return like nothing happened
             if (IsListening() && !firstTimeStarted)
             {
@@ -96,7 +109,7 @@ namespace UDPListener
             {
                 var channelName = Enum.GetName(typeof(ChannelNames), Param.GetName());
                 var statusSender = new ChannelStatusSender();
-                //_socket.Bind(_remoteEndPoint);
+                _socket.Bind(_remoteEndPoint);
                 firstTimeStarted = false;
                 statusSender.SendStatus($"{channelName} active");
             }
@@ -119,6 +132,7 @@ namespace UDPListener
                 var statusSender = new ChannelStatusSender();
                 _socket.Shutdown(SocketShutdown.Both);
                 _socket.Close();
+                disposed = true;
                 statusSender.SendStatus($"{channelName} inactive");
             }
             catch (Exception e)
