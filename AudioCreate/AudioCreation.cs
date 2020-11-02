@@ -25,7 +25,7 @@ namespace AudioCreate
     {
         public subSegment[] subsegments;
     }
-    public class UDPListener
+    public class AudioCreation
     {
         private const int listenPort = 25104;
         private static SystemTarget Targets = new SystemTarget();
@@ -33,7 +33,7 @@ namespace AudioCreate
         private static int RabbitMqPort;
         private static Dictionary<long, WaveFileWriter> TargetWriters = new Dictionary<long, WaveFileWriter>();
         private static WaveFormat waveFormat = new WaveFormat(31250, 16, 1);
-
+        private static string pathToAudioFile;
 
         private static void receiveTargets()
         {
@@ -78,6 +78,7 @@ namespace AudioCreate
             subSegment tempSub = new subSegment();
             Segment tempSegment = new Segment();
             tempSegment.subsegments = new subSegment[10];
+            pathToAudioFile = GetAudioFolderPath();
             double heading;
             int idNumber;
             int counter = 1;
@@ -129,9 +130,11 @@ namespace AudioCreate
 
             if (!(TargetWriters.ContainsKey(tID)))
             {
-                string filename = "Audio/" + tID + ".wav";
-                WaveFileWriter newWriter = new WaveFileWriter(filename, waveFormat);
-                TargetWriters.Add(tID, newWriter);
+                //WaveFileWriter newWriter = new WaveFileWriter(pathToAudioFile, waveFormat);
+                string filename = pathToAudioFile+"/" + tID + ".wav";
+                    WaveFileWriter newWriter = new WaveFileWriter(filename, waveFormat);
+                    TargetWriters.Add(tID, newWriter);
+
             }
             return TargetWriters[tID];
         }
@@ -349,10 +352,31 @@ namespace AudioCreate
 
             return beamToReturn;
         }
-
+        static string GetProjectPath()
+        {
+            string path = System.IO.Directory.GetCurrentDirectory();
+            for (int i = 0; i < 3; i++)
+            {
+                System.IO.DirectoryInfo directoryInfo = System.IO.Directory.GetParent(path);
+                path = directoryInfo.FullName;
+            }
+            return path; 
+        }
+        static string GetAudioFolderPath()
+        {
+            string path = GetProjectPath();
+            string newStr = path.Replace('\\','/');
+            newStr = newStr + "/channels-control-panel/public";
+            return newStr;
+        }
 
         public static void Main()
         {
+            //string path = System.IO.Directory.GetCurrentDirectory();
+            //path = GetProjectPath(path);
+            //Console.WriteLine(path);
+            //Console.ReadLine();
+
             dictionaryInit();
             Thread A = new Thread(StartListener);
             Thread B = new Thread(receiveTargets);
