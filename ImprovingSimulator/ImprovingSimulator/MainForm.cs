@@ -73,7 +73,7 @@ namespace ImprovingSimulator
 
                 var success = SendMessagesToCheckedStreams();
 
-                if(TargetsCheckbox.IsDisposed == true)
+                if (TargetsCheckbox.Checked == true)
                 {
                     targetsCancellationTokenSource = new CancellationTokenSource();
                     TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
@@ -84,7 +84,7 @@ namespace ImprovingSimulator
                     panel2.Visible = true;
 
                 }//End If
-                
+
                 if (!success)
                 {
                     MessageBox.Show("No Channels Were Selected!");
@@ -192,28 +192,28 @@ namespace ImprovingSimulator
             } //End Else
         } //End QuantitySendingBtn
 
-        private void SendTargetsBtn_Click(object sender, EventArgs e)
-        {
-            if (SendTargetsBtn.Text == "Start Sending Targets")
-            {
-                NumberSendingBtn.Enabled = false;
-                TimeSendingBtn.Enabled = false;
-                targetsCancellationTokenSource = new CancellationTokenSource();
-                TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
-                targetsCancellationTokenSource = new CancellationTokenSource();
-                SendTargetsBtn.Text = "Stop Sending Targets";
+        //private void SendTargetsBtn_Click(object sender, EventArgs e)
+        //{
+        //    if (SendTargetsBtn.Text == "Start Sending Targets")
+        //    {
+        //        NumberSendingBtn.Enabled = false;
+        //        TimeSendingBtn.Enabled = false;
+        //        targetsCancellationTokenSource = new CancellationTokenSource();
+        //        TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
+        //        targetsCancellationTokenSource = new CancellationTokenSource();
+        //        SendTargetsBtn.Text = "Stop Sending Targets";
 
-                // Do it in background
-                Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
-            }
-            else
-            {
-                targetsCancellationTokenSource.Cancel();
-                SendTargetsBtn.Text = "Start Sending Targets";
-                NumberSendingBtn.Enabled = true;
-                TimeSendingBtn.Enabled = true;
-            }
-        }
+        //        // Do it in background
+        //        Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
+        //    }
+        //    else
+        //    {
+        //        targetsCancellationTokenSource.Cancel();
+        //        SendTargetsBtn.Text = "Start Sending Targets";
+        //        NumberSendingBtn.Enabled = true;
+        //        TimeSendingBtn.Enabled = true;
+        //    }
+        //}
 
         private void DisplayingNumberSendingComponents()
         {
@@ -221,7 +221,6 @@ namespace ImprovingSimulator
             SubHeadlineLabel.Visible = false;
             SendByNumberPanel.Visible = true;
             QuantitySendingBtn.Visible = true;
-            SendTargetsBtn.Visible = false;
             label3.Visible = true;
             BeamBusCas.Visible = true;
             BeamBusFasTasLabel.Visible = true;
@@ -248,7 +247,6 @@ namespace ImprovingSimulator
             SubHeadlineLabel.Visible = false;
             SendByNumberPanel.Visible = false;
             QuantitySendingBtn.Visible = false;
-            SendTargetsBtn.Visible = false;
             label3.Visible = true;
             BeamBusCas.Visible = true;
             BeamBusFasTasLabel.Visible = true;
@@ -277,7 +275,7 @@ namespace ImprovingSimulator
         private void TimeSendingBtn_Click(object sender, EventArgs e)
         {
             DisplayingTimeSendingComponent();
-            
+
         }//End TimeSendingBtn_Click
 
         private void MinimizeButton_Click(object sender, EventArgs e)
@@ -349,6 +347,6 @@ namespace ImprovingSimulator
 
         }//End TargetLabel_Click
 
-    }//End MainForm
+    }
 
 } //End Improving Simulator
