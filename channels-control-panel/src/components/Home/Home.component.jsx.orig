@@ -3,8 +3,11 @@ import socketIOClient from 'socket.io-client'
 import SonarStatus from '../SonarStatus/SonarStatus.component'
 import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
-import PlayAudio from '../PlayAudio/PlayAudio.component'
+<<<<<<< HEAD
 import StorageStatus from '../StorageStatus/StorageStatus.component'
+=======
+import PlayAudio from "../PlayAudio/PlayAudio.component";
+>>>>>>> AudioPlayerGui
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
@@ -69,8 +72,12 @@ export default function Home() {
                     <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
                 </Col>
                 <Col>
+<<<<<<< HEAD
                     <StorageStatus />
+=======
+                    
                     <PlayAudio />
+>>>>>>> AudioPlayerGui
                 </Col>
             </Row>
         </div>

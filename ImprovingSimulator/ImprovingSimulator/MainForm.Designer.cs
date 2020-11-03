@@ -503,7 +503,7 @@
             this.SendByNumberPanel.Controls.Add(this.numericUpDown1);
             this.SendByNumberPanel.Location = new System.Drawing.Point(527, 95);
             this.SendByNumberPanel.Name = "SendByNumberPanel";
-            this.SendByNumberPanel.Size = new System.Drawing.Size(493, 295);
+            this.SendByNumberPanel.Size = new System.Drawing.Size(493, 331);
             this.SendByNumberPanel.TabIndex = 33;
             this.SendByNumberPanel.Visible = false;
             // 
