@@ -13,7 +13,11 @@ namespace TargetsStreamerMain.Models
     {
         public TimeType sentTimeStamp;
 
+<<<<<<< HEAD
         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex =0)]
+=======
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
+>>>>>>> 'LD_137'
         public List<TargetData> systemTargets;
 
         public SystemTarget()
@@ -129,19 +133,19 @@ namespace TargetsStreamerMain.Models
         public long day;
 
         public static TimeType ParseFromDateTime(DateTime dateTime)
-         {
-             var dateTimeUtc = dateTime.ToUniversalTime();
-             var timeType = new TimeType
-             {
-                 day = dateTimeUtc.Day,
-                 m_seconds = dateTimeUtc.Millisecond,
-                 hours = dateTimeUtc.Hour,
-                 minutes = dateTimeUtc.Minute,
-                 seconds = dateTimeUtc.Second,
-                 year = dateTimeUtc.Year,
-                 month = dateTime.Month
-             };
-             return timeType;
-         }
+        {
+            var dateTimeUtc = dateTime.ToUniversalTime();
+            var timeType = new TimeType
+            {
+                day = dateTimeUtc.Day,
+                m_seconds = dateTimeUtc.Millisecond,
+                hours = dateTimeUtc.Hour,
+                minutes = dateTimeUtc.Minute,
+                seconds = dateTimeUtc.Second,
+                year = dateTimeUtc.Year,
+                month = dateTime.Month
+            };
+            return timeType;
+        }
     }
 }

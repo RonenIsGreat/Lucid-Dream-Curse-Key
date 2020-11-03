@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.NumberSendingBtn = new System.Windows.Forms.Button();
             this.TimeSendingBtn = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -55,14 +56,30 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.QuantitySendingBtn = new System.Windows.Forms.Button();
             this.SendTargetsBtn = new System.Windows.Forms.Button();
+            this.HeadlineLabel = new System.Windows.Forms.Label();
+            this.SubHeadlineLabel = new System.Windows.Forms.Label();
+            this.bunifuElipse2 = new Bunifu.Framework.UI.BunifuElipse(this.components);
+            this.bunifuElipse3 = new Bunifu.Framework.UI.BunifuElipse(this.components);
+            this.bunifuElipse4 = new Bunifu.Framework.UI.BunifuElipse(this.components);
+            this.TargetsCheckbox = new System.Windows.Forms.CheckBox();
+            this.TargetsLabel = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.SendByNumberPanel = new System.Windows.Forms.Panel();
+            this.MinimizeButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.SendByNumberPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(59)))), ((int)(((byte)(68)))));
+            this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.NumberSendingBtn);
             this.panel1.Controls.Add(this.TimeSendingBtn);
             this.panel1.Controls.Add(this.pictureBox1);
@@ -72,17 +89,26 @@
             this.panel1.Size = new System.Drawing.Size(167, 516);
             this.panel1.TabIndex = 0;
             // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(20, 147);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(138, 2);
+            this.label1.TabIndex = 30;
+            // 
             // NumberSendingBtn
             // 
             this.NumberSendingBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(78)))), ((int)(((byte)(89)))));
             this.NumberSendingBtn.FlatAppearance.BorderSize = 0;
             this.NumberSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.NumberSendingBtn.Image = ((System.Drawing.Image)(resources.GetObject("NumberSendingBtn.Image")));
-            this.NumberSendingBtn.Location = new System.Drawing.Point(44, 266);
+            this.NumberSendingBtn.Location = new System.Drawing.Point(45, 396);
             this.NumberSendingBtn.Name = "NumberSendingBtn";
-            this.NumberSendingBtn.Size = new System.Drawing.Size(76, 74);
+            this.NumberSendingBtn.Size = new System.Drawing.Size(75, 75);
             this.NumberSendingBtn.TabIndex = 25;
             this.NumberSendingBtn.UseVisualStyleBackColor = false;
+            this.NumberSendingBtn.Click += new System.EventHandler(this.NumberSendingBtn_Click);
             // 
             // TimeSendingBtn
             // 
@@ -90,11 +116,12 @@
             this.TimeSendingBtn.FlatAppearance.BorderSize = 0;
             this.TimeSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.TimeSendingBtn.Image = ((System.Drawing.Image)(resources.GetObject("TimeSendingBtn.Image")));
-            this.TimeSendingBtn.Location = new System.Drawing.Point(44, 366);
+            this.TimeSendingBtn.Location = new System.Drawing.Point(45, 290);
             this.TimeSendingBtn.Name = "TimeSendingBtn";
-            this.TimeSendingBtn.Size = new System.Drawing.Size(76, 74);
+            this.TimeSendingBtn.Size = new System.Drawing.Size(75, 75);
             this.TimeSendingBtn.TabIndex = 24;
             this.TimeSendingBtn.UseVisualStyleBackColor = false;
+            this.TimeSendingBtn.Click += new System.EventHandler(this.TimeSendingBtn_Click);
             // 
             // pictureBox1
             // 
@@ -109,7 +136,7 @@
             // 
             // bunifuElipse1
             // 
-            this.bunifuElipse1.ElipseRadius = 35;
+            this.bunifuElipse1.ElipseRadius = 40;
             this.bunifuElipse1.TargetControl = this;
             // 
             // TitleLabel
@@ -120,7 +147,6 @@
             this.TitleLabel.Name = "TitleLabel";
             this.TitleLabel.Size = new System.Drawing.Size(716, 72);
             this.TitleLabel.TabIndex = 1;
-            this.TitleLabel.Text = "Lucid Dream Simulator";
             this.TitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // SequenceSendingBtn
@@ -132,13 +158,14 @@
             this.SequenceSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SequenceSendingBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SequenceSendingBtn.ForeColor = System.Drawing.Color.White;
-            this.SequenceSendingBtn.Location = new System.Drawing.Point(639, 432);
+            this.SequenceSendingBtn.Location = new System.Drawing.Point(805, 432);
             this.SequenceSendingBtn.Name = "SequenceSendingBtn";
             this.SequenceSendingBtn.Size = new System.Drawing.Size(190, 39);
             this.SequenceSendingBtn.TabIndex = 2;
             this.SequenceSendingBtn.Text = "Start Sending";
             this.SequenceSendingBtn.UseMnemonic = false;
             this.SequenceSendingBtn.UseVisualStyleBackColor = false;
+            this.SequenceSendingBtn.Visible = false;
             this.SequenceSendingBtn.Click += new System.EventHandler(this.SequenceSendingBtn_Click);
             // 
             // ExitButton
@@ -163,70 +190,71 @@
             this.BeamBusCasCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BeamBusCasCheckBox.Location = new System.Drawing.Point(220, 190);
             this.BeamBusCasCheckBox.Name = "BeamBusCasCheckBox";
-            this.BeamBusCasCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.BeamBusCasCheckBox.Size = new System.Drawing.Size(20, 50);
             this.BeamBusCasCheckBox.TabIndex = 11;
-            this.BeamBusCasCheckBox.Text = "Beam Bus Cas";
             this.BeamBusCasCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.BeamBusCasCheckBox.UseVisualStyleBackColor = true;
+            this.BeamBusCasCheckBox.Visible = false;
             // 
             // IdrsCheckBox
             // 
             this.IdrsCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IdrsCheckBox.Location = new System.Drawing.Point(220, 240);
             this.IdrsCheckBox.Name = "IdrsCheckBox";
-            this.IdrsCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.IdrsCheckBox.Size = new System.Drawing.Size(20, 50);
             this.IdrsCheckBox.TabIndex = 10;
-            this.IdrsCheckBox.Text = "IDRS";
             this.IdrsCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.IdrsCheckBox.UseVisualStyleBackColor = true;
+            this.IdrsCheckBox.Visible = false;
             // 
             // PrsStaveBusCheckBox
             // 
             this.PrsStaveBusCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PrsStaveBusCheckBox.Location = new System.Drawing.Point(220, 290);
             this.PrsStaveBusCheckBox.Name = "PrsStaveBusCheckBox";
-            this.PrsStaveBusCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.PrsStaveBusCheckBox.Size = new System.Drawing.Size(20, 50);
             this.PrsStaveBusCheckBox.TabIndex = 9;
-            this.PrsStaveBusCheckBox.Text = "Prs Stave Bus";
             this.PrsStaveBusCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.PrsStaveBusCheckBox.UseVisualStyleBackColor = true;
+            this.PrsStaveBusCheckBox.Visible = false;
             // 
             // StaveBusCasCheckBox
             // 
             this.StaveBusCasCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StaveBusCasCheckBox.Location = new System.Drawing.Point(220, 340);
             this.StaveBusCasCheckBox.Name = "StaveBusCasCheckBox";
-            this.StaveBusCasCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.StaveBusCasCheckBox.Size = new System.Drawing.Size(20, 50);
             this.StaveBusCasCheckBox.TabIndex = 8;
-            this.StaveBusCasCheckBox.Text = "Stave Bus Cas";
             this.StaveBusCasCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.StaveBusCasCheckBox.UseVisualStyleBackColor = true;
+            this.StaveBusCasCheckBox.Visible = false;
             // 
             // StaveBusFasTasCheckBox
             // 
             this.StaveBusFasTasCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StaveBusFasTasCheckBox.Location = new System.Drawing.Point(220, 390);
             this.StaveBusFasTasCheckBox.Name = "StaveBusFasTasCheckBox";
-            this.StaveBusFasTasCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.StaveBusFasTasCheckBox.Size = new System.Drawing.Size(20, 50);
             this.StaveBusFasTasCheckBox.TabIndex = 7;
-            this.StaveBusFasTasCheckBox.Text = "Stave Bus Fas/Tas ";
             this.StaveBusFasTasCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.StaveBusFasTasCheckBox.UseVisualStyleBackColor = true;
+            this.StaveBusFasTasCheckBox.Visible = false;
             // 
             // BeamBusFasTasCheckBox
             // 
             this.BeamBusFasTasCheckBox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BeamBusFasTasCheckBox.Location = new System.Drawing.Point(220, 140);
             this.BeamBusFasTasCheckBox.Name = "BeamBusFasTasCheckBox";
-            this.BeamBusFasTasCheckBox.Size = new System.Drawing.Size(300, 50);
+            this.BeamBusFasTasCheckBox.Size = new System.Drawing.Size(20, 50);
             this.BeamBusFasTasCheckBox.TabIndex = 6;
-            this.BeamBusFasTasCheckBox.Text = "Beam Bus Fas/Tas";
             this.BeamBusFasTasCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.BeamBusFasTasCheckBox.UseVisualStyleBackColor = true;
+            this.BeamBusFasTasCheckBox.Visible = false;
             // 
             // BeamBusFasTasLabel
             // 
             this.BeamBusFasTasLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.BeamBusFasTasLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.BeamBusFasTasLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BeamBusFasTasLabel.ForeColor = System.Drawing.Color.White;
             this.BeamBusFasTasLabel.Location = new System.Drawing.Point(245, 150);
@@ -235,10 +263,13 @@
             this.BeamBusFasTasLabel.TabIndex = 12;
             this.BeamBusFasTasLabel.Text = "Beam Bus Fas/Tas";
             this.BeamBusFasTasLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.BeamBusFasTasLabel.Visible = false;
+            this.BeamBusFasTasLabel.Click += new System.EventHandler(this.BeamBusFasTasLabel_Click);
             // 
             // BeamBusCas
             // 
             this.BeamBusCas.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.BeamBusCas.Cursor = System.Windows.Forms.Cursors.Hand;
             this.BeamBusCas.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BeamBusCas.ForeColor = System.Drawing.Color.White;
             this.BeamBusCas.Location = new System.Drawing.Point(246, 200);
@@ -247,10 +278,13 @@
             this.BeamBusCas.TabIndex = 18;
             this.BeamBusCas.Text = "Beam Bus Cas";
             this.BeamBusCas.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.BeamBusCas.Visible = false;
+            this.BeamBusCas.Click += new System.EventHandler(this.BeamBusCas_Click);
             // 
             // IdrsLabel
             // 
             this.IdrsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.IdrsLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.IdrsLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IdrsLabel.ForeColor = System.Drawing.Color.White;
             this.IdrsLabel.Location = new System.Drawing.Point(246, 250);
@@ -259,10 +293,13 @@
             this.IdrsLabel.TabIndex = 19;
             this.IdrsLabel.Text = "IDRS";
             this.IdrsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.IdrsLabel.Visible = false;
+            this.IdrsLabel.Click += new System.EventHandler(this.IdrsLabel_Click);
             // 
             // PrsStaveBusLabel
             // 
             this.PrsStaveBusLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.PrsStaveBusLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.PrsStaveBusLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PrsStaveBusLabel.ForeColor = System.Drawing.Color.White;
             this.PrsStaveBusLabel.Location = new System.Drawing.Point(246, 300);
@@ -271,10 +308,13 @@
             this.PrsStaveBusLabel.TabIndex = 20;
             this.PrsStaveBusLabel.Text = "Prs Stave Bus";
             this.PrsStaveBusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.PrsStaveBusLabel.Visible = false;
+            this.PrsStaveBusLabel.Click += new System.EventHandler(this.PrsStaveBusLabel_Click);
             // 
             // StaveBusCasLabel
             // 
             this.StaveBusCasLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.StaveBusCasLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.StaveBusCasLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StaveBusCasLabel.ForeColor = System.Drawing.Color.White;
             this.StaveBusCasLabel.Location = new System.Drawing.Point(245, 350);
@@ -283,10 +323,13 @@
             this.StaveBusCasLabel.TabIndex = 21;
             this.StaveBusCasLabel.Text = "Stave Bus Cas";
             this.StaveBusCasLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.StaveBusCasLabel.Visible = false;
+            this.StaveBusCasLabel.Click += new System.EventHandler(this.StaveBusCasLabel_Click);
             // 
             // StaveBusFasTasLabel
             // 
             this.StaveBusFasTasLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
+            this.StaveBusFasTasLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.StaveBusFasTasLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.StaveBusFasTasLabel.ForeColor = System.Drawing.Color.White;
             this.StaveBusFasTasLabel.Location = new System.Drawing.Point(246, 400);
@@ -295,6 +338,8 @@
             this.StaveBusFasTasLabel.TabIndex = 22;
             this.StaveBusFasTasLabel.Text = "Stave Bus Fas/Tas";
             this.StaveBusFasTasLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.StaveBusFasTasLabel.Visible = false;
+            this.StaveBusFasTasLabel.Click += new System.EventHandler(this.StaveBusFasTasLabel_Click);
             // 
             // label3
             // 
@@ -307,13 +352,14 @@
             this.label3.TabIndex = 23;
             this.label3.Text = "Stream Channels";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label3.Visible = false;
             // 
             // NumberOfMessagesLabel
             // 
             this.NumberOfMessagesLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NumberOfMessagesLabel.Location = new System.Drawing.Point(658, 170);
+            this.NumberOfMessagesLabel.Location = new System.Drawing.Point(143, 127);
             this.NumberOfMessagesLabel.Name = "NumberOfMessagesLabel";
-            this.NumberOfMessagesLabel.Size = new System.Drawing.Size(337, 40);
+            this.NumberOfMessagesLabel.Size = new System.Drawing.Size(325, 41);
             this.NumberOfMessagesLabel.TabIndex = 24;
             this.NumberOfMessagesLabel.Text = "Number Of Messages : ";
             // 
@@ -322,7 +368,7 @@
             this.numericUpDown1.BackColor = System.Drawing.Color.White;
             this.numericUpDown1.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.numericUpDown1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(78)))), ((int)(((byte)(89)))));
-            this.numericUpDown1.Location = new System.Drawing.Point(692, 230);
+            this.numericUpDown1.Location = new System.Drawing.Point(175, 171);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -334,7 +380,7 @@
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(156, 34);
+            this.numericUpDown1.Size = new System.Drawing.Size(156, 47);
             this.numericUpDown1.TabIndex = 25;
             this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.numericUpDown1.Value = new decimal(new int[] {
@@ -352,13 +398,14 @@
             this.QuantitySendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.QuantitySendingBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.QuantitySendingBtn.ForeColor = System.Drawing.Color.White;
-            this.QuantitySendingBtn.Location = new System.Drawing.Point(674, 290);
+            this.QuantitySendingBtn.Location = new System.Drawing.Point(805, 432);
             this.QuantitySendingBtn.Name = "QuantitySendingBtn";
             this.QuantitySendingBtn.Size = new System.Drawing.Size(190, 39);
             this.QuantitySendingBtn.TabIndex = 26;
             this.QuantitySendingBtn.Text = "Send By Number";
             this.QuantitySendingBtn.UseMnemonic = false;
             this.QuantitySendingBtn.UseVisualStyleBackColor = false;
+            this.QuantitySendingBtn.Visible = false;
             this.QuantitySendingBtn.Click += new System.EventHandler(this.QuantitySendingBtn_Click);
             // 
             // SendTargetsBtn
@@ -370,24 +417,144 @@
             this.SendTargetsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SendTargetsBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SendTargetsBtn.ForeColor = System.Drawing.Color.White;
-            this.SendTargetsBtn.Location = new System.Drawing.Point(835, 432);
+            this.SendTargetsBtn.Location = new System.Drawing.Point(805, 432);
             this.SendTargetsBtn.Name = "SendTargetsBtn";
             this.SendTargetsBtn.Size = new System.Drawing.Size(190, 39);
             this.SendTargetsBtn.TabIndex = 27;
             this.SendTargetsBtn.Text = "Start Sending Targets";
             this.SendTargetsBtn.UseMnemonic = false;
             this.SendTargetsBtn.UseVisualStyleBackColor = false;
+            this.SendTargetsBtn.Visible = false;
             this.SendTargetsBtn.Click += new System.EventHandler(this.SendTargetsBtn_Click);
+            // 
+            // HeadlineLabel
+            // 
+            this.HeadlineLabel.Font = new System.Drawing.Font("Yu Gothic Medium", 45F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HeadlineLabel.Location = new System.Drawing.Point(173, 0);
+            this.HeadlineLabel.Name = "HeadlineLabel";
+            this.HeadlineLabel.Size = new System.Drawing.Size(852, 516);
+            this.HeadlineLabel.TabIndex = 28;
+            this.HeadlineLabel.Text = "Lucid Dream Simulator";
+            this.HeadlineLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // SubHeadlineLabel
+            // 
+            this.SubHeadlineLabel.Font = new System.Drawing.Font("Yu Gothic UI Light", 17F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SubHeadlineLabel.Location = new System.Drawing.Point(252, 290);
+            this.SubHeadlineLabel.Name = "SubHeadlineLabel";
+            this.SubHeadlineLabel.Size = new System.Drawing.Size(690, 50);
+            this.SubHeadlineLabel.TabIndex = 29;
+            this.SubHeadlineLabel.Text = "Powered By Submarine Section";
+            this.SubHeadlineLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // bunifuElipse2
+            // 
+            this.bunifuElipse2.ElipseRadius = 15;
+            this.bunifuElipse2.TargetControl = this.TimeSendingBtn;
+            // 
+            // bunifuElipse3
+            // 
+            this.bunifuElipse3.ElipseRadius = 15;
+            this.bunifuElipse3.TargetControl = this;
+            // 
+            // bunifuElipse4
+            // 
+            this.bunifuElipse4.ElipseRadius = 15;
+            this.bunifuElipse4.TargetControl = this.NumberSendingBtn;
+            // 
+            // TargetsCheckbox
+            // 
+            this.TargetsCheckbox.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TargetsCheckbox.Location = new System.Drawing.Point(220, 440);
+            this.TargetsCheckbox.Name = "TargetsCheckbox";
+            this.TargetsCheckbox.Size = new System.Drawing.Size(20, 50);
+            this.TargetsCheckbox.TabIndex = 30;
+            this.TargetsCheckbox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.TargetsCheckbox.UseVisualStyleBackColor = true;
+            this.TargetsCheckbox.Visible = false;
+            // 
+            // TargetsLabel
+            // 
+            this.TargetsLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(21)))), ((int)(((byte)(59)))), ((int)(((byte)(68)))));
+            this.TargetsLabel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.TargetsLabel.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TargetsLabel.ForeColor = System.Drawing.Color.White;
+            this.TargetsLabel.Location = new System.Drawing.Point(245, 450);
+            this.TargetsLabel.Name = "TargetsLabel";
+            this.TargetsLabel.Size = new System.Drawing.Size(275, 35);
+            this.TargetsLabel.TabIndex = 31;
+            this.TargetsLabel.Text = "Targets";
+            this.TargetsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.TargetsLabel.Visible = false;
+            this.TargetsLabel.Click += new System.EventHandler(this.TargetsLabel_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.pictureBox2);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.panel2.Location = new System.Drawing.Point(532, 126);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(493, 300);
+            this.panel2.TabIndex = 32;
+            this.panel2.Visible = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.Location = new System.Drawing.Point(109, 44);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(248, 235);
+            this.pictureBox2.TabIndex = 1;
+            this.pictureBox2.TabStop = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(4, 12);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(671, 41);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Sending Data From Selected Stream Channels ...";
+            // 
+            // SendByNumberPanel
+            // 
+            this.SendByNumberPanel.Controls.Add(this.NumberOfMessagesLabel);
+            this.SendByNumberPanel.Controls.Add(this.numericUpDown1);
+            this.SendByNumberPanel.Location = new System.Drawing.Point(527, 95);
+            this.SendByNumberPanel.Name = "SendByNumberPanel";
+            this.SendByNumberPanel.Size = new System.Drawing.Size(493, 295);
+            this.SendByNumberPanel.TabIndex = 33;
+            this.SendByNumberPanel.Visible = false;
+            // 
+            // MinimizeButton
+            // 
+            this.MinimizeButton.BackColor = System.Drawing.Color.White;
+            this.MinimizeButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.MinimizeButton.FlatAppearance.BorderSize = 0;
+            this.MinimizeButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.MinimizeButton.Font = new System.Drawing.Font("Verdana", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MinimizeButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
+            this.MinimizeButton.Location = new System.Drawing.Point(901, 12);
+            this.MinimizeButton.Name = "MinimizeButton";
+            this.MinimizeButton.Size = new System.Drawing.Size(61, 44);
+            this.MinimizeButton.TabIndex = 34;
+            this.MinimizeButton.Text = "_";
+            this.MinimizeButton.UseMnemonic = false;
+            this.MinimizeButton.UseVisualStyleBackColor = false;
+            this.MinimizeButton.Click += new System.EventHandler(this.MinimizeButton_Click);
             // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1032, 516);
+            this.Controls.Add(this.MinimizeButton);
+            this.Controls.Add(this.SendByNumberPanel);
+            this.Controls.Add(this.TargetsLabel);
+            this.Controls.Add(this.TargetsCheckbox);
             this.Controls.Add(this.SendTargetsBtn);
             this.Controls.Add(this.QuantitySendingBtn);
-            this.Controls.Add(this.numericUpDown1);
-            this.Controls.Add(this.NumberOfMessagesLabel);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.StaveBusFasTasLabel);
             this.Controls.Add(this.StaveBusCasLabel);
@@ -405,6 +572,9 @@
             this.Controls.Add(this.SequenceSendingBtn);
             this.Controls.Add(this.TitleLabel);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.SubHeadlineLabel);
+            this.Controls.Add(this.HeadlineLabel);
+            this.Controls.Add(this.panel2);
             this.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
@@ -412,6 +582,10 @@
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.SendByNumberPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -443,5 +617,18 @@
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button QuantitySendingBtn;
         private System.Windows.Forms.Button SendTargetsBtn;
+        private System.Windows.Forms.Label HeadlineLabel;
+        private System.Windows.Forms.Label SubHeadlineLabel;
+        private System.Windows.Forms.Label label1;
+        private Bunifu.Framework.UI.BunifuElipse bunifuElipse2;
+        private Bunifu.Framework.UI.BunifuElipse bunifuElipse3;
+        private Bunifu.Framework.UI.BunifuElipse bunifuElipse4;
+        private System.Windows.Forms.Label TargetsLabel;
+        private System.Windows.Forms.CheckBox TargetsCheckbox;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Panel SendByNumberPanel;
+        private System.Windows.Forms.Button MinimizeButton;
     }
 }

@@ -78,7 +78,7 @@ namespace TargetsStreamerMain
                 while (!f.EndOfStream)
                 {
                     //Check cancellation
-                    if(ct.IsCancellationRequested)
+                    if (ct.IsCancellationRequested)
                     {
                         return Task.CompletedTask;
                     }
