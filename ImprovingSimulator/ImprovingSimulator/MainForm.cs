@@ -28,7 +28,7 @@ namespace ImprovingSimulator
 
         } //End MainForm Constructor
 
-        private void StartSendingStreamMessages(string streamType, CancellationToken ct,
+        private Task StartSendingStreamMessages(string streamType, CancellationToken ct,
             long numberOfMessagesToSend = -1)
         {
             if (ConfigurationManager.GetSection("StreamSettings/" + streamType) is NameValueCollection config)
@@ -45,8 +45,9 @@ namespace ImprovingSimulator
                     double.Parse(config["Delimiter"]));
 
                 // We don't care if we go back to original context so configure await is false
-                Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct);
+               return Task.Run(() => stream.SendMessages(ct, numberOfMessagesToSend), ct);
             }
+            return null;
         }
 
         private void StopAllSending()
@@ -73,19 +74,19 @@ namespace ImprovingSimulator
 
                 var success = SendMessagesToCheckedStreams();
 
-                if (TargetsCheckbox.Checked == true)
-                {
-                    targetsCancellationTokenSource = new CancellationTokenSource();
-                    TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
-                    targetsCancellationTokenSource = new CancellationTokenSource();
+                //if (TargetsCheckbox.Checked == true)
+                //{
+                //    targetsCancellationTokenSource = new CancellationTokenSource();
+                //    TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
+                //    targetsCancellationTokenSource = new CancellationTokenSource();
 
-                    // Do it in background
-                    Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
-                    panel2.Visible = true;
+                //    // Do it in background
+                //    Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
+                //    panel2.Visible = true;
 
-                }//End If
+                //}//End If
 
-                if (!success)
+                if (success == null && TargetsCheckbox.Checked == false)
                 {
                     MessageBox.Show("No Channels Were Selected!");
                     SequenceSendingBtn.Text = "Start Sending";
@@ -96,14 +97,34 @@ namespace ImprovingSimulator
                 } //End If
                 else
                 {
-                    panel2.Visible = true;
-                    SequenceSendingBtn.Text = "Stop Sending";
-                }
+                    if (success != null)
+                    {
+                        CheckSendingCompleted(success);
+                        panel2.Visible = true;
+                        SequenceSendingBtn.Text = "Stop Sending";
+
+                    }//End If
+
+                    if(TargetsCheckbox.Checked == true)
+                    {
+                        targetsCancellationTokenSource = new CancellationTokenSource();
+                        TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
+                        targetsCancellationTokenSource = new CancellationTokenSource();
+
+                        // Do it in background
+                        Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
+                        panel2.Visible = true;
+                        SequenceSendingBtn.Text = "Stop Sending";
+
+                    }//End If
+
+                }//End Else
+
             } //End If
 
             else
             {
-                if (TargetsCheckbox.IsDisposed == true)
+                if (TargetsCheckbox.Checked == true)
                     targetsCancellationTokenSource.Cancel();
 
                 SequenceSendingBtn.Text = "Start Sending";
@@ -115,9 +136,9 @@ namespace ImprovingSimulator
             } //End Else
         }
 
-        private bool SendMessagesToCheckedStreams(long numberOfMessagesToSend = -1)
+        private Task SendMessagesToCheckedStreams(long numberOfMessagesToSend = -1)
         {
-            var flag = false;
+            Task task = null;
             var checkedBoxes = Controls.OfType<CheckBox>().Where(box => box.Checked);
             foreach (var box in checkedBoxes)
             {
@@ -126,11 +147,10 @@ namespace ImprovingSimulator
 
                 streamsCancellationTokens.Add(ctSource);
 
-                StartSendingStreamMessages(streamType, ctSource.Token, numberOfMessagesToSend);
-                flag = true;
+                task = StartSendingStreamMessages(streamType, ctSource.Token, numberOfMessagesToSend);
             }
 
-            return flag;
+            return task;
         }
 
         private void DisableCheckboxes()
@@ -170,16 +190,24 @@ namespace ImprovingSimulator
 
                 var success = SendMessagesToCheckedStreams(NumberOfMessages);
 
-                if (!success)
+                if (success == null)
                 {
                     MessageBox.Show("No Channels Were Selected!");
                     QuantitySendingBtn.Text = "Send By Number";
                     EnableCheckboxes();
                     TimeSendingBtn.Enabled = true;
+                    SendByNumberPanel.Visible = true;
+                    panel2.Visible = false;
 
                 } //End If
+                else
+                {
+                    CheckSendingCompleted(success);
+                    SendByNumberPanel.Visible = false;
+                    panel2.Visible = true;
 
-                //BeamBusCasNumberSenderThread.Join();
+                }//End Else
+
             } //End If
 
             else
@@ -188,32 +216,29 @@ namespace ImprovingSimulator
                 StopAllSending();
                 EnableCheckboxes();
                 TimeSendingBtn.Enabled = true;
+                panel2.Visible = false;
+                SendByNumberPanel.Visible = true;
 
             } //End Else
+
         } //End QuantitySendingBtn
 
-        //private void SendTargetsBtn_Click(object sender, EventArgs e)
-        //{
-        //    if (SendTargetsBtn.Text == "Start Sending Targets")
-        //    {
-        //        NumberSendingBtn.Enabled = false;
-        //        TimeSendingBtn.Enabled = false;
-        //        targetsCancellationTokenSource = new CancellationTokenSource();
-        //        TargetsStreamer targetsStreamer = TargetsStreamer.Instance;
-        //        targetsCancellationTokenSource = new CancellationTokenSource();
-        //        SendTargetsBtn.Text = "Stop Sending Targets";
+        private void CheckSendingCompleted(Task success)
+        {
+            success.ContinueWith((task) =>
+            {
+                if (QuantitySendingBtn.Text != "Send By Number")
+                {
+                    QuantitySendingBtn.Text = "Send By Number";
+                    EnableCheckboxes();
+                    NumberSendingBtn.Enabled = true;
+                    panel2.Visible = false;
+                    SendByNumberPanel.Visible = true;
 
-        //        // Do it in background
-        //        Task.Run(() => targetsStreamer.StartSending(targetsCancellationTokenSource.Token));
-        //    }
-        //    else
-        //    {
-        //        targetsCancellationTokenSource.Cancel();
-        //        SendTargetsBtn.Text = "Start Sending Targets";
-        //        NumberSendingBtn.Enabled = true;
-        //        TimeSendingBtn.Enabled = true;
-        //    }
-        //}
+                }//End If
+
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
 
         private void DisplayingNumberSendingComponents()
         {
@@ -236,6 +261,7 @@ namespace ImprovingSimulator
             PrsStaveBusCheckBox.Visible = true;
             IdrsCheckBox.Visible = true;
             TargetsCheckbox.Visible = false;
+            TargetsCheckbox.Checked = false;
             SequenceSendingBtn.Visible = false;
 
 
@@ -347,6 +373,7 @@ namespace ImprovingSimulator
 
         }//End TargetLabel_Click
 
-    }
+
+    }//End MainForm
 
 } //End Improving Simulator
