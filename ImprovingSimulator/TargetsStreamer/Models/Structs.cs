@@ -13,12 +13,7 @@ namespace TargetsStreamerMain.Models
     {
         public TimeType sentTimeStamp;
 
-<<<<<<< Updated upstream
         [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
-=======
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex =0)]
-
->>>>>>> Stashed changes
         public List<TargetData> systemTargets;
 
         public SystemTarget()

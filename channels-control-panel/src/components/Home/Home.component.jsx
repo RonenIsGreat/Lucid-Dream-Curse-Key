@@ -5,6 +5,7 @@ import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
 import StorageStatus from '../StorageStatus/StorageStatus.component'
 import TargetIdentifying from '../TargetIdentifying/TargetIdentifying.component'
+import PlayAudio from '../PlayAudio/PlayAudio.component'
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
