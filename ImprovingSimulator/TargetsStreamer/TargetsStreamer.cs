@@ -153,7 +153,7 @@ namespace TargetsStreamerMain
             {
                 channel.ExchangeDeclare("SystemTracks",
                     "direct", true);
-                channel.BasicPublish("channelControl",
+                channel.BasicPublish("SystemTracks",
                     "SystemTracks",
                     null,
                     message);
