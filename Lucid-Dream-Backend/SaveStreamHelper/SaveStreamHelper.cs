@@ -37,6 +37,7 @@ namespace SaveStream
                 MaxDegreeOfParallelism = Environment.ProcessorCount,
                 TaskScheduler = _scheduler.ConcurrentScheduler
             };
+
             DataflowBlockOptions generalOptions = new DataflowBlockOptions
             {
                 TaskScheduler = _scheduler.ConcurrentScheduler
