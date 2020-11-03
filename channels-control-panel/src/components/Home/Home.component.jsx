@@ -5,6 +5,7 @@ import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
 import PlayAudio from '../PlayAudio/PlayAudio.component'
 import StorageStatus from '../StorageStatus/StorageStatus.component'
+import TargetIdentifying from '../TargetIdentifying/TargetIdentifying.component'
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
@@ -23,31 +24,31 @@ export default function Home() {
         //     socket.close()
         // });
         // if(socket.connected) {
-        socket.on("StatusSocketIO", data => {
-            let dataSplit = data.split(" ");
-            switch (dataSplit[0]) {
-                case "CasBeam":
-                    setCasBeam(dataSplit[1]);
-                    break;
-                case "CasStave":
-                    setCasStave(dataSplit[1]);
-                    break;
-                case "FasTasBeam":
-                    setFasTasBeam(dataSplit[1]);
-                    break;
-                case "FasTasStave":
-                    setFasTasStave(dataSplit[1]);
-                    break;
-                case "PRSStave":
-                    setPRSStave(dataSplit[1]);
-                    break;
-                case "IDRSBus":
-                    setIDRSBus(dataSplit[1]);
-                    break;
-                default:
-                    break;
-            }
-        });
+            socket.on("StatusSocketIO", data => {
+                let dataSplit = data.split(" ");
+                switch (dataSplit[0]) {
+                    case "CasBeam":
+                        setCasBeam(dataSplit[1]);
+                        break;
+                    case "CasStave":
+                        setCasStave(dataSplit[1]);
+                        break;
+                    case "FasTasBeam":
+                        setFasTasBeam(dataSplit[1]);
+                        break;
+                    case "FasTasStave":
+                        setFasTasStave(dataSplit[1]);
+                        break;
+                    case "PRSStave":
+                        setPRSStave(dataSplit[1]);
+                        break;
+                    case "IDRSBus":
+                        setIDRSBus(dataSplit[1]);
+                        break;
+                    default:
+                        break;
+                }
+            });
         // }
     }, [socket])
 
@@ -67,6 +68,7 @@ export default function Home() {
             <Row>
                 <Col xs={6}>
                     <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
+                    <TargetIdentifying />
                 </Col>
                 <Col>
                     <StorageStatus />

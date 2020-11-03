@@ -35,7 +35,7 @@ namespace Consumer
                 port.GetName().ToString());
 
 
-            Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
+            //Console.WriteLine(" [*] {0} Is waiting for messages.", port.GetName().ToString());
 
             EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
@@ -50,12 +50,13 @@ namespace Consumer
                 }
                 else if (message.Equals("OFF"))
                 {
+                    
                     _udpClient.StopListener();
                     _udpClient.DataReceivedDelegate -= UdpClientDataReceivedDelegate;
                 }
 
-                Console.WriteLine(" [x] Received '{0}':'{1}'",
-                    routingKey, message);
+                //Console.WriteLine(" [x] Received '{0}':'{1}'",
+                //    routingKey, message);
             };
             channel.BasicConsume(queueName,
                 true,
