@@ -6,7 +6,7 @@ namespace Controller
 {
     internal class Producer
     {
-        public void SendMessage(string message, string rKey)
+        public static void SendMessage(string message, string rKey)
         {
             var factory = new ConnectionFactory {HostName = "localhost", RequestedHeartbeat = TimeSpan.FromSeconds(60)};
             using (var connection = factory.CreateConnection())
