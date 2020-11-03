@@ -22,31 +22,31 @@ export default function Home() {
         //     socket.close()
         // });
         // if(socket.connected) {
-            socket.on("StatusSocketIO", data => {
-                let dataSplit = data.split(" ");
-                switch (dataSplit[0]) {
-                    case "CasBeam":
-                        setCasBeam(dataSplit[1]);
-                        break;
-                    case "CasStave":
-                        setCasStave(dataSplit[1]);
-                        break;
-                    case "FasTasBeam":
-                        setFasTasBeam(dataSplit[1]);
-                        break;
-                    case "FasTasStave":
-                        setFasTasStave(dataSplit[1]);
-                        break;
-                    case "PRSStave":
-                        setPRSStave(dataSplit[1]);
-                        break;
-                    case "IDRSBus":
-                        setIDRSBus(dataSplit[1]);
-                        break;
-                    default:
-                        break;
-                }
-            });
+        socket.on("StatusSocketIO", data => {
+            let dataSplit = data.split(" ");
+            switch (dataSplit[0]) {
+                case "CasBeam":
+                    setCasBeam(dataSplit[1]);
+                    break;
+                case "CasStave":
+                    setCasStave(dataSplit[1]);
+                    break;
+                case "FasTasBeam":
+                    setFasTasBeam(dataSplit[1]);
+                    break;
+                case "FasTasStave":
+                    setFasTasStave(dataSplit[1]);
+                    break;
+                case "PRSStave":
+                    setPRSStave(dataSplit[1]);
+                    break;
+                case "IDRSBus":
+                    setIDRSBus(dataSplit[1]);
+                    break;
+                default:
+                    break;
+            }
+        });
         // }
     }, [socket])
 
@@ -68,6 +68,7 @@ export default function Home() {
                     <DistributionController ENDPOINT={ENDPOINT} socket={socket} />
                 </Col>
                 <Col>
+                    
                     <PlayAudio />
                 </Col>
             </Row>
