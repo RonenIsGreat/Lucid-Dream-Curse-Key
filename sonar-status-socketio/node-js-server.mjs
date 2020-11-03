@@ -13,17 +13,6 @@ const server = createServer((req, res) => {
 });
 
 
-// ------------------- SocketIO ------------------- //
-const io = socketIo(server);
-const socketCallback = (socket) => {
-    console.log("New client connected");
-    socket.on("disconnect", () => {
-        console.log("Client disconnected");
-    });
-}
-const socket = io.on("connection", socketCallback);
-
-
 // ------------------- Server Listener ------------------- //
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
@@ -55,6 +44,20 @@ server.listen(port, hostname, () => {
             channel.assertExchange(targetDataExchange, 'direct', {
                 durable: true
             });
+
+            // ------------------- SocketIO ------------------- //
+            const io = socketIo(server);
+            const socketCallback = (socket) => {
+                console.log("New client connected");
+                socket.on("disconnect", () => {
+                    console.log("Client disconnected");
+                });
+                socket.on("DistributionSocketIO", data => {
+                    console.log(data);
+                    channel.publish(distributionDataExchange, '', Buffer.from(JSON.stringify(data)));
+                })
+            }
+            const socket = io.on("connection", socketCallback);
 
             channel.assertQueue('', {
                 exclusive: true
