@@ -26,11 +26,6 @@ namespace StreamWrapper.Main
 
         private bool CheckRequirements(long numberOfMessagesToSend)
         {
-            if (!File.Exists(subSementPath))
-            {
-                MessageBox.Show("Wrong path entered");
-                return false;
-            }
 
             if (numberOfMessagesToSend > subSegmentLength)
             {
@@ -52,12 +47,19 @@ namespace StreamWrapper.Main
         /// <returns></returns>
         public Task SendMessages(CancellationToken ct, long numberOfMessagesToSend = -1)
         {
+            if (!File.Exists(subSementPath))
+            {
+                MessageBox.Show("Wrong path entered");
+
+            }//End If
+
             // Check requirements before sending messages
-            if (!CheckRequirements(numberOfMessagesToSend)) return Task.CompletedTask;
             // Encapsulate with using so resources will be flushed after execution
             using (var f = File.OpenRead(subSementPath))
             {
                 subSegmentLength = f.Length;
+
+                if (!CheckRequirements(numberOfMessagesToSend)) return Task.CompletedTask;
 
                 // Sending limit, can be either numberOfMessagesToSend or recording file size ( will be looped around forever if so)
                 var limitInBytes = numberOfMessagesToSend > 0 ? numberOfMessagesToSend * 1400 : subSegmentLength;
@@ -84,12 +86,12 @@ namespace StreamWrapper.Main
                     //Sets the index according to numberOfMessagesToSend (forever or limited)
                     messageIndex = CheckSendLimit(messageIndex++, numberOfMessagesInRecording, f,
                         numberOfMessagesToSend);
+
                 }
             }
 
             return Task.CompletedTask;
         }
-
 
         private int CheckSendLimit(int messageIndex, long limit, Stream f, long numberOfMessagesToSend)
         {

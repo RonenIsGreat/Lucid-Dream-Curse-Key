@@ -55,7 +55,6 @@
             this.NumberOfMessagesLabel = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.QuantitySendingBtn = new System.Windows.Forms.Button();
-            this.SendTargetsBtn = new System.Windows.Forms.Button();
             this.HeadlineLabel = new System.Windows.Forms.Label();
             this.SubHeadlineLabel = new System.Windows.Forms.Label();
             this.bunifuElipse2 = new Bunifu.Framework.UI.BunifuElipse(this.components);
@@ -158,7 +157,7 @@
             this.SequenceSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SequenceSendingBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SequenceSendingBtn.ForeColor = System.Drawing.Color.White;
-            this.SequenceSendingBtn.Location = new System.Drawing.Point(805, 432);
+            this.SequenceSendingBtn.Location = new System.Drawing.Point(817, 449);
             this.SequenceSendingBtn.Name = "SequenceSendingBtn";
             this.SequenceSendingBtn.Size = new System.Drawing.Size(190, 39);
             this.SequenceSendingBtn.TabIndex = 2;
@@ -398,7 +397,7 @@
             this.QuantitySendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.QuantitySendingBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.QuantitySendingBtn.ForeColor = System.Drawing.Color.White;
-            this.QuantitySendingBtn.Location = new System.Drawing.Point(805, 432);
+            this.QuantitySendingBtn.Location = new System.Drawing.Point(817, 449);
             this.QuantitySendingBtn.Name = "QuantitySendingBtn";
             this.QuantitySendingBtn.Size = new System.Drawing.Size(190, 39);
             this.QuantitySendingBtn.TabIndex = 26;
@@ -407,25 +406,6 @@
             this.QuantitySendingBtn.UseVisualStyleBackColor = false;
             this.QuantitySendingBtn.Visible = false;
             this.QuantitySendingBtn.Click += new System.EventHandler(this.QuantitySendingBtn_Click);
-            // 
-            // SendTargetsBtn
-            // 
-            this.SendTargetsBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(157)))), ((int)(((byte)(156)))));
-            this.SendTargetsBtn.Cursor = System.Windows.Forms.Cursors.Default;
-            this.SendTargetsBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(69)))), ((int)(((byte)(88)))));
-            this.SendTargetsBtn.FlatAppearance.BorderSize = 0;
-            this.SendTargetsBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.SendTargetsBtn.Font = new System.Drawing.Font("Yu Gothic UI Semibold", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SendTargetsBtn.ForeColor = System.Drawing.Color.White;
-            this.SendTargetsBtn.Location = new System.Drawing.Point(805, 432);
-            this.SendTargetsBtn.Name = "SendTargetsBtn";
-            this.SendTargetsBtn.Size = new System.Drawing.Size(190, 39);
-            this.SendTargetsBtn.TabIndex = 27;
-            this.SendTargetsBtn.Text = "Start Sending Targets";
-            this.SendTargetsBtn.UseMnemonic = false;
-            this.SendTargetsBtn.UseVisualStyleBackColor = false;
-            this.SendTargetsBtn.Visible = false;
-            this.SendTargetsBtn.Click += new System.EventHandler(this.SendTargetsBtn_Click);
             // 
             // HeadlineLabel
             // 
@@ -523,7 +503,7 @@
             this.SendByNumberPanel.Controls.Add(this.numericUpDown1);
             this.SendByNumberPanel.Location = new System.Drawing.Point(527, 95);
             this.SendByNumberPanel.Name = "SendByNumberPanel";
-            this.SendByNumberPanel.Size = new System.Drawing.Size(493, 295);
+            this.SendByNumberPanel.Size = new System.Drawing.Size(493, 331);
             this.SendByNumberPanel.TabIndex = 33;
             this.SendByNumberPanel.Visible = false;
             // 
@@ -551,10 +531,9 @@
             this.ClientSize = new System.Drawing.Size(1032, 516);
             this.Controls.Add(this.MinimizeButton);
             this.Controls.Add(this.SendByNumberPanel);
+            this.Controls.Add(this.QuantitySendingBtn);
             this.Controls.Add(this.TargetsLabel);
             this.Controls.Add(this.TargetsCheckbox);
-            this.Controls.Add(this.SendTargetsBtn);
-            this.Controls.Add(this.QuantitySendingBtn);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.StaveBusFasTasLabel);
             this.Controls.Add(this.StaveBusCasLabel);
@@ -573,8 +552,8 @@
             this.Controls.Add(this.TitleLabel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.SubHeadlineLabel);
-            this.Controls.Add(this.HeadlineLabel);
             this.Controls.Add(this.panel2);
+            this.Controls.Add(this.HeadlineLabel);
             this.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
@@ -616,7 +595,6 @@
         private System.Windows.Forms.Label NumberOfMessagesLabel;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Button QuantitySendingBtn;
-        private System.Windows.Forms.Button SendTargetsBtn;
         private System.Windows.Forms.Label HeadlineLabel;
         private System.Windows.Forms.Label SubHeadlineLabel;
         private System.Windows.Forms.Label label1;

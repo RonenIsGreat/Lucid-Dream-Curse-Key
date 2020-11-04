@@ -13,23 +13,12 @@ const server = createServer((req, res) => {
 });
 
 
-// ------------------- SocketIO ------------------- //
-const io = socketIo(server);
-const socketCallback = (socket) => {
-    console.log("New client connected");
-    socket.on("disconnect", () => {
-        console.log("Client disconnected");
-    });
-}
-const socket = io.on("connection", socketCallback);
-
-
 // ------------------- Server Listener ------------------- //
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 
     let sonarTimeoutChannel;
-    amqp.connect('amqp://localhost', function (error0, connection) {
+    amqp.connect('amqp://admin:admin@localhost', function (error0, connection) {
         if (error0) {
             throw error0;
         }
@@ -37,10 +26,12 @@ server.listen(port, hostname, () => {
             if (error1) {
                 throw error1;
             }
-            
+
             var channelStatusExchange = 'channelStatus';
             var distributionDataExchange = 'distributionData';
             var storageStatusExchange = "storageStatus";
+            var targetDataExchange = 'SystemTracksJSON';
+
             channel.assertExchange(channelStatusExchange, 'fanout', {
                 durable: false
             });
@@ -50,6 +41,23 @@ server.listen(port, hostname, () => {
             channel.assertExchange(storageStatusExchange, 'fanout', {
                 durable: false
             });
+            channel.assertExchange(targetDataExchange, 'direct', {
+                durable: true
+            });
+
+            // ------------------- SocketIO ------------------- //
+            const io = socketIo(server);
+            const socketCallback = (socket) => {
+                console.log("New client connected");
+                socket.on("disconnect", () => {
+                    console.log("Client disconnected");
+                });
+                socket.on("DistributionSocketIO", data => {
+                    console.log(data);
+                    channel.publish(distributionDataExchange, '', Buffer.from(JSON.stringify(data)));
+                })
+            }
+            const socket = io.on("connection", socketCallback);
 
             channel.assertQueue('', {
                 exclusive: true
@@ -97,6 +105,29 @@ server.listen(port, hostname, () => {
                         });
                         console.log(storageStatusObjects);
                         socket.emit("StorageStatus", JSON.stringify(storageStatusObjects));
+                    }
+                }, {
+                    noAck: true
+                });
+            });
+
+            channel.assertQueue('', {
+                exclusive: true
+            }, function (error2, q) {
+                if (error2) {
+                    throw error2;
+                }
+                console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+                channel.bindQueue(q.queue, targetDataExchange, 'SystemTracks');
+
+                channel.consume(q.queue, function (msg) {
+                    // ---------- If received message from rabbitMQ: ---------- //
+                    console.log(msg)
+                    if (msg.content) {
+                        const targetsString = msg.content.toString();
+                        let targets = JSON.parse(targetsString);
+                        console.log(targets);
+                        socket.emit("TargetStatus", targetsString);
                     }
                 }, {
                     noAck: true

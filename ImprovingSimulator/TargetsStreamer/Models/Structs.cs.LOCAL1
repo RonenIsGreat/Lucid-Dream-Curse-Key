@@ -13,7 +13,6 @@ namespace TargetsStreamerMain.Models
     {
         public TimeType sentTimeStamp;
 
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
         public List<TargetData> systemTargets;
 
         public SystemTarget()

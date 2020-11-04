@@ -55,7 +55,7 @@ namespace AudioCreate
                                   exchange: "SystemTracks",
                                   routingKey: "SystemTracks");
 
-                Console.WriteLine(" [*] Waiting for logs.");
+               // Console.WriteLine(" [*] Waiting for logs.");
 
                 var consumer = new EventingBasicConsumer(channel);
                 consumer.Received += (model, ea) =>
@@ -68,13 +68,14 @@ namespace AudioCreate
                                      autoAck: true,
                                      consumer: consumer);
 
-                Console.WriteLine(" Press [enter] to exit.");
+              //  Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
         }
 
         private static void StartListener()
         {
+            Console.WriteLine("Waiting for broadcast");
             UdpClient listener = new UdpClient(listenPort);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
             subSegment tempSub = new subSegment();
@@ -88,7 +89,7 @@ namespace AudioCreate
             {
                 while (true)
                 {
-                    Console.WriteLine("Waiting for broadcast");
+                    
                     byte[] bytes = listener.Receive(ref groupEP);
                     idNumber = Convert.ToInt32(bytes[4]);
                     if (idNumber == counter)
@@ -105,6 +106,7 @@ namespace AudioCreate
                                 WaveFileWriter writer = getWriter(targetData.trackID);
                                 writer.Write(tAudio, 0, tAudio.Length);
                                 writer.Flush();
+                                Console.WriteLine("recieved segment");
                             }
                             counter = 1;
                         }

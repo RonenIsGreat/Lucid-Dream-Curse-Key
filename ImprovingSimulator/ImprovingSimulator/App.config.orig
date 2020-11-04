@@ -17,11 +17,18 @@
   </startup>
 
   <appSettings>
-    <add key="TargetsDataPath" value="C:\Users\ziv.krimberg\Documents\Lucid-Dream\reordings fo simulator 30 seconds\tracks.txt" />
-    <add key="RecordingsPath" value="C:\Users\ziv.krimberg\Documents\Lucid-Dream\reordings fo simulator 30 seconds" />
+<<<<<<< HEAD
+    <add key="TargetsDataPath" value="C:/workspace/Lucid-Dream-Curse-Key/reordings fo simulator 30 seconds/tracks.txt" />
+    <add key="RecordingsPath" value="C:/workspace/Lucid-Dream-Curse-Key/reordings fo simulator 30 seconds" />
+=======
+    <add key="TargetsDataPath" value="C:\Users\מרכז מפתח\Desktop\My Project\reordings fo simulator 30 seconds\tracks.txt" />
+    <add key="RecordingsPath" value="C:\Users\מרכז מפתח\Desktop\My Project\reordings fo simulator 30 seconds"/>
+>>>>>>> 'LD_137'
 
     <add key="UdpRemoteIp" value="127.0.0.1" />
+
     <add key="RabbitMqHost" value="127.0.0.1" />
+    <!--  -1 Means default    -->
     <add key="RabbitMqPort" value="-1" />
   </appSettings>
 
@@ -72,7 +79,8 @@
       <dependentAssembly>
         <assemblyIdentity name="System.Runtime.CompilerServices.Unsafe" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-4.0.6.0" newVersion="4.0.6.0" />
-      </dependentAssembly>    </assemblyBinding>
+      </dependentAssembly>
+    </assemblyBinding>
   </runtime>
 
 </configuration>
