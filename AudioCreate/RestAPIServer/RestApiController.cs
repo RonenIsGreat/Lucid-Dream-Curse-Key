@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Cors;
 
 namespace AudioCreate.RestAPIController
 {
-    [EnableCors(origins: "http://localhost:5555", headers: "*", methods: "*")]
     public class ChannelController : ApiController
     {
 
@@ -16,6 +14,8 @@ namespace AudioCreate.RestAPIController
     
         public IHttpActionResult GetFileNames()
         {
+            if (AudioCreation.fileNames.Count == 0)
+                return NotFound();
             return Ok(AudioCreation.fileNames);
         }
     }

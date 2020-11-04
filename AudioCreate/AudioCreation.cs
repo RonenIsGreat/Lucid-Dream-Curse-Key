@@ -387,8 +387,8 @@ namespace AudioCreate
             Thread B = new Thread(receiveTargets);
             A.Start();
             B.Start();
-            //RestApiServer restApiServer = new RestApiServer(5555);
-            //await restApiServer.StartAsync();
+            RestApiServer restApiServer = new RestApiServer(5555);
+            await restApiServer.StartAsync();
         }
     }
 }
