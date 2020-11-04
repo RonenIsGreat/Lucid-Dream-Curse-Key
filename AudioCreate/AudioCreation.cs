@@ -12,8 +12,8 @@ using System.Threading;
 using NAudio.Wave;
 using NAudio;
 using NAudio.FileFormats.Wav;
-
-
+using System.Threading.Tasks;
+using AudioCreate.RestAPIController;
 
 namespace AudioCreate
 {
@@ -27,6 +27,8 @@ namespace AudioCreate
     }
     public class AudioCreation
     {
+        public static List<string> fileNames = new List<string>();
+
         private const int listenPort = 25104;
         private static SystemTarget Targets = new SystemTarget();
         private static string RabbitMqHost;
@@ -132,6 +134,7 @@ namespace AudioCreate
             {
                 //WaveFileWriter newWriter = new WaveFileWriter(pathToAudioFile, waveFormat);
                 string filename = pathToAudioFile+"/" + tID + ".wav";
+                fileNames.Add(tID + ".wav");
                     WaveFileWriter newWriter = new WaveFileWriter(filename, waveFormat);
                     TargetWriters.Add(tID, newWriter);
 
@@ -370,7 +373,7 @@ namespace AudioCreate
             return newStr;
         }
 
-        public static void Main()
+        public static async Task Main()
         {
             //string path = System.IO.Directory.GetCurrentDirectory();
             //path = GetProjectPath(path);
@@ -382,6 +385,8 @@ namespace AudioCreate
             Thread B = new Thread(receiveTargets);
             A.Start();
             B.Start();
+            //RestApiServer restApiServer = new RestApiServer(5555);
+            //await restApiServer.StartAsync();
         }
     }
 }
