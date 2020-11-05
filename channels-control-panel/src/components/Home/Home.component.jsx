@@ -3,10 +3,9 @@ import socketIOClient from 'socket.io-client'
 import SonarStatus from '../SonarStatus/SonarStatus.component'
 import ChannelController from '../ChannelController/ChannelController.component'
 import DistributionController from '../DistributionController/DistributionController.component'
-import PlayAudio from '../PlayAudio/PlayAudio.component'
 import StorageStatus from '../StorageStatus/StorageStatus.component'
 import TargetIdentifying from '../TargetIdentifying/TargetIdentifying.component'
-import PlayAudio from '../PlayAudio/PlayAudio.component'
+import PlayAudioPage from '../PlayAudio/PlayAudio.component'
 import { Row, Col } from 'react-bootstrap'
 
 export default function Home() {
@@ -73,7 +72,7 @@ export default function Home() {
                 </Col>
                 <Col>
                     <StorageStatus />
-                    <PlayAudio />
+                    <PlayAudioPage />
                 </Col>
             </Row>
         </div>

@@ -18,6 +18,7 @@ namespace AudioCreate.RestAPIController
             var config = new HttpSelfHostConfiguration(restApiAdress);
             config.Routes.MapHttpRoute("Default", "api/{controller}/{action}");
             config.Formatters.Add(new BrowserJsonFormatter());
+            config.EnableCors();
 
             _server = new HttpSelfHostServer(config);
         }
